@@ -4,11 +4,16 @@
 
 #include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
+#include "pqDataRepresentation.h"
 #include "pqDisplayPolicy.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineSource.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
+
+#include "vtkSMProperty.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMProxy.h"
 
 #include <QtDebug>
 
@@ -57,6 +62,25 @@ void pqLogoStarter::createSource()
     pqDisplayPolicy* displayPolicy = pqApplicationCore::instance()->getDisplayPolicy();
     displayPolicy->setRepresentationVisibility(
       text->getOutputPort(0), pqActiveObjects::instance().activeView(), true);
+
+    // The text source is now the active object and its representation
+    // is active.
+    pqDataRepresentation *rep = pqActiveObjects::instance().activeRepresentation();
+    if (rep)
+      {
+      // Set the logo properties here. For additional properties, see
+      // ParaView/Qt/Components/pqTextDisplayPropertiesWidget.cxx.
+      vtkSMProxy *repProxy = rep->getProxy();
+      vtkSMIntVectorProperty *italicProperty =
+        vtkSMIntVectorProperty::SafeDownCast(repProxy->GetProperty("Italic"));
+
+      if (italicProperty)
+        {
+        italicProperty->SetElement(0, 1);
+        repProxy->UpdateProperty("Italic");
+        }
+      }
     }
+
 }
 
