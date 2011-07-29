@@ -1,0 +1,28 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+
+    <SourceProxy name="MADAILogoTextSource" class="vtkPVTextSource" 
+                 label="MADAI Logo">
+      <Documentation
+         short_help="Display the MADAI logo" 
+         long_help="The MADAI Logo text source generates a MADAI logo in the bottom right corner of the screen." >
+      </Documentation>
+      <StringVectorProperty
+         name="Text" 
+         command="SetText" 
+         number_of_elements="1" 
+         default_values="MADAI.us">
+        <Hints>
+          <Widget type="multi_line"/>
+        </Hints>
+        <Documentation>
+          This property specifies the text to display.
+        </Documentation>
+      </StringVectorProperty>
+      <Hints>
+        <OutputPort name="Output-0" index="0" type="text" />
+      </Hints>
+      <!-- End of TextSource -->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
