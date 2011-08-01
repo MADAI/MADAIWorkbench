@@ -31,8 +31,6 @@ pqLogoStarter::~pqLogoStarter()
 //-----------------------------------------------------------------------------
 void pqLogoStarter::onStartup()
 {
-  qWarning() << "Message from pqMyApplicationStarter: Application Started";
-
   pqApplicationCore* core = pqApplicationCore::instance();
   QObject::connect(core->getServerManagerModel(), SIGNAL(preServerAdded(pqServer*)),
                    this, SLOT(newServerAdded()));
