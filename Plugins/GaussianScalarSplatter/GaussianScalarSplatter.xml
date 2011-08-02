@@ -1,0 +1,64 @@
+<!--
+## See README.txt for more information.
+##
+## Written 2011 Hal Canary <hal@cs.unc.edu> for the MADAI project
+## <http://MADAI.us>.  Based on vtkGaussianSplatter written by Ken
+## Martin, Will Schroeder, Bill Lorensen.
+##
+##   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+##   CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+##   INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+##   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+##   DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR CONTRIBUTORS BE
+##   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+##   OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+##   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+##   OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+##   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+##   TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+##   OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
+##   OF SUCH DAMAGE.
+-->
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <SourceProxy 
+        name="GaussianScalarSplatter"
+        class="vtkGaussianScalarSplatter"
+        label="Gaussian Scalar Splatter">
+      <Documentation
+          long_help="This is a VTK filter class as well as a ParaView Plugin that makes use of the filter.  The filter can be applied to any vtkDataSet that has PointData, but is intended for use on vtkPolyData that contains a set of points.
+
+For each vtkDataArray attached to the points, this filter will Gaussian splat those values into a vtkImageData grid.  The only user-set parameter is StandardDeviation, the standard deviation of the Gaussians used for the splat.
+
+The output will have one aditional vtkDataArray called NumberDensity which simply gives the number of points."
+          short_help="Gaussian Scalar Splat">
+      </Documentation>
+	  <DoubleVectorProperty
+		name="Standard Deviation"
+		command="SetStandardDeviation"
+		number_of_elements="1"
+		default_values="0.1">
+      </DoubleVectorProperty><!-- -->
+	  <IntVectorProperty
+		name="Sample Dimensions"
+		command="SetSampleDimensions"
+		number_of_elements="3"
+		default_values="50 50 50">
+      </IntVectorProperty><!-- -->
+      <InputProperty
+          name="Input"
+          command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+      </InputProperty>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
+
+
+		

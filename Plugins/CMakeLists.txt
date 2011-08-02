@@ -1,2 +1,3 @@
 add_subdirectory(Logo)
 add_subdirectory(BinningFilter)
+add_subdirectory(GaussianScalarSplatter)
