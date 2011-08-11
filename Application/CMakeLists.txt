@@ -42,7 +42,7 @@ build_paraview_client(MADAIWorkbench
     VERSION_MAJOR ${MW_VERSION_MAJOR}
     VERSION_MINOR ${MW_VERSION_MINOR}
     VERSION_PATCH ${MW_VERSION_PATCH}
-    SPLASH_IMAGE "${PROJECT_SOURCE_DIR}/Application/MADAILogo.jpg"
+    SPLASH_IMAGE "${PROJECT_SOURCE_DIR}/Application/MADAILogo.png"
     PVMAIN_WINDOW ParaViewMainWindow
     PVMAIN_WINDOW_INCLUDE ParaViewMainWindow.h
     BUNDLE_ICON   "${PROJECT_SOURCE_DIR}/Application/MacIcon.icns"
@@ -118,12 +118,16 @@ IF(APPLE)
   SET(CPACK_BUNDLE_STARTUP_COMMAND "${CMAKE_BINARY_DIR}/bin/MADAIWorkbench.app/Contents/MacOS/MADAIWorkbench")
 
   # The qt.conf file tells Qt to disregard hard-coded paths in the Qt libraries.
-  INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/qt.conf DESTINATION "MADAIWorkbench.app/Contents/Resources")
+  FILE(WRITE "${CMAKE_BINARY_DIR}/bin/MADAIWorkbench.app/Contents/Resources/qt.conf" "")
+  INSTALL(FILES "${CMAKE_BINARY_DIR}/bin/MADAIWorkbench.app/Contents/Resources/qt.conf"
+    DESTINATION "MADAIWorkbench.app/Contents/Resources")
 
   INSTALL(CODE "
           INCLUDE(BundleUtilities)
           FIXUP_BUNDLE( \"${CMAKE_BINARY_DIR}/bin/${APP_NAME}.app\" \"\" \"\" )
           " COMPONENT Runtime )
+
+
 
 ENDIF(APPLE)
 
