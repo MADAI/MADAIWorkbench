@@ -55,7 +55,7 @@ build_paraview_client(MADAIWorkbench
       ${PARAVIEW_EXTRA_GUI_RESOURCES} # Add any compiled in GUI configuration xmls
     COMPRESSED_HELP_FILE "${ParaView_BINARY_DIR}/Documentation/paraview.qch"
     SOURCES ${ParaView_SOURCE_FILES}
-    REQUIRED_PLUGINS LogoPlugin
+    #REQUIRED_PLUGINS LogoPlugin
 )
 
 include_directories(${PARAVIEW_INCLUDE_DIRS} ${PARAVIEW_APP_DIR})
@@ -69,21 +69,64 @@ target_link_libraries(MADAIWorkbench
   pqComponents
 )
 
-build_paraview_client_cpack_config_init(
-    PACKAGE_NAME "MADAIWorkbench"
-    ORGANIZATION "Modeling and Data Analysis Initiative"
-    VERSION_MAJOR ${MW_VERSION_MAJOR}
-    VERSION_MINOR ${MW_VERSION_MINOR}
-    VERSION_PATCH ${MW_VERSION_PATCH}
-    DESCRIPTION "MADAI Workbench is a scientific visualization tool"
-    LICENSE_FILE "${ParaView_SOURCE_DIR}/License_v1.2.txt"
-    DESCRIPTION_FILE "${ParaView_SOURCE_DIR}/License_v1.2.txt"
-    PACKAGE_EXECUTABLES "madaiworkbench;MADAIWorkbench"
-)
+
+#build_paraview_client_cpack_config_init(
+#    PACKAGE_NAME "MADAIWorkbench"
+#    ORGANIZATION "Modeling and Data Analysis Initiative"
+#    VERSION_MAJOR ${MW_VERSION_MAJOR}
+#    VERSION_MINOR ${MW_VERSION_MINOR}
+#    VERSION_PATCH ${MW_VERSION_PATCH}
+#    DESCRIPTION "MADAI Workbench is a scientific visualization tool"
+#    LICENSE_FILE "${ParaView_SOURCE_DIR}/License_v1.2.txt"
+#    DESCRIPTION_FILE "${ParaView_SOURCE_DIR}/License_v1.2.txt"
+#    PACKAGE_EXECUTABLES "madaiworkbench;MADAIWorkbench"
+#)
 
 # This ensure that the only component that is used by cpack when building the
 # drag-n-drop on Mac is the "Bundle" component.
-set (CPACK_INSTALL_CMAKE_PROJECTS_DRAGNDROP
-  "${CMAKE_CURRENT_BINARY_DIR}" "MADAIWorkbench Mac Bundle" "Bundle" "/")
+#set (CPACK_INSTALL_CMAKE_PROJECTS_DRAGNDROP
+#  "${CMAKE_CURRENT_BINARY_DIR}" "MADAIWorkbench Mac Bundle" "Bundle" "/")
 
-build_paraview_client_cpack_config()
+#build_paraview_client_cpack_config()
+
+#------------------------------------------------------------------------
+# CPack settings (installer)
+#------------------------------------------------------------------------
+# CPack variables
+SET(APP_NAME "MADAIWorkbench")
+SET(CPACK_PACKAGE_NAME               "${APP_NAME}")
+SET(CPACK_PACKAGE_DESCRIPTION        "MADAIWorkbench")
+SET(CPACK_PACKAGE_VENDOR             "Modeling and Data Analysis Initiative")
+SET(CPACK_PACKAGE_VERSION_MAJOR      ${MW_VERSION_MAJOR})
+SET(CPACK_PACKAGE_VERSION_MINOR      ${MW_VERSION_MINOR})
+SET(CPACK_PACKAGE_VERSION_PATCH      ${MW_VERSION_PATCH})
+SET(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
+#SET(CPACK_PACKAGE_DESCRIPTION_FILE  "${RESOURCES}/README.txt")
+#SET(CPACK_RESOURCE_FILE_LICENSE     "${RESOURCES}/LICENSE.txt")
+
+SET(CPACK_PACKAGE_EXECUTABLES "${APP_NAME};${APP_NAME}")
+
+IF(APPLE)
+  SET(CPACK_GENERATOR DragNDrop)
+
+  INSTALL(TARGETS "${APP_NAME}" BUNDLE DESTINATION ".")
+
+  SET(CPACK_PACKAGE_FILE_NAME      "${APP_NAME}-${MW_VERSION_MAJOR}.${MW_VERSION_MINOR}.${MW_VERSION_PATCH}")
+  SET(CPACK_BUNDLE_ICON	           "${CMAKE_CURRENT_SOURCE_DIR}/MacIcon.icns")
+  SET(CPACK_BUNDLE_NAME            "${APP_NAME}")
+  SET(CPACK_BUNDLE_PLIST           "${CMAKE_BINARY_DIR}/bin/MADAIWorkbench.app/Contents/Info.plist")
+  SET(CPACK_BUNDLE_STARTUP_COMMAND "${CMAKE_BINARY_DIR}/bin/MADAIWorkbench.app/Contents/MacOS/MADAIWorkbench")
+  #INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/MacIcon.icns DESTINATION "./Resources")
+
+  MESSAGE( "system include path: " ${CMAKE_SYSTEM_INCLUDE_PATH})
+  MESSAGE( "system framework path: " ${CMAKE_SYSTEM_FRAMEWORK_PATH})
+
+  INSTALL(CODE "
+          INCLUDE(BundleUtilities)
+          FIXUP_BUNDLE( \"${CMAKE_BINARY_DIR}/bin/${APP_NAME}.app\" \"\" \"\" )
+          " COMPONENT Runtime )
+
+ENDIF(APPLE)
+
+# Creates a 'PACKAGE' project
+INCLUDE(CPack)
