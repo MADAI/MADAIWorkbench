@@ -116,10 +116,9 @@ IF(APPLE)
   SET(CPACK_BUNDLE_NAME            "${APP_NAME}")
   SET(CPACK_BUNDLE_PLIST           "${CMAKE_BINARY_DIR}/bin/MADAIWorkbench.app/Contents/Info.plist")
   SET(CPACK_BUNDLE_STARTUP_COMMAND "${CMAKE_BINARY_DIR}/bin/MADAIWorkbench.app/Contents/MacOS/MADAIWorkbench")
-  #INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/MacIcon.icns DESTINATION "./Resources")
 
-  MESSAGE( "system include path: " ${CMAKE_SYSTEM_INCLUDE_PATH})
-  MESSAGE( "system framework path: " ${CMAKE_SYSTEM_FRAMEWORK_PATH})
+  # The qt.conf file tells Qt to disregard hard-coded paths in the Qt libraries.
+  INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/qt.conf DESTINATION "MADAIWorkbench.app/Contents/Resources")
 
   INSTALL(CODE "
           INCLUDE(BundleUtilities)
