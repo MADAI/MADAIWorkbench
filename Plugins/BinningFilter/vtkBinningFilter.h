@@ -48,7 +48,7 @@
 
 #include "vtkImageAlgorithm.h"
 
-class VTK_IMAGING_EXPORT vtkBinningFilter : public vtkImageAlgorithm
+class VTK_EXPORT vtkBinningFilter : public vtkImageAlgorithm
 {
 public:
   vtkTypeMacro(vtkBinningFilter,vtkImageAlgorithm);

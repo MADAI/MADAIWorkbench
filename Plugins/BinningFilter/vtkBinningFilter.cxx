@@ -29,6 +29,7 @@
 #include "vtkDoubleArray.h"
 #include "vtkInformationDoubleVectorKey.h"
 #include "vtkMultiThreader.h"
+#include "vtkMath.h"
 
 const char DENSITY_STRING[] = "_Density"; //This is the string that is
                               // appended to the vtkDataArray::GetName.
@@ -378,11 +379,11 @@ static VTK_THREAD_RETURN_TYPE threadedExecute( void * arg )
     //first convert pointCoords to integer vtkImageData coordinates
     for(i=0; i<3; i++)
       {
-      if (isnan(pointCoords[i]))
-	{
-	bin[i] = 0;  //	numerrors++;
-	continue;
-	}
+      if (vtkMath::IsNan(pointCoords[i]))
+        {
+	      bin[i] = 0;  //	numerrors++;
+	      continue;
+	      }
       bin[i] = static_cast<int>(floor(
         (pointCoords[i] - threadData->Origin[i]) /
           threadData->Spacing[i]));
