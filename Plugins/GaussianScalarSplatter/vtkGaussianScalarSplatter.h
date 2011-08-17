@@ -65,7 +65,7 @@
 
 class vtkDoubleArray;
 
-class VTK_IMAGING_EXPORT vtkGaussianScalarSplatter : public vtkImageAlgorithm
+class VTK_EXPORT vtkGaussianScalarSplatter : public vtkImageAlgorithm
 {
 public:
   vtkTypeMacro(vtkGaussianScalarSplatter,vtkImageAlgorithm);
@@ -116,7 +116,7 @@ protected:
   void ComputeModelBounds(vtkDataSet *input, vtkImageData *output,
                           vtkInformation *outInfo);
 
-  static const double DEFAULT_STANDARD_DEVIATION = 1.0;
+  static const double DEFAULT_STANDARD_DEVIATION;
   int SampleDimensions[3]; // dimensions of volume to splat into
   double StandardDeviation; // Standard Deviation of the Gaussians
   double ModelBounds[6]; // bounding box of splatting dimensions

@@ -32,6 +32,35 @@
 
 const double NUMBER_OF_STD_DEVIATIONS = 4.0; 
 const char DENSITY_STRING [] = "_Density";
+const double vtkGaussianScalarSplatter::DEFAULT_STANDARD_DEVIATION = 1.0;
+
+// This is public domain code from John D. Cook based on
+// the formula 7.1.26 in the Handbook of Mathematical Functions
+// by Abramowitz and Stegun. http://www.johndcook.com/cpp_erf.html
+// It really should be put somewhere better than here, but this will
+// work for now.
+double erf(double x)
+{
+  // constants
+  double a1 =  0.254829592;
+  double a2 = -0.284496736;
+  double a3 =  1.421413741;
+  double a4 = -1.453152027;
+  double a5 =  1.061405429;
+  double p  =  0.3275911;
+
+  // Save the sign of x
+  int sign = 1;
+  if (x < 0)
+    sign = -1;
+  x = fabs(x);
+
+  // A&S formula 7.1.26
+  double t = 1.0/(1.0 + p*x);
+  double y = 1.0 - (((((a5*t + a4)*t) + a3)*t + a2)*t + a1)*t*exp(-x*x);
+
+  return sign*y;
+}
 
 class sliceDataType {
 public:
@@ -130,7 +159,7 @@ int vtkGaussianScalarSplatter::RequestData(
     outInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT()));
 
   vtkIdType numPts, idx;
-  int i, sliceIndex;
+  int i;
 
   vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
   vtkDataSet *input = vtkDataSet::SafeDownCast(
@@ -146,7 +175,6 @@ int vtkGaussianScalarSplatter::RequestData(
   int dataType;			// VTK_FLOAT or VTK_DOUBLE
   vtkDataArray * iDataArray;    // the ith input data array
   vtkDataArray * oDataArray;    // output data array
-  int dataArrayIdx;
   int numberOfComponents;
   int compIdx;          // component index (for vectors)
   char * oldname, * newname ;
@@ -189,7 +217,7 @@ int vtkGaussianScalarSplatter::RequestData(
   sliceData.voxelVolume = (this->Spacing[0] *
 			   this->Spacing[1] *
 			   this->Spacing[2]);
-  sliceData.sqrt2sigma = (sqrt(2) * this->StandardDeviation);
+  sliceData.sqrt2sigma = (sqrt(2.0) * this->StandardDeviation);
   sliceData.radius = ((this->StandardDeviation * NUMBER_OF_STD_DEVIATIONS)
 		      + (largest_dim / 2.0));
 
