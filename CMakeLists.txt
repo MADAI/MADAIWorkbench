@@ -3,7 +3,10 @@ cmake_minimum_required(VERSION 2.8.5)
 
 option(BUILD_APPLICATION "Build the MADAI Workbench application." OFF)
 
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin/ CACHE PATH
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE PATH
+  "Single output directory for building all executables."
+  )
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin CACHE PATH
   "Single output directory for building all plugins."
   )
 
