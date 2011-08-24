@@ -41,6 +41,7 @@ set(MW_PLUGINS
   LogoPlugin
   BinningFilter
   GaussianScalarSplatter
+  BooleanOperation
 )
 
 set(APP_NAME "MADAIWorkbench")
@@ -124,31 +125,44 @@ if(APPLE)
   set(CPACK_BUNDLE_PLIST           "${CMAKE_BINARY_DIR}/bin/MADAIWorkbench.app/Contents/Info.plist")
   set(CPACK_BUNDLE_STARTUP_COMMAND "${CMAKE_BINARY_DIR}/bin/MADAIWorkbench.app/Contents/MacOS/MADAIWorkbench")
 
+  # Copy other ParaView executables into the bundle
+  add_custom_command(TARGET "${APP_NAME}" POST_BUILD
+    COMMAND "${CMAKE_SOURCE_DIR}/Application/CopyPVApplications.sh"
+            "${ParaView_DIR}" "${CMAKE_BINARY_DIR}/bin/MADAIWorkbench.app"
+    VERBATIM)
+
   # The qt.conf file tells Qt to disregard hard-coded paths in the Qt libraries
   execute_process( COMMAND "touch ${CMAKE_BINARY_DIR}/bin/MADAIWorkbench.app/Contents/Resources/qt.conf")
   install(FILES "${CMAKE_BINARY_DIR}/bin/MADAIWorkbench.app/Contents/Resources/qt.conf"
     DESTINATION "MADAIWorkbench.app/Contents/Resources")
 
+  # Copy python files
+  add_custom_command(TARGET "${APP_NAME}" POST_BUILD
+    COMMAND "${CMAKE_SOURCE_DIR}/Application/CopyPython.sh"
+            "${ParaView_DIR}" "${CMAKE_BINARY_DIR}/bin/MADAIWorkbench.app"
+    VERBATIM)
+
   # Copy custom plugins into the bundle.
-  add_dependencies("${APP_NAME}" "${CMAKE_SOURCE_DIR}/Application/CopyPVPlugins.sh")
   add_custom_command(TARGET "${APP_NAME}" POST_BUILD
     COMMAND "${CMAKE_SOURCE_DIR}/Application/CopyPVPlugins.sh"
             "${CMAKE_BINARY_DIR}" "${CMAKE_BINARY_DIR}/bin/MADAIWorkbench.app"
     VERBATIM)
 
+#  install(CODE "
+#    INCLUDE(BundleUtilities)
+#    FIXUP_BUNDLE( \"${CMAKE_BINARY_DIR}/bin/${APP_NAME}.app\" \"\" \"\" )
+#    " COMPONENT Runtime )
 
-  install(CODE "
-    INCLUDE(BundleUtilities)
-    FIXUP_BUNDLE( \"${CMAKE_BINARY_DIR}/bin/${APP_NAME}.app\" \"\" \"\" )
-    " COMPONENT Runtime )
+  FILE(GLOB PV_PLUGIN_DYLIBS "${CMAKE_BINARY_DIR}/bin/${APP_NAME}.app/Contents/Plugins/*.dylib")
+  MESSAGE( "PV Plugin List: ${PV_PLUGIN_DYLIBS}" )
 
   # Fixup the ParaView plugins
   install(CODE "
-    FILE(GLOB PV_PLUGIN_DYLIBS \"${CMAKE_BINARY_DIR}/bin/*.dylib\")
+    FILE(GLOB PV_PLUGIN_DYLIBS \"${CMAKE_BINARY_DIR}/bin/${APP_NAME}.app/Contents/Plugins/*.dylib\")
     INCLUDE(BundleUtilities)
     FIXUP_BUNDLE(\"${CMAKE_BINARY_DIR}/bin/${APP_NAME}.app\"
-      \"${PV_PLUGIN_DYLIBS}\" \"${CMAKE_BINARY_DIR}/bin\")
-    " COMPONENT Runtime)
+      \"${PV_PLUGIN_DYLIBS}\" \"${CMAKE_BINARY_DIR}/bin/${APP_NAME}.app/Contents/Plugins\")
+    " COMPONENT BrandedRuntime)
 
   # Generate the plugins XML configuration file.
   set(plugins_ini "<?xml version=\"1.0\"?>\n<Plugins>\n")
