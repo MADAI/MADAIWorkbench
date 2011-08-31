@@ -33,6 +33,7 @@ add_paraview_auto_start(IFACES IFACE_SRCS CLASS_NAME pqLogoStarter
 
 add_paraview_plugin(
   LogoPlugin "1.0"
+  AUTOLOAD ON
   GUI_INTERFACES ${IFACES}
   SOURCES pqLogoStarter.cxx
     ${MOC_SRCS}

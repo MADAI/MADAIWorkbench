@@ -67,8 +67,8 @@ cp -p "@EXECUTABLE_OUTPUT_PATH@/pvrenderserver" "$BinDir"
 cp -p "@EXECUTABLE_OUTPUT_PATH@/pvserver" "$BinDir"
 
 # Copy the ".plugins" configuration file.
-echo "Copying $ParaViewExeOutputDir/.plugins to $SupportDir"
-cp "$ParaViewExeOutputDir/.plugins" "$SupportDir/"
+echo "Copying $ParaViewExeOutputDir/.plugins to $PluginsDir"
+cp "$ParaViewExeOutputDir/.plugins" "$PluginsDir/"
 
 # Copy the python scripts into the Python directory
 #

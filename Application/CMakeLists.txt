@@ -151,6 +151,7 @@ endif (EXISTS "${PARAVIEW_EXTRA_INSTALL_RULES_FILE}")
 
 #------------------------------------------------------------------------
 # Install the .plugins configuration file.
+write_plugins_file()
 install(FILES "${EXECUTABLE_OUTPUT_PATH}/.plugins"
         DESTINATION ${PV_INSTALL_PLUGIN_DIR}
         COMPONENT BrandedRuntime)
