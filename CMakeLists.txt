@@ -13,6 +13,8 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin CACHE PATH
 find_package(ParaView REQUIRED)
 include(${PARAVIEW_USE_FILE})
 
+get_filename_component(ParaView_SOURCE_DIR "${ParaView_CMAKE_DIR}/.." ABSOLUTE)
+
 add_subdirectory(Plugins)
 
 if(BUILD_APPLICATION)
