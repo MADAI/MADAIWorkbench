@@ -19,12 +19,12 @@ if (NOT ParaView_BINARY_DIR)
 endif(NOT ParaView_BINARY_DIR)
 
 qt4_wrap_cpp(MOC_SRCS
-  pqLogoStarter.h
+  pqMADAILogoTextSourceStarter.h
   )
 
 include(${QT_USE_FILE})
 
-add_paraview_auto_start(IFACES IFACE_SRCS CLASS_NAME pqLogoStarter
+add_paraview_auto_start(IFACES IFACE_SRCS CLASS_NAME pqMADAILogoTextSourceStarter
   STARTUP onStartup
   SHUTDOWN onShutdown
   )
@@ -32,14 +32,14 @@ add_paraview_auto_start(IFACES IFACE_SRCS CLASS_NAME pqLogoStarter
 # Create a plugin for this starter.
 
 add_paraview_plugin(
-  LogoPlugin "1.0"
+  MADAILogoTextSourcePlugin "1.0"
   AUTOLOAD ON
   GUI_INTERFACES ${IFACES}
-  SOURCES pqLogoStarter.cxx
+  SOURCES pqMADAILogoTextSourceStarter.cxx
     ${MOC_SRCS}
     ${VRPN_SOURCE_FILES}
     ${RCS_SRCS} ${IFACE_SRCS}
-  SERVER_MANAGER_XML LogoTextSource.xml
+  SERVER_MANAGER_XML MADAILogoTextSource.xml
   )
 
-target_link_libraries(LogoPlugin pqApplicationComponents)
+target_link_libraries(MADAILogoTextSourcePlugin pqApplicationComponents)

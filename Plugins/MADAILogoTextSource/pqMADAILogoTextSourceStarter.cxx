@@ -1,4 +1,4 @@
-#include "pqLogoStarter.h"
+#include "pqMADAILogoTextSourceStarter.h"
 
 #include "vtkProcessModule.h"
 
@@ -18,18 +18,18 @@
 #include <QtDebug>
 
 //-----------------------------------------------------------------------------
-pqLogoStarter::pqLogoStarter(QObject * p)
+pqMADAILogoTextSourceStarter::pqMADAILogoTextSourceStarter(QObject * p)
   : QObject(p)
 {
 }
 
 //-----------------------------------------------------------------------------
-pqLogoStarter::~pqLogoStarter()
+pqMADAILogoTextSourceStarter::~pqMADAILogoTextSourceStarter()
 {
 }
 
 //-----------------------------------------------------------------------------
-void pqLogoStarter::onStartup()
+void pqMADAILogoTextSourceStarter::onStartup()
 {
   pqApplicationCore* core = pqApplicationCore::instance();
   QObject::connect(core->getServerManagerModel(), SIGNAL(preServerAdded(pqServer*)),
@@ -37,14 +37,14 @@ void pqLogoStarter::onStartup()
 }
 
 //-----------------------------------------------------------------------------
-void pqLogoStarter::newServerAdded()
+void pqMADAILogoTextSourceStarter::newServerAdded()
 {
   QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
                    this, SLOT(createSource()), Qt::QueuedConnection);
 }
 
 //-----------------------------------------------------------------------------
-void pqLogoStarter::createSource()
+void pqMADAILogoTextSourceStarter::createSource()
 {
   if (pqActiveObjects::instance().activeView())
     {

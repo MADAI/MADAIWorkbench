@@ -56,10 +56,9 @@ endif (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
 
 # List the plugins that will be installed and available in the workbench
 set(MW_PLUGINS
-  LogoPlugin
+  MADAILogoTextSourcePlugin
   BinningFilter
   GaussianScalarSplatter
-  BooleanOperation
 )
 
 #------------------------------------------------------------------------------
