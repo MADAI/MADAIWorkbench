@@ -1,4 +1,4 @@
-Parts of MADAIWorkbench are under the following licenses:
+Parts of MADAI Workbench are under the following licenses:
 
 Copyright (c) 2010-2011 The University of North Carolina at Chapel Hill
 All rights reserved.
