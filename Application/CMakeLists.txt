@@ -195,8 +195,8 @@ build_paraview_client_cpack_config_init(
     VERSION_MINOR ${MW_VERSION_MINOR}
     VERSION_PATCH ${MW_VERSION_PATCH}
     DESCRIPTION "MADAI Workbench is a scientific visualization tool"
-    LICENSE_FILE "${ParaView_SOURCE_DIR}/License_v1.2.txt"
-    DESCRIPTION_FILE "${ParaView_SOURCE_DIR}/License_v1.2.txt"
+    LICENSE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../License_v1.0.txt"
+    DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../License_v1.0.txt"
     PACKAGE_EXECUTABLES "madaiworkbench;MADAIWorkbench"
 )
 
