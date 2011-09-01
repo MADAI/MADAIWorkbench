@@ -1,0 +1,7 @@
+<!-- This tells ParaView to put this filter into the MADAI submenu under the Filters menu. -->
+<ParaViewFilters>
+  <Category name="MADAI" menu_label="&amp;MADAI">
+    <!-- adds a new category and then adds our filter to it -->
+    <Filter name="GaussianScalarSplatter" />
+  </Category>
+</ParaViewFilters>

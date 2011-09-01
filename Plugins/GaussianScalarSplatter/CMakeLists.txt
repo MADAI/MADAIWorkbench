@@ -12,4 +12,5 @@ add_paraview_plugin(
   GaussianScalarSplatter "1.0"
   SERVER_MANAGER_XML GaussianScalarSplatter.xml
   SERVER_MANAGER_SOURCES vtkGaussianScalarSplatter.cxx
+  GUI_RESOURCE_FILES GaussianScalarSplatterGUI.xml
   )

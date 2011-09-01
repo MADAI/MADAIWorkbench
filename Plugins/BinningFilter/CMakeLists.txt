@@ -12,4 +12,5 @@ add_paraview_plugin(
   BinningFilter "1.0"
   SERVER_MANAGER_XML BinningFilter.xml
   SERVER_MANAGER_SOURCES vtkBinningFilter.cxx
+  GUI_RESOURCE_FILES BinningFilterGUI.xml
   )
