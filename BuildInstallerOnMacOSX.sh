@@ -52,18 +52,18 @@ paraview_build_dir=$bin_dir/ParaView-build
 mkdir -p $paraview_build_dir
 cd $paraview_build_dir
 cmake \
-    -D CMAKE_BUILD_TYPE=Release \
-    -D BUILD_SHARED_LIBS=ON \
-    -D BUILD_TESTING=OFF \
-    -D PARAVIEW_ENABLE_PYTHON=ON \
-    -D PARAVIEW_ENABLE_PYTHON_FILTERS=ON \
-    -D PYTHON_EXECUTABLE=/usr/bin/python2.5 \
-    -D PYTHON_INCLUDE_DIR=/System/Library/Frameworks/Python.framework/Versions/2.5/Headers \
-    -D PYTHON_LIBRARY=/usr/lib/libpython2.5.dylib \
-    -D PARAVIEW_USE_VISITBRIDGE=ON \
-    -D QT_QMAKE_EXECUTABLE=$qmake \
-    -D CMAKE_OSX_DEPLOYMENT_TARGET=10.5 \
-    -D CMAKE_OSX_SYSROOT=/Developer/SDKs/MacOSX10.5.sdk \
+    -D CMAKE_BUILD_TYPE:STRING=Release \
+    -D BUILD_SHARED_LIBS:BOOL=ON \
+    -D BUILD_TESTING:BOOL=OFF \
+    -D PARAVIEW_ENABLE_PYTHON:BOOL=ON \
+    -D PARAVIEW_ENABLE_PYTHON_FILTERS:BOOL=ON \
+    -D PYTHON_EXECUTABLE:PATH=/usr/bin/python2.5 \
+    -D PYTHON_INCLUDE_DIR:PATH=/System/Library/Frameworks/Python.framework/Versions/2.5/Headers \
+    -D PYTHON_LIBRARY:PATH=/usr/lib/libpython2.5.dylib \
+    -D PARAVIEW_USE_VISITBRIDGE:BOOL=ON \
+    -D QT_QMAKE_EXECUTABLE:PATH=$qmake \
+    -D CMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.5 \
+    -D CMAKE_OSX_SYSROOT:PATH=/Developer/SDKs/MacOSX10.5.sdk \
     $paraview_src_dir
 cmake .
 
@@ -77,12 +77,12 @@ madaiworkbench_build_dir=$bin_dir/MADAIWorkbench-build
 mkdir -p $madaiworkbench_build_dir
 cd $madaiworkbench_build_dir
 cmake \
-    -D CMAKE_BUILD_TYPE=Release \
-    -D BUILD_APPLICATION=ON \
-    -D BUILD_SHARED_LIBS=ON \
-    -D ParaView_DIR=$paraview_build_dir \
-    -D CMAKE_OSX_DEPLOYMENT_TARGET=10.5 \
-    -D CMAKE_OSX_SYSROOT=/Developer/SDKs/MacOSX10.5.sdk \
+    -D CMAKE_BUILD_TYPE:STRING=Release \
+    -D BUILD_APPLICATION:BOOL=ON \
+    -D BUILD_SHARED_LIBS:BOOL=ON \
+    -D ParaView_DIR:PATH=$paraview_build_dir \
+    -D CMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.5 \
+    -D CMAKE_OSX_SYSROOT:PATH=/Developer/SDKs/MacOSX10.5.sdk \
     $madaiworkbench_src_dir
 cmake .
 
