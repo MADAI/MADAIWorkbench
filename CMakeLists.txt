@@ -1,5 +1,5 @@
 project( MADAIWorkbench )
-cmake_minimum_required(VERSION 2.8.5)
+cmake_minimum_required(VERSION 2.8.4)
 
 option(BUILD_APPLICATION "Build the MADAI Workbench application." OFF)
 

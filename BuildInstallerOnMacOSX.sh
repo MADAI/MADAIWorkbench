@@ -8,7 +8,7 @@ die () {
     exit 1
 }
 
-[ "$#" -eq 2 ] || die "Usage: BuildOnMacOSX.sh <path to qmake> <build directory>"
+[ "$#" -eq 2 ] || die "Usage: BuildInstallerOnMacOSX.sh <path to qmake> <build directory>"
 
 ###################################
 # Convert relative paths to full paths
