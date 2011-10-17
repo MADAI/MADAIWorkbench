@@ -17,53 +17,66 @@
 
 #include <QtDebug>
 
-//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------
 pqMADAILogoTextSourceStarter::pqMADAILogoTextSourceStarter(QObject * p)
   : QObject(p)
 {
 }
 
-//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------
 pqMADAILogoTextSourceStarter::~pqMADAILogoTextSourceStarter()
 {
 }
 
-//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------
 void pqMADAILogoTextSourceStarter::onStartup()
 {
   pqApplicationCore* core = pqApplicationCore::instance();
-  QObject::connect(core->getServerManagerModel(), SIGNAL(preServerAdded(pqServer*)),
+  QObject::connect(core->getServerManagerModel(),
+		   SIGNAL(preServerAdded(pqServer*)),
                    this, SLOT(newServerAdded()));
 }
 
-//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------
 void pqMADAILogoTextSourceStarter::newServerAdded()
 {
-  QObject::connect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
+  QObject::connect(&pqActiveObjects::instance(),
+		   SIGNAL(viewChanged(pqView*)),
                    this, SLOT(createSource()), Qt::QueuedConnection);
+
+  // We want to add the plugin only once, so we'll disconnect
+  // the preServerAdded sgnal.
+  pqApplicationCore* core = pqApplicationCore::instance();
+  QObject::disconnect(core->getServerManagerModel(),
+		      SIGNAL(preServerAdded(pqServer*)),
+		      this, SLOT(newServerAdded()));
 }
 
-//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------
 void pqMADAILogoTextSourceStarter::createSource()
 {
   if (pqActiveObjects::instance().activeView())
     {
-    QObject::disconnect(&pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
+    QObject::disconnect(&pqActiveObjects::instance(),
+			SIGNAL(viewChanged(pqView*)),
                         this, SLOT(createSource()));
     pqApplicationCore* app = pqApplicationCore::instance();
     pqObjectBuilder* builder = app->getObjectBuilder();
-    pqPipelineSource *text = builder->createSource("sources",
-                                                   "MADAILogoTextSource",
-                                                   pqActiveObjects::instance().activeServer());
+    pqPipelineSource *text =
+      builder->createSource("sources", "MADAILogoTextSource",
+			    pqActiveObjects::instance().activeServer());
     text->rename(tr("MADAI Logo"));
     text->setModifiedState(pqProxy::UNMODIFIED);
-    pqDisplayPolicy* displayPolicy = pqApplicationCore::instance()->getDisplayPolicy();
+    pqDisplayPolicy* displayPolicy =
+      pqApplicationCore::instance()->getDisplayPolicy();
     displayPolicy->setRepresentationVisibility(
-      text->getOutputPort(0), pqActiveObjects::instance().activeView(), true);
+      text->getOutputPort(0), pqActiveObjects::instance().activeView(),
+      true);
 
     // The text source is now the active object and its representation
     // is active.
-    pqDataRepresentation *rep = pqActiveObjects::instance().activeRepresentation();
+    pqDataRepresentation *rep =
+      pqActiveObjects::instance().activeRepresentation();
     if (rep)
       {
       // Set the logo properties here. For additional properties, see
