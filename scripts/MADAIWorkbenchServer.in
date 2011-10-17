@@ -1,0 +1,32 @@
+#!/bin/sh
+
+: ${PORT:="11111"}
+DISPLAY=":0"
+export DISPLAY
+NCPUS=`grep "^processor" < /proc/cpuinfo | wc -l`
+xterm -rv -e echo . 2> /dev/null || {
+       echo "You need access to display ${DISPLAY}.";
+       exit 1;
+}
+test "$1" || {
+       echo "Useage:"
+       echo "  $0 NUMBER_OF_PROCESSES"
+       echo ""
+       echo "(This computer has ${NCPUS} CPUs.)"
+       exit 1 ;
+}
+NUMPROC=$1
+echo Host = `hostname --fqdn`
+echo Port = $PORT
+
+bin_dir=`dirname "$0"`
+bin_dir=`readlink -f "${bin_dir}/MADAIWorkbench-@VERSION@"`
+lib_dir=`readlink -f "${bin_dir}/../../lib/MADAIWorkbench-@VERSION@"`
+PATH="${bin_dir}:${lib_dir}:${PATH}"
+LD_LIBRARY_PATH="${bin_dir}:${lib_dir}"
+export PATH
+export LD_LIBRARY_PATH
+pvserver="${bin_dir}/pvserver"
+mpirun="${lib_dir}/mpirun"
+exec "$mpirun" -np "$NUMPROC" "$pvserver" -display "$DISPLAY" \
+       --server-port="$PORT" --use-offscreen-rendering
