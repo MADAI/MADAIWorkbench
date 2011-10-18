@@ -9,6 +9,9 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE PATH
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin CACHE PATH
   "Single output directory for building all plugins."
   )
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin CACHE PATH
+  "Single output directory for building all plugins on Windows."
+  )
 
 find_package(ParaView REQUIRED)
 include(${PARAVIEW_USE_FILE})
