@@ -4,6 +4,6 @@ bin_dir=`readlink -f "${bin_dir}/MADAIWorkbench-@VERSION@"`
 lib_dir=`readlink -f "${bin_dir}/../../lib/MADAIWorkbench-@VERSION@"`
 PATH=${bin_dir}:${lib_dir}:${PATH}
 export PATH
-LD_LIBRARY_PATH=${bin_dir}${lib_dir}
+LD_LIBRARY_PATH=${bin_dir}:${lib_dir}
 export LD_LIBRARY_PATH
 exec ${bin_dir}/MADAIWorkbench $@
