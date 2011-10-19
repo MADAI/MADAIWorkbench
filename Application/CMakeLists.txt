@@ -86,6 +86,7 @@ set(MW_PLUGINS
   MADAILogoTextSourcePlugin
   BinningFilter
   GaussianScalarSplatter
+  MaskTableRows
 )
 
 if("${CMAKE_SIZEOF_VOID_P}" EQUAL 8)

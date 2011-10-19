@@ -1,0 +1,35 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <SourceProxy 
+        name="MaskTableRows"
+        class="vtkMaskTableRows"
+        label="Mask Table Rows">
+      <Documentation
+          long_help="This filter samples a table, selecting a subset of the rows. Every n-th row can be selected from the table."
+          short_help="This filter samples a table, selecting a subset of the rows.">
+      </Documentation>
+      
+	    <IntVectorProperty
+        name="OnRatio"
+        command="SetOnRatio"
+        number_of_elements="1"
+        default_values="1">
+      </IntVectorProperty><!-- -->
+    
+      <InputProperty
+        name="Input"
+        command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+      </InputProperty>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
+
+
+		
