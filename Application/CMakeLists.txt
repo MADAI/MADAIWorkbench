@@ -88,11 +88,17 @@ set(MW_PLUGINS
   GaussianScalarSplatter
 )
 
+if("${CMAKE_SIZEOF_VOID_P}" EQUAL 8)
+  set(MW_BUILD_ARCHITECTURE "64")
+else()
+  set(MW_BUILD_ARCHITECTURE "32")
+endif()
+
 #------------------------------------------------------------------------------
 set(APP_NAME "MADAIWorkbench")
 build_paraview_client("${APP_NAME}"
   APPLICATION_NAME "MADAIWorkbench"
-  TITLE "MADAI Workbench ${MW_VERSION_STRING} ${PARAVIEW_BUILD_ARCHITECTURE}-bit"
+  TITLE "MADAI Workbench ${MW_VERSION_STRING} ${MW_BUILD_ARCHITECTURE}-bit"
   ORGANIZATION  "Modeling and Data Analysis Initiative"
   VERSION_MAJOR ${MW_VERSION_MAJOR}
   VERSION_MINOR ${MW_VERSION_MINOR}
