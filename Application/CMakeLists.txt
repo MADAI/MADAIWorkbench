@@ -159,7 +159,18 @@ endif (EXISTS "${PARAVIEW_EXTRA_INSTALL_RULES_FILE}")
 write_plugins_file()
 install(FILES "${EXECUTABLE_OUTPUT_PATH}/.plugins"
         DESTINATION ${PV_INSTALL_PLUGIN_DIR}
-        COMPONENT BrandedRuntime)
+        COMPONENT BrandedRuntime
+)
+
+# Install the plugins
+if (WIN32)
+  foreach(plugin ${MW_PLUGINS})
+    install(FILES "${EXECUTABLE_OUTPUT_PATH}/Release/${plugin}.dll"
+            DESTINATION ${PV_INSTALL_PLUGIN_DIR}
+            COMPONENT BrandedRuntime
+    )
+  endforeach()
+endif()
 
 # Call this last so the install script runs after the above targets are installed:
 #
@@ -190,6 +201,31 @@ if(APPLE)
 
   install(SCRIPT "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" COMPONENT Bundle)
 endif(APPLE)
+
+IF (NOT APPLE)
+  set(QT_LIBS
+    PHONON QT3SUPPORT QTCLUCENE QTCORE QTDECLARATIVE QTDESIGNERCOMPONENTS
+    QTDESIGNER QTGUI QTHELP QTMULTIMEDIA QTNETWORK QTOPENGL QTSCRIPTTOOLS
+    QTSCRIPT QTSQL QTSVG QTTEST QTWEBKIT QTXMLPATTERNS QTXML
+  )
+  FOREACH(qtlib ${QT_LIBS})
+    MESSAGE("qtlib: " ${qtlib})
+    IF (QT_${qtlib}_LIBRARY_RELEASE)
+      IF (NOT WIN32)
+        GET_FILENAME_COMPONENT(QT_LIB_DIR_tmp ${QT_${qtlib}_LIBRARY_RELEASE} PATH)
+        GET_FILENAME_COMPONENT(QT_LIB_NAME_tmp ${QT_${qtlib}_LIBRARY_RELEASE} NAME)
+        INSTALL(DIRECTORY ${QT_LIB_DIR_tmp}/ DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
+              FILES_MATCHING PATTERN "${QT_LIB_NAME_tmp}*"
+              PATTERN "${QT_LIB_NAME_tmp}*.debug" EXCLUDE)
+      ELSE (NOT WIN32)
+        GET_FILENAME_COMPONENT(QT_DLL_PATH_tmp ${QT_QMAKE_EXECUTABLE} PATH)
+        GET_FILENAME_COMPONENT(QT_LIB_NAME_tmp ${QT_${qtlib}_LIBRARY_RELEASE} NAME_WE)
+        MESSAGE("qtlib: " ${QT_DLL_PATH_tmp}/${QT_LIB_NAME_tmp}.dll)
+        INSTALL(FILES ${QT_DLL_PATH_tmp}/${QT_LIB_NAME_tmp}.dll DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT "BrandedRuntime")
+      ENDIF (NOT WIN32)
+    ENDIF (QT_${qtlib}_LIBRARY_RELEASE)
+  ENDFOREACH(qtlib)
+ENDIF (NOT APPLE)
 
 #------------------------------------------------------------------------
 # Install ParaView client
