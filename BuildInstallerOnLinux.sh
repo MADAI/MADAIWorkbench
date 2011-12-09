@@ -8,7 +8,7 @@ die () {
     exit 1
 }
 
-[ "$#" -eq 2 ] || die "Usage: BuildInstallerOnLinux.sh <path to qmake> <build directory>"
+[ "$#" -gt 1 ] || die "Usage: BuildInstallerOnLinux.sh <path to qmake> <build directory> [Release | Debug]"
 
 ###################################
 # Convert relative paths to full paths
@@ -28,6 +28,11 @@ script_relative_path=`dirname $0`
 script_dir=`fullpath $script_relative_path`
 madaiworkbench_src_dir=$script_dir
 num_cores=`cat /proc/cpuinfo | grep "core id" | wc -l`
+
+build_type=Release
+if [ -z "$2" ]; then
+    build_type=Debug
+fi
 
 ###################################
 # Set up build and source directories
@@ -58,13 +63,13 @@ pushd mpich2-1.4
 if [ ! -f config.log ]; then
     ./configure --prefix=$install_dir --enable-threads=runtime --disable-f77 --disable-fc
 fi
-popd
 
 ###################################
 # Build MPI
 ###################################
 nice make -j $num_cores
 nice make install
+popd
 
 unset CLFAGS
 unset CXXFLAGS
@@ -84,6 +89,9 @@ git clone --recursive git://paraview.org/ParaView.git ParaView
 cd $paraview_src_dir
 git checkout v3.12.0
 
+# Get python version
+python_version=`python -c 'import sys; print sys.version[:3]'`
+
 ###################################
 # Configure ParaView
 ###################################
@@ -91,17 +99,19 @@ paraview_build_dir=$bin_dir/ParaView-build
 mkdir -p $paraview_build_dir
 cd $paraview_build_dir
 cmake \
-    -D CMAKE_BUILD_TYPE:STRING=Release \
+    -D CMAKE_BUILD_TYPE:STRING=${build_type} \
     -D BUILD_SHARED_LIBS:BOOL=ON \
     -D BUILD_TESTING:BOOL=OFF \
     -D PARAVIEW_USE_MPI:BOOL=ON \
     -D MPI_CC_COMPILER:PATH=$CC \
     -D MPI_CXX_COMPILER:PATH=$CXX \
+    -D MPI_LIBRARY:PATH=$install_dir/lib/libmpich.a \
+    -D MPI_INCLUDE_PATH:PATH=$install_dir/include \
     -D PARAVIEW_ENABLE_PYTHON:BOOL=ON \
     -D PARAVIEW_ENABLE_PYTHON_FILTERS:BOOL=ON \
     -D PYTHON_EXECUTABLE:PATH=/usr/bin/python \
-    -D PYTHON_INCLUDE_DIR:PATH=/usr/include/python2.6 \
-    -D PYTHON_LIBRARY:PATH=/usr/lib64/libpython2.6.so \
+    -D PYTHON_INCLUDE_DIR:PATH=/usr/include/python${python_version} \
+    -D PYTHON_LIBRARY:PATH=/usr/lib64/libpython${python_version}.so \
     -D PARAVIEW_USE_VISITBRIDGE:BOOL=ON \
     -D QT_QMAKE_EXECUTABLE:PATH=$qmake \
     $paraview_src_dir
@@ -119,7 +129,7 @@ madaiworkbench_build_dir=$bin_dir/MADAIWorkbench-build
 mkdir -p $madaiworkbench_build_dir
 cd $madaiworkbench_build_dir
 cmake \
-    -D CMAKE_BUILD_TYPE:STRING=Release \
+    -D CMAKE_BUILD_TYPE:STRING=${build_type} \
     -D BUILD_APPLICATION:BOOL=ON \
     -D BUILD_SHARED_LIBS:BOOL=ON \
     -D ParaView_DIR:PATH=$paraview_build_dir \
@@ -232,7 +242,7 @@ chmod 755 $script_name
 # Now tar up the file
 ###################################
 pushd ${install_dir}
-tar -czf ${current_dir}/MADAIWorkbench-${version}.tar.gz ./bin ./lib
+tar -czf ${current_dir}/MADAIWorkbench-${version}-${build_type}.tar.gz ./bin ./lib
 popd
 
 ###################################
