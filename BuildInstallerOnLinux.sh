@@ -30,9 +30,10 @@ madaiworkbench_src_dir=$script_dir
 num_cores=`cat /proc/cpuinfo | grep "core id" | wc -l`
 
 build_type=Release
-if [ -z "$2" ]; then
+if [ "$3" == Debug ]; then
     build_type=Debug
 fi
+echo "Build type:" ${build_type}
 
 ###################################
 # Set up build and source directories
