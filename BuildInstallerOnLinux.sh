@@ -62,7 +62,7 @@ export CXXFLAGS=-fPIC
 ###################################
 pushd mpich2-1.4
 if [ ! -f config.log ]; then
-    ./configure --prefix=$install_dir --enable-threads=runtime --disable-f77 --disable-fc
+    ./configure --prefix=$install_dir --enable-threads=runtime --disable-f77 --disable-fc --enable-cxx
 fi
 
 ###################################
@@ -104,9 +104,9 @@ cmake \
     -D BUILD_SHARED_LIBS:BOOL=ON \
     -D BUILD_TESTING:BOOL=OFF \
     -D PARAVIEW_USE_MPI:BOOL=ON \
-    -D MPI_CC_COMPILER:PATH=$CC \
+    -D MPI_C_COMPILER:PATH=$CC \
     -D MPI_CXX_COMPILER:PATH=$CXX \
-    -D MPI_LIBRARY:PATH=$install_dir/lib/libmpich.a \
+    -D MPI_LIBRARY:PATH=$install_dir/lib/libmpichcxx.a \
     -D MPI_INCLUDE_PATH:PATH=$install_dir/include \
     -D PARAVIEW_ENABLE_PYTHON:BOOL=ON \
     -D PARAVIEW_ENABLE_PYTHON_FILTERS:BOOL=ON \
