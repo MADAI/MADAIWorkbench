@@ -45,6 +45,10 @@ paraview_src_dir=$src_dir/ParaView
 git clone --recursive git://paraview.org/ParaView.git ParaView
 cd $paraview_src_dir
 
+# Switch to tag v3.12.0
+git checkout v3.12.0
+git submodule update
+
 ###################################
 # Configure ParaView
 ###################################

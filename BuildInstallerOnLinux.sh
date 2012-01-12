@@ -88,7 +88,10 @@ cd $src_dir
 paraview_src_dir=$src_dir/ParaView
 git clone --recursive git://paraview.org/ParaView.git ParaView
 cd $paraview_src_dir
+
+# Checkout version 3.12.0
 git checkout v3.12.0
+git submodule update
 
 # Get python version
 python_version=`python -c 'import sys; print sys.version[:3]'`
