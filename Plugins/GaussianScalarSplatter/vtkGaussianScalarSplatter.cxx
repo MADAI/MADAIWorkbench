@@ -249,11 +249,11 @@ int vtkGaussianScalarSplatter::RequestData(
 
     //oDataArray->SetName(iDataArray->GetName() + DENSITY_STRING);
     oldname = iDataArray->GetName();
-    newname = new char [(strlen(oldname) + sizeof(DENSITY_STRING))];
+    newname = new char [strlen(oldname) + sizeof(DENSITY_STRING) + 1];
     strcpy(newname, oldname);
     strcpy(newname + strlen(oldname), DENSITY_STRING);
     oDataArray->SetName(newname);
-    delete newname;
+    delete[] newname;
 
     numberOfComponents = iDataArray->GetNumberOfComponents();
     oDataArray->SetNumberOfComponents(numberOfComponents);
