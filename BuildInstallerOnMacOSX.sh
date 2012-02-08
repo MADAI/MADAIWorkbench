@@ -8,7 +8,7 @@ die () {
     exit 1
 }
 
-[ "$#" -gt 1 ] || die "Usage: BuildInstallerOnMacOSX.sh <path to qmake> <build directory> [Release | Debug]"
+[ "$#" -gt 1 ] || die "Usage: BuildInstallerOnMacOSX.sh <path to qmake> <build directory> [Release | Debug] [10.5 | 10.6]"
 
 ###################################
 # Convert relative paths to full paths
@@ -33,6 +33,15 @@ if [ "$3" == Debug ]; then
     build_type=Debug
 fi
 echo "Build type:" ${build_type}
+
+target=10.6
+if [ "$4" == "10.5" -o "$4" == "10.6" ]; then
+    target="$4"
+else
+    echo "Invalid target ${target}. Must be 10.5 or 10.6."
+    exit
+fi
+echo "Target: " ${target}
 
 ###################################
 # Set up build and source directories
@@ -72,8 +81,8 @@ cmake \
     -D PYTHON_LIBRARY:PATH=/usr/lib/libpython2.5.dylib \
     -D PARAVIEW_USE_VISITBRIDGE:BOOL=ON \
     -D QT_QMAKE_EXECUTABLE:PATH=$qmake \
-    -D CMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.5 \
-    -D CMAKE_OSX_SYSROOT:PATH=/Developer/SDKs/MacOSX10.5.sdk \
+    -D CMAKE_OSX_DEPLOYMENT_TARGET:STRING=${target} \
+    -D CMAKE_OSX_SYSROOT:PATH=/Developer/SDKs/MacOSX${target}.sdk \
     $paraview_src_dir
 cmake .
 
@@ -91,8 +100,8 @@ cmake \
     -D BUILD_APPLICATION:BOOL=ON \
     -D BUILD_SHARED_LIBS:BOOL=ON \
     -D ParaView_DIR:PATH=$paraview_build_dir \
-    -D CMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.5 \
-    -D CMAKE_OSX_SYSROOT:PATH=/Developer/SDKs/MacOSX10.5.sdk \
+    -D CMAKE_OSX_DEPLOYMENT_TARGET:STRING=${target} \
+    -D CMAKE_OSX_SYSROOT:PATH=/Developer/SDKs/MacOSX${target}.sdk \
     $madaiworkbench_src_dir
 cmake .
 
