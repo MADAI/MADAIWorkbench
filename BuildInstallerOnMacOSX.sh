@@ -8,7 +8,7 @@ die () {
     exit 1
 }
 
-[ "$#" -eq 2 ] || die "Usage: BuildInstallerOnMacOSX.sh <path to qmake> <build directory>"
+[ "$#" -gt 1 ] || die "Usage: BuildInstallerOnMacOSX.sh <path to qmake> <build directory> [Release | Debug]"
 
 ###################################
 # Convert relative paths to full paths
@@ -27,6 +27,12 @@ script_relative_path=`dirname $0`
 script_dir=`fullpath $script_relative_path`
 madaiworkbench_src_dir=$script_dir
 num_cores=`sysctl -n hw.ncpu`
+
+build_type=Release
+if [ "$3" == Debug ]; then
+    build_type=Debug
+fi
+echo "Build type:" ${build_type}
 
 ###################################
 # Set up build and source directories
@@ -56,7 +62,7 @@ paraview_build_dir=$bin_dir/ParaView-build
 mkdir -p $paraview_build_dir
 cd $paraview_build_dir
 cmake \
-    -D CMAKE_BUILD_TYPE:STRING=Release \
+    -D CMAKE_BUILD_TYPE:STRING=${build_type} \
     -D BUILD_SHARED_LIBS:BOOL=ON \
     -D BUILD_TESTING:BOOL=OFF \
     -D PARAVIEW_ENABLE_PYTHON:BOOL=ON \
@@ -81,7 +87,7 @@ madaiworkbench_build_dir=$bin_dir/MADAIWorkbench-build
 mkdir -p $madaiworkbench_build_dir
 cd $madaiworkbench_build_dir
 cmake \
-    -D CMAKE_BUILD_TYPE:STRING=Release \
+    -D CMAKE_BUILD_TYPE:STRING=${build_type} \
     -D BUILD_APPLICATION:BOOL=ON \
     -D BUILD_SHARED_LIBS:BOOL=ON \
     -D ParaView_DIR:PATH=$paraview_build_dir \
