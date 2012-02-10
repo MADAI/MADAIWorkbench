@@ -1,6 +1,11 @@
 #!/bin/bash
 
 ###################################
+# Options
+###################################
+BUILD_AGAINST_PARAVIEW_VERSION="v3.12.0"
+
+###################################
 # Argument checking
 ###################################
 die () {
@@ -22,12 +27,19 @@ fullpath () (
 # Define important variables
 ###################################
 qmake=$1
+[ -x "$qmake" ] || die "qmake: \"${qmake}\" not found."
 build_dir=$2
 script_relative_path=`dirname $0`
 script_dir=`fullpath $script_relative_path`
 madaiworkbench_src_dir=$script_dir
 num_cores=`sysctl -n hw.ncpu`
 
+###################################
+# Determine the build target
+# This is the version of OS X
+# on which you want the Workbench
+# to run.
+###################################
 build_type=Release
 if [ "$3" == Debug ]; then
     build_type=Debug
@@ -60,8 +72,8 @@ paraview_src_dir=$src_dir/ParaView
 git clone --recursive git://paraview.org/ParaView.git ParaView
 cd $paraview_src_dir
 
-# Switch to tag v3.12.0
-git checkout v3.12.0
+# Switch to desired ParaView version
+git checkout "$BUILD_AGAINST_PARAVIEW_VERSION"
 git submodule update
 
 ###################################

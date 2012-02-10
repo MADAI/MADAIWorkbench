@@ -1,6 +1,11 @@
 #!/bin/bash
 
 ###################################
+# Options
+###################################
+BUILD_AGAINST_PARAVIEW_VERSION="v3.12.0"
+
+###################################
 # Argument checking
 ###################################
 die () {
@@ -23,6 +28,7 @@ fullpath () (
 ###################################
 current_dir=`pwd`
 qmake=$1
+[ -x "$qmake" ] || die "qmake: \"${qmake}\" not found."
 build_dir=$2
 script_relative_path=`dirname $0`
 script_dir=`fullpath $script_relative_path`
@@ -90,7 +96,7 @@ git clone --recursive git://paraview.org/ParaView.git ParaView
 cd $paraview_src_dir
 
 # Checkout version 3.12.0
-git checkout v3.12.0
+git checkout "$BUILD_AGAINST_PARAVIEW_VERSION"
 git submodule update
 
 # Get python version
