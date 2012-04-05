@@ -53,6 +53,14 @@ install_dir=$build_dir/install
 mkdir -p $install_dir
 
 ###################################
+# Add /usr/lib64/nvidia/tls to
+# LD_LIBRARY_PATH to find necessary
+# link libraries on ntheory-3d.phy.duke.edu
+####################################
+set LD_LIBRARY_PATH=/usr/lib64/nvidia/tls:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH
+
+###################################
 # Get MPI
 ###################################
 cd $src_dir
@@ -115,7 +123,8 @@ cmake \
     -D PARAVIEW_USE_MPI:BOOL=ON \
     -D MPI_C_COMPILER:PATH=$CC \
     -D MPI_CXX_COMPILER:PATH=$CXX \
-    -D MPI_LIBRARY:PATH=$install_dir/lib/libmpichcxx.a \
+    -D MPI_LIBRARY:PATH=$install_dir/lib/libmpich.a \
+    -D MPI_EXTRA_LIBRARY:PATH=$install_dir/lib/libmpichcxx.a \
     -D MPI_INCLUDE_PATH:PATH=$install_dir/include \
     -D PARAVIEW_ENABLE_PYTHON:BOOL=ON \
     -D PARAVIEW_ENABLE_PYTHON_FILTERS:BOOL=ON \
