@@ -15,8 +15,8 @@ How to use:
 		(same variables and geometry)
 		Convert to point data if necessary.
 	Select both datasets by Ctrl-clicking.
+        Tools -> Python Shell
 	Macros -> "Calculate Difference"
-    If nothing happens, Tools -> "Python Shell"
 """
 #_____________________________________________________________________
 try:
