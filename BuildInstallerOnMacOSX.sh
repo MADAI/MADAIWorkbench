@@ -3,7 +3,7 @@
 ###################################
 # Options
 ###################################
-BUILD_AGAINST_PARAVIEW_VERSION="v3.12.0"
+BUILD_AGAINST_PARAVIEW_VERSION="v3.14.1"
 
 ###################################
 # Argument checking
@@ -88,9 +88,9 @@ cmake \
     -D BUILD_TESTING:BOOL=OFF \
     -D PARAVIEW_ENABLE_PYTHON:BOOL=ON \
     -D PARAVIEW_ENABLE_PYTHON_FILTERS:BOOL=ON \
-    -D PYTHON_EXECUTABLE:PATH=/usr/bin/python2.5 \
-    -D PYTHON_INCLUDE_DIR:PATH=/System/Library/Frameworks/Python.framework/Versions/2.5/Headers \
-    -D PYTHON_LIBRARY:PATH=/usr/lib/libpython2.5.dylib \
+    -D PYTHON_EXECUTABLE:PATH=/usr/bin/python2.6 \
+    -D PYTHON_INCLUDE_DIR:PATH=/System/Library/Frameworks/Python.framework/Versions/2.6/Headers \
+    -D PYTHON_LIBRARY:PATH=/usr/lib/libpython2.6.dylib \
     -D PARAVIEW_USE_VISITBRIDGE:BOOL=ON \
     -D QT_QMAKE_EXECUTABLE:PATH=$qmake \
     -D CMAKE_OSX_DEPLOYMENT_TARGET:STRING=${target} \
