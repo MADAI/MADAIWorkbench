@@ -111,6 +111,11 @@ git submodule update
 python_version=`python -c 'import sys; print sys.version[:3]'`
 
 ###################################
+# Copy Macro directory
+###################################
+cp -r --preserve=timestamps "${script_dir}/Macros" "${bin_dir}/"
+
+###################################
 # Configure ParaView
 ###################################
 paraview_build_dir=$bin_dir/ParaView-build
