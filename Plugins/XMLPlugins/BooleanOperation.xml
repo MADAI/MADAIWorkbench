@@ -1,0 +1,82 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ================================================================== -->
+    <SourceProxy name="BooleanOperations" class="vtkBooleanOperationPolyDataFilter" label="Boolean Operation Filter">
+      <Documentation
+         long_help="Computes the boundary of the union, intersection, or difference volume computed from the volumes defined by two input surfaces. The two surfaces do not need to be manifold, but if they are not, unexpected results may be obtained. The resulting surface is available in the first output of the filter. The second output contains a set of polylines that represent the intersection between the two input surfaces."
+         short_help="Computes the boundary of the union, intersection, or difference volume computed from the volumes defined by two input surfaces.">
+      </Documentation>
+ 
+      <InputProperty
+         name="FirstSurface"
+          port_index="0"
+         command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData"/>
+        </DataTypeDomain>
+        <Documentation>
+          Set the first surface.
+        </Documentation>
+      </InputProperty>
+ 
+      <InputProperty
+         name="SecondSurface"
+          port_index="1"
+         command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData"/>
+        </DataTypeDomain>
+        <Documentation>
+          Set the second surface.
+        </Documentation>
+      </InputProperty>
+ 
+      <IntVectorProperty
+         name="Operation"
+         command="SetOperation"
+         number_of_elements="1"
+         default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Union"/>
+          <Entry value="1" text="Intersection"/>
+          <Entry value="2" text="Difference"/>
+          <Documentation>
+            Set the boolean operation to perform.
+          </Documentation>
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="ReorientDifferenceCells"
+         command="SetReorientDifferenceCells"
+         number_of_elements="1"
+         default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Turn on/off cell reorientation of the intersection portion of the surface when the operation is set to DIFFERENCE.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="Tolerance"
+         command="SetTolerance"
+         number_of_elements="1"
+         default_values="0.000001">
+        <Documentation>
+          Set/get the tolerance used to determine when a point's absolute distance is considered to be zero.
+        </Documentation>
+      </DoubleVectorProperty>
+ 
+    </SourceProxy>
+    <!-- End LandmarkTransformFilter -->
+  </ProxyGroup>
+  <!-- End Filters Group -->
+</ServerManagerConfiguration>
