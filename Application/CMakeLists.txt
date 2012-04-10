@@ -85,6 +85,7 @@ endif (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
 set(MW_PLUGINS
   MADAILogoTextSourcePlugin
   BinningFilter
+  BooleanOperationFilter
   GaussianScalarSplatter
   MaskTableRows
 )
