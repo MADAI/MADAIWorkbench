@@ -209,6 +209,8 @@ int vtkGaussianScalarSplatter::RequestData(
     sliceData.origin[i] = this->Origin[i];
     sliceData.spacing[i] = this->Spacing[i];
     sliceData.sampleDimensions[i] = this->SampleDimensions[i];
+
+    // This is a little odd. Shouldn't it be largest_dim < this->Spacing[i]
     if (largest_dim > this->Spacing[i])
       {
       largest_dim = this->Spacing[i];
@@ -318,8 +320,7 @@ static VTK_THREAD_RETURN_TYPE threadedExecute( void * arg )
 //----------------------------------------------------------------------------
 // Static Function called by vtkGaussianScalarSplatter::RequestData()
 // this function will modify 
-//   sliceData->outputDataArrays->at(*)->GetComponent(index,*)
-//   sliceData->numberDensity->GetComponent(index,0) 
+//   sliceData->outputDataArrays->at(*)->GetComponent(sliceData->numberDensity->GetComponent(index,0) 
 //    (for the range of indices corresponding to this slice)
 // Other values will be left alone.
 static void processSlice(sliceDataType * sliceData, int sliceIndex) 
@@ -344,7 +345,7 @@ static void processSlice(sliceDataType * sliceData, int sliceIndex)
   vtkIdList * closePoints = vtkIdList::New();
   int sliceSize = (sliceData->sampleDimensions[0] *
 		   sliceData->sampleDimensions[1]);
-  double * pointCoords; // double[3] coords of a point
+  double pointCoords[3]; // double[3] coords of a point
   double voxGausWeight;
   int ptId, nearPoint;
   int dataArrayIdx,compIdx, numberOfComponents, idx;
@@ -383,7 +384,7 @@ static void processSlice(sliceDataType * sliceData, int sliceIndex)
 	   nearPoint++)
 	{
 	ptId = closePoints->GetId(nearPoint);
-	pointCoords = input->GetPoint(ptId);
+	input->GetPoint(ptId, pointCoords);
 	voxGausWeight = (
 	  (erf((voxMax[0] - pointCoords[0]) / sqrt2sigma) -
 	   erf((voxMin[0] - pointCoords[0]) / sqrt2sigma)) *
