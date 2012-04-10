@@ -42,7 +42,7 @@
 // for splatting, even if they are many standard deviations away
 //#define USE_LOCATOR
 
-const double NUMBER_OF_STD_DEVIATIONS = 4.0; 
+const double NUMBER_OF_STD_DEVIATIONS = 4.0;
 const char DENSITY_STRING [] = "_Density";
 const double vtkGaussianScalarSplatter::DEFAULT_STANDARD_DEVIATION = 1.0;
 
@@ -108,7 +108,6 @@ vtkGaussianScalarSplatter::vtkGaussianScalarSplatter()
   this->ModelBounds[3] = 0.0;
   this->ModelBounds[4] = 0.0;
   this->ModelBounds[5] = 0.0;
-
 }
 
 //----------------------------------------------------------------------------
@@ -193,10 +192,8 @@ int vtkGaussianScalarSplatter::RequestData(
   int abortExecute;
   vtkIdType progressInterval;
 
-  std::vector<vtkDataArray *> outputDataArrays; // pointers to
-	// the arrays I'm going to splat.
-  std::vector<vtkDataArray *> inputDataArrays; // pointers to
-	// the arrays I'm splatting into
+  std::vector<vtkDataArray *> outputDataArrays; // pointers to the arrays I'm going to splat.
+  std::vector<vtkDataArray *> inputDataArrays; // pointers to the arrays I'm splatting into
 
   // sliceData is a chunck of memory containing information I'm going
   // to pass to the processSlice() function.
@@ -252,7 +249,7 @@ int vtkGaussianScalarSplatter::RequestData(
 #endif
     }
   sliceData.outputDataArrays = (& outputDataArrays);
-  sliceData.inputDataArrays = (& inputDataArrays); 
+  sliceData.inputDataArrays = (& inputDataArrays);
 
   //  Make sure points are available
   if ( (numPts = input->GetNumberOfPoints()) < 1 )
@@ -278,11 +275,11 @@ int vtkGaussianScalarSplatter::RequestData(
       }
     }
   sliceData.voxelVolume = (this->Spacing[0] *
-			   this->Spacing[1] *
-			   this->Spacing[2]);
+                           this->Spacing[1] *
+                           this->Spacing[2]);
   sliceData.sqrt2sigma = (sqrt(2.0) * this->StandardDeviation);
   sliceData.radius = ((this->StandardDeviation * NUMBER_OF_STD_DEVIATIONS)
-		      + (largest_dim / 2.0));
+                      + (largest_dim / 2.0));
 
   // Inserting a new array.
   sliceData.numberDensity = vtkDoubleArray::New();
@@ -326,9 +323,9 @@ int vtkGaussianScalarSplatter::RequestData(
     for (idx = 0; idx < numNewPts; idx++)
       {
       for(compIdx = 0; compIdx < numberOfComponents; compIdx++)
-	{
-	oDataArray->SetComponent(idx, 0, 0.0); //initialize to ZERO
-	}
+        {
+        oDataArray->SetComponent(idx, 0, 0.0); //initialize to ZERO
+        }
       }
     outputDataArrays.push_back(oDataArray);
     inputDataArrays.push_back(iDataArray);
@@ -338,8 +335,8 @@ int vtkGaussianScalarSplatter::RequestData(
   abortExecute = 0;
   progressInterval = numPts/100 + 1;
 
-                                    // Run the threads
-  threader->SetSingleMethod(threadedExecute, 
+  // Run the threads
+  threader->SetSingleMethod(threadedExecute,
 			    static_cast<void *>(&sliceData));
   threader->SingleMethodExecute();
   threader->Delete();
@@ -368,7 +365,7 @@ static VTK_THREAD_RETURN_TYPE threadedExecute( void * arg )
   numberSlices = threadData->sampleDimensions[2];
 
   for (sliceIndex = threadId;
-       sliceIndex < numberSlices; 
+       sliceIndex < numberSlices;
        sliceIndex += threadCount)
     {
     processSlice(threadData, sliceIndex, threadId);
@@ -379,8 +376,8 @@ static VTK_THREAD_RETURN_TYPE threadedExecute( void * arg )
 
 //----------------------------------------------------------------------------
 // Static Function called by vtkGaussianScalarSplatter::RequestData()
-// this function will modify 
-//   sliceData->outputDataArrays->at(*)->GetComponent(sliceData->numberDensity->GetComponent(index,0) 
+// this function will modify
+//   sliceData->outputDataArrays->at(*)->GetComponent(sliceData->numberDensity->GetComponent(index,0)
 //    (for the range of indices corresponding to this slice)
 // Other values will be left alone.
 static void processSlice(sliceDataType * sliceData, int sliceIndex, int threadId)
@@ -413,38 +410,38 @@ static void processSlice(sliceDataType * sliceData, int sliceIndex, int threadId
 
   long int erfsCounted = 0;
 
-  for (vox[1] = 0, 
-	 voxLoc[1] = sliceData->origin[1],
-	 voxMin[1] = voxLoc[1] - (sliceData->spacing[1] / 2),
-	 voxMax[1] = voxLoc[1] + (sliceData->spacing[1] / 2);
+  for (vox[1] = 0,
+         voxLoc[1] = sliceData->origin[1],
+         voxMin[1] = voxLoc[1] - (sliceData->spacing[1] / 2),
+         voxMax[1] = voxLoc[1] + (sliceData->spacing[1] / 2);
        vox[1] < sliceData->sampleDimensions[1];
-       vox[1]++, 
-	 voxMin[1] = voxMax[1],
-	 voxMax[1] += sliceData->spacing[1],
-	 voxLoc[1] += sliceData->spacing[1])
+       vox[1]++,
+         voxMin[1] = voxMax[1],
+         voxMax[1] += sliceData->spacing[1],
+         voxLoc[1] += sliceData->spacing[1])
     {
     idx = (vox[1] * sliceData->sampleDimensions[0]) + (sliceIndex * sliceSize);
-    for (vox[0] = 0, 
-	   voxLoc[0] = sliceData->origin[0],
-	   voxMin[0] = voxLoc[0] - (sliceData->spacing[0] / 2),
-	   voxMax[0] = voxLoc[0] + (sliceData->spacing[0] / 2);
-	 vox[0] < sliceData->sampleDimensions[0];
-	 vox[0]++, 
-	   voxMin[0] = voxMax[0],
-	   voxMax[0] += sliceData->spacing[0],
-	   voxLoc[0] += sliceData->spacing[0],
-	   idx++)
+    for (vox[0] = 0,
+           voxLoc[0] = sliceData->origin[0],
+           voxMin[0] = voxLoc[0] - (sliceData->spacing[0] / 2),
+           voxMax[0] = voxLoc[0] + (sliceData->spacing[0] / 2);
+         vox[0] < sliceData->sampleDimensions[0];
+         vox[0]++,
+           voxMin[0] = voxMax[0],
+           voxMax[0] += sliceData->spacing[0],
+           voxLoc[0] += sliceData->spacing[0],
+           idx++)
       {
       closePoints->Reset();
 #ifdef USE_LOCATOR
       pointLocator->FindPointsWithinRadius(sliceData->radius,
-					   voxLoc, closePoints);
+                                           voxLoc, closePoints);
       erfsCounted += closePoints->GetNumberOfIds();
-      for (nearPoint = 0; 
-	   nearPoint < closePoints->GetNumberOfIds();
-	   nearPoint++)
-	{
-	ptId = closePoints->GetId(nearPoint);
+      for (nearPoint = 0;
+           nearPoint < closePoints->GetNumberOfIds();
+           nearPoint++)
+        {
+        ptId = closePoints->GetId(nearPoint);
 #else
       erfsCounted += input->GetNumberOfPoints();
       for ( ptId = 0;
@@ -452,41 +449,40 @@ static void processSlice(sliceDataType * sliceData, int sliceIndex, int threadId
             ptId++)
         {
 #endif
-	input->GetPoint(ptId, pointCoords);
-	voxGausWeight = (
-	  (erf((voxMax[0] - pointCoords[0]) / sqrt2sigma) -
-	   erf((voxMin[0] - pointCoords[0]) / sqrt2sigma)) *
-	  (erf((voxMax[1] - pointCoords[1]) / sqrt2sigma) -
-	   erf((voxMin[1] - pointCoords[1]) / sqrt2sigma)) *
-	  (erf((voxMax[2] - pointCoords[2]) / sqrt2sigma) -
-	   erf((voxMin[2] - pointCoords[2]) / sqrt2sigma)) / 8.0);
-	voxGausWeight /= sliceData->voxelVolume;
+        input->GetPoint(ptId, pointCoords);
+        voxGausWeight = (
+          (erf((voxMax[0] - pointCoords[0]) / sqrt2sigma) -
+           erf((voxMin[0] - pointCoords[0]) / sqrt2sigma)) *
+          (erf((voxMax[1] - pointCoords[1]) / sqrt2sigma) -
+           erf((voxMin[1] - pointCoords[1]) / sqrt2sigma)) *
+          (erf((voxMax[2] - pointCoords[2]) / sqrt2sigma) -
+           erf((voxMin[2] - pointCoords[2]) / sqrt2sigma)) / 8.0);
+        voxGausWeight /= sliceData->voxelVolume;
 
-	if (voxGausWeight == 0.0)
-	  {
-	  continue; //with for loop
-	  }
-	numberDensity->SetComponent(idx, 0,
-	  (numberDensity->GetComponent(idx,0)
-	   + voxGausWeight));
-	for(dataArrayIdx = 0;
-	    dataArrayIdx < outputDataArrays->size() ;
-	    dataArrayIdx++)
-	  {
-	  oDataArray = outputDataArrays->at(dataArrayIdx);
-	  //assert(inputDataArrays->at(i) != NULL);
-	  iDataArray = inputDataArrays->at(dataArrayIdx);
-	  numberOfComponents = oDataArray->GetNumberOfComponents();
-	  //assert(numberOfComponents==oDataArray->GetNumberOfComponents())
-	  for(compIdx = 0; compIdx < numberOfComponents; compIdx++)
-	    {
-	    oDataArray->SetComponent(idx,compIdx,
-	      (oDataArray->GetComponent(idx,compIdx) +
-	       (iDataArray->GetComponent(ptId,compIdx) *
-		voxGausWeight)));
-	    } //for numberOfComponents
-	  } //for outputDataArrays
-	} // for nearby points
+        if (voxGausWeight == 0.0)
+          {
+          continue; //with for loop
+          }
+        numberDensity->SetComponent(idx, 0, (numberDensity->GetComponent(idx,0)
+                                             + voxGausWeight));
+        for(dataArrayIdx = 0;
+            dataArrayIdx < outputDataArrays->size() ;
+            dataArrayIdx++)
+          {
+          oDataArray = outputDataArrays->at(dataArrayIdx);
+          //assert(inputDataArrays->at(i) != NULL);
+          iDataArray = inputDataArrays->at(dataArrayIdx);
+          numberOfComponents = oDataArray->GetNumberOfComponents();
+          //assert(numberOfComponents==oDataArray->GetNumberOfComponents())
+          for(compIdx = 0; compIdx < numberOfComponents; compIdx++)
+            {
+            oDataArray->SetComponent(idx,compIdx,
+                                     (oDataArray->GetComponent(idx,compIdx) +
+                                      (iDataArray->GetComponent(ptId,compIdx) *
+                                       voxGausWeight)));
+            } //for numberOfComponents
+          } //for outputDataArrays
+        } // for nearby points
       } // for I
     } // for J
   closePoints->Delete();
@@ -518,7 +514,7 @@ void vtkGaussianScalarSplatter::ComputeModelBounds(vtkDataSet *input,
   // Set volume origin and data spacing
   outInfo->Set(vtkDataObject::ORIGIN(),
                this->ModelBounds[0],
-	       this->ModelBounds[2],
+               this->ModelBounds[2],
                this->ModelBounds[4]);
   memcpy(this->Origin,outInfo->Get(vtkDataObject::ORIGIN()), sizeof(double)*3);
   output->SetOrigin(this->Origin);
