@@ -19,16 +19,28 @@
 #include "vtkGaussianScalarSplatter.h"
 
 #include "vtkDoubleArray.h"
+#include "vtkIdList.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkMultiThreader.h"
 #include "vtkPointData.h"
 #include "vtkPointLocator.h"
 #include "vtkPoints.h"
-#include "vtkIdList.h"
-#include "vtkMultiThreader.h"
+#include "vtkPolyData.h"
+#include "vtkRectilinearGrid.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStructuredGrid.h"
+#include "vtkStructuredPoints.h"
+#include "vtkUnstructuredGrid.h"
+
+// This enables use of a vtkPointLocator to find only the points that
+// affect a pixel. The downside of enabling this is option is that the
+// input data needs to be DeepCopy'ed once per thread. The downside of
+// not enabling it is that all points in the input will be considered
+// for splatting, even if they are many standard deviations away
+//#define USE_LOCATOR
 
 const double NUMBER_OF_STD_DEVIATIONS = 4.0; 
 const char DENSITY_STRING [] = "_Density";
@@ -64,7 +76,7 @@ double erf(double x)
 
 class sliceDataType {
 public:
-  vtkDataSet * input;
+  vtkDataSet ** input;
   vtkDoubleArray * numberDensity;
   std::vector<vtkDataArray *> * outputDataArrays;
   std::vector<vtkDataArray *> * inputDataArrays;
@@ -75,7 +87,7 @@ public:
   double spacing[3];
   int sampleDimensions[3];
 };
-static void processSlice(sliceDataType * sliceData, int sliceIndex);
+static void processSlice(sliceDataType * sliceData, int sliceIndex, int threadId);
 static VTK_THREAD_RETURN_TYPE threadedExecute( void * arg );
 
 vtkStandardNewMacro(vtkGaussianScalarSplatter);
@@ -189,7 +201,56 @@ int vtkGaussianScalarSplatter::RequestData(
   // sliceData is a chunck of memory containing information I'm going
   // to pass to the processSlice() function.
   sliceDataType sliceData;
-  sliceData.input = input;
+
+  // Initialize multiple threads
+  vtkMultiThreader * threader = vtkMultiThreader::New();
+  int numberOfThreads = vtkMultiThreader::GetGlobalDefaultNumberOfThreads();
+  vtkMultiThreader::SetGlobalMaximumNumberOfThreads(numberOfThreads);
+  if (numberOfThreads > this->SampleDimensions[2])
+    {
+    numberOfThreads = this->SampleDimensions[2];
+    }
+  threader->SetNumberOfThreads(numberOfThreads);
+
+  sliceData.input = new vtkDataSet*[numberOfThreads];
+  for (int threadId = 0; threadId < numberOfThreads; threadId++)
+    {
+    switch (input->GetDataObjectType())
+      {
+      case VTK_POLY_DATA:
+        sliceData.input[threadId] = vtkPolyData::New();
+        break;
+
+      case VTK_IMAGE_DATA:
+        sliceData.input[threadId] = vtkImageData::New();
+        break;
+
+      case VTK_STRUCTURED_POINTS:
+        sliceData.input[threadId] = vtkStructuredPoints::New();
+        break;
+
+      case VTK_STRUCTURED_GRID:
+        sliceData.input[threadId] = vtkStructuredGrid::New();
+        break;
+
+      case VTK_UNSTRUCTURED_GRID:
+        sliceData.input[threadId] = vtkUnstructuredGrid::New();
+        break;
+
+      case VTK_RECTILINEAR_GRID:
+        sliceData.input[threadId] = vtkRectilinearGrid::New();
+        break;
+
+      default:
+        vtkErrorMacro(<< "Unsupported data set type " << input->GetClassName());
+        break;
+      }
+#ifdef USE_LOCATOR
+    sliceData.input[threadId]->DeepCopy(input);
+#else
+    sliceData.input[threadId]->ShallowCopy(input);
+#endif
+    }
   sliceData.outputDataArrays = (& outputDataArrays);
   sliceData.inputDataArrays = (& inputDataArrays); 
 
@@ -277,19 +338,18 @@ int vtkGaussianScalarSplatter::RequestData(
   abortExecute = 0;
   progressInterval = numPts/100 + 1;
 
-  //initilize multiple threads
-  vtkMultiThreader * threader = vtkMultiThreader::New();
-  int numberOfThreads = vtkMultiThreader::GetGlobalDefaultNumberOfThreads();
-  vtkMultiThreader::SetGlobalMaximumNumberOfThreads(numberOfThreads);
-  if (numberOfThreads > this->SampleDimensions[2])
-    {
-    numberOfThreads = this->SampleDimensions[2];
-    }
-  threader->SetNumberOfThreads(numberOfThreads);
+                                    // Run the threads
   threader->SetSingleMethod(threadedExecute, 
 			    static_cast<void *>(&sliceData));
   threader->SingleMethodExecute();
   threader->Delete();
+
+  // Free the copies of the input
+  for (int threadId = 0; threadId < numberOfThreads; threadId++)
+    {
+    sliceData.input[threadId]->Delete();
+    }
+  delete[] sliceData.input;
 
   vtkDebugMacro(<< "Splatted " << numPts << " points");
   return 1;
@@ -311,7 +371,7 @@ static VTK_THREAD_RETURN_TYPE threadedExecute( void * arg )
        sliceIndex < numberSlices; 
        sliceIndex += threadCount)
     {
-    processSlice(threadData, sliceIndex);
+    processSlice(threadData, sliceIndex, threadId);
     }
   return VTK_THREAD_RETURN_VALUE;
 }
@@ -323,12 +383,12 @@ static VTK_THREAD_RETURN_TYPE threadedExecute( void * arg )
 //   sliceData->outputDataArrays->at(*)->GetComponent(sliceData->numberDensity->GetComponent(index,0) 
 //    (for the range of indices corresponding to this slice)
 // Other values will be left alone.
-static void processSlice(sliceDataType * sliceData, int sliceIndex) 
+static void processSlice(sliceDataType * sliceData, int sliceIndex, int threadId)
 {
   double voxLoc[3], voxMin[3], voxMax[3];
   int vox[2]; // vox[2] would be sliceIndex;
 
-  vtkDataSet * input = sliceData->input;
+  vtkDataSet * input = sliceData->input[threadId];
 
   vtkPointLocator * pointLocator = vtkPointLocator::New();
   pointLocator->SetDataSet(input);
@@ -376,6 +436,7 @@ static void processSlice(sliceDataType * sliceData, int sliceIndex)
 	   idx++)
       {
       closePoints->Reset();
+#ifdef USE_LOCATOR
       pointLocator->FindPointsWithinRadius(sliceData->radius,
 					   voxLoc, closePoints);
       erfsCounted += closePoints->GetNumberOfIds();
@@ -384,6 +445,13 @@ static void processSlice(sliceDataType * sliceData, int sliceIndex)
 	   nearPoint++)
 	{
 	ptId = closePoints->GetId(nearPoint);
+#else
+      erfsCounted += input->GetNumberOfPoints();
+      for ( ptId = 0;
+            ptId < input->GetNumberOfPoints();
+            ptId++)
+        {
+#endif
 	input->GetPoint(ptId, pointCoords);
 	voxGausWeight = (
 	  (erf((voxMax[0] - pointCoords[0]) / sqrt2sigma) -
