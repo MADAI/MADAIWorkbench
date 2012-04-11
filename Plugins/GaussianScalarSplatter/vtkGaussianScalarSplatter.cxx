@@ -618,13 +618,18 @@ void vtkGaussianScalarSplatter::ComputeModelBounds(vtkDataSet *input,
 
   maxDist = this->StandardDeviation * NUMBER_OF_STD_DEVIATIONS;
   bounds = input->GetBounds();
-  for (i = 0; i < 6; i += 2)
+  for (i = 0; i < 3; i ++)
     {
-    this->ModelBounds[i] = bounds[i] - maxDist;
-    }
-  for (i = 1; i < 6; i += 2)
-    {
-    this->ModelBounds[i] = bounds[i] + maxDist;
+    if ( this->SampleDimensions[i] > 1 )
+      {
+      this->ModelBounds[2*i  ] = bounds[2*i  ] - maxDist;
+      this->ModelBounds[2*i+1] = bounds[2*i+1] + maxDist;
+      }
+    else
+      {
+      this->ModelBounds[2*i  ] = bounds[2*i  ];
+      this->ModelBounds[2*i+1] = bounds[2*i+1];
+      }
     }
 
   // Set volume origin and data spacing
