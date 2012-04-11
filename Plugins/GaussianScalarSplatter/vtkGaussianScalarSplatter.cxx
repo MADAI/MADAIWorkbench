@@ -370,7 +370,6 @@ int vtkGaussianScalarSplatter::RequestData(
     sliceData.spacing[i] = this->Spacing[i];
     sliceData.sampleDimensions[i] = this->SampleDimensions[i];
 
-    // This is a little odd. Shouldn't it be largest_dim < this->Spacing[i]
     if (this->Spacing[i] > largest_dim)
       {
       largest_dim = this->Spacing[i];
@@ -409,7 +408,6 @@ int vtkGaussianScalarSplatter::RequestData(
       }
     oDataArray = vtkDataArray::CreateDataArray(dataType);
 
-    //oDataArray->SetName(iDataArray->GetName() + DENSITY_STRING);
     oldname = iDataArray->GetName();
     newname = new char [strlen(oldname) + sizeof(DENSITY_STRING) + 1];
     strcpy(newname, oldname);
@@ -552,13 +550,29 @@ static void processSlice(sliceDataType * sliceData, int sliceIndex, int threadId
         {
 #endif
         input->GetPoint(ptId, pointCoords);
-        voxGausWeight = (
-          (erf((voxMax[0] - pointCoords[0]) / sqrt2sigma) -
-           erf((voxMin[0] - pointCoords[0]) / sqrt2sigma)) *
-          (erf((voxMax[1] - pointCoords[1]) / sqrt2sigma) -
-           erf((voxMin[1] - pointCoords[1]) / sqrt2sigma)) *
-          (erf((voxMax[2] - pointCoords[2]) / sqrt2sigma) -
-           erf((voxMin[2] - pointCoords[2]) / sqrt2sigma)) / 8.0);
+        double erfX = 1.0;
+        double erfY = 1.0;
+        double erfZ = 1.0;
+
+        if ( sliceData->sampleDimensions[0] > 1 )
+          {
+          erfX = (erf((voxMax[0] - pointCoords[0]) / sqrt2sigma) -
+                  erf((voxMin[0] - pointCoords[0]) / sqrt2sigma));
+          }
+
+        if ( sliceData->sampleDimensions[1] > 1 )
+          {
+          erfY = (erf((voxMax[1] - pointCoords[1]) / sqrt2sigma) -
+                  erf((voxMin[1] - pointCoords[1]) / sqrt2sigma));
+          }
+
+        if ( sliceData->sampleDimensions[2] > 1 )
+          {
+          erfZ = (erf((voxMax[2] - pointCoords[2]) / sqrt2sigma) -
+                  erf((voxMin[2] - pointCoords[2]) / sqrt2sigma));
+          }
+
+        voxGausWeight = (erfX * erfY * erfZ) / 8.0;
         voxGausWeight /= sliceData->voxelVolume;
 
         if (voxGausWeight == 0.0)
@@ -623,8 +637,15 @@ void vtkGaussianScalarSplatter::ComputeModelBounds(vtkDataSet *input,
 
   for (i=0; i<3; i++)
     {
-    this->Spacing[i] = (this->ModelBounds[2*i+1] - this->ModelBounds[2*i])
-      / (this->SampleDimensions[i] - 1);
+    if ( this->SampleDimensions[i] > 1 )
+      {
+      this->Spacing[i] = (this->ModelBounds[2*i+1] - this->ModelBounds[2*i])
+        / (this->SampleDimensions[i] - 1);
+      }
+    else
+      {
+      this->Spacing[i] = 1.0;
+      }
     if ( this->Spacing[i] <= 0.0 )
       {
       this->Spacing[i] = 1.0;
@@ -670,12 +691,6 @@ void vtkGaussianScalarSplatter::SetSampleDimensions(int dim[3])
         {
         dataDim++;
         }
-      }
-
-    if ( dataDim  < 3 )
-      {
-      vtkErrorMacro(<<"Sample dimensions must define a volume!");
-      return;
       }
 
     for ( i=0; i<3; i++)
