@@ -103,6 +103,9 @@ protected:
   ~vtkGaussianScalarSplatter() {};
 
   virtual int FillInputPortInformation(int port, vtkInformation* info);
+  virtual int RequestUpdateExtent(vtkInformation* vtkNotUsed(request),
+                                  vtkInformationVector** inputVector,
+                                  vtkInformationVector* outputVector);
   virtual int RequestInformation (vtkInformation *,
                                   vtkInformationVector **,
                                   vtkInformationVector *);

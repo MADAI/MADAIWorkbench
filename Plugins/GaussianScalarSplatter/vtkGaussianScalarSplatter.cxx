@@ -19,12 +19,14 @@
 #include "vtkGaussianScalarSplatter.h"
 
 #include "vtkDoubleArray.h"
+#include "vtkExtentTranslator.h"
 #include "vtkIdList.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkObjectFactory.h"
 #include "vtkMultiThreader.h"
+#include "vtkObjectFactory.h"
+#include "vtkOnePieceExtentTranslator.h"
 #include "vtkPointData.h"
 #include "vtkPointLocator.h"
 #include "vtkPoints.h"
@@ -111,6 +113,84 @@ vtkGaussianScalarSplatter::vtkGaussianScalarSplatter()
 }
 
 //----------------------------------------------------------------------------
+int vtkGaussianScalarSplatter::RequestUpdateExtent(vtkInformation* vtkNotUsed(request),
+                                                   vtkInformationVector** inputVector,
+                                                   vtkInformationVector* outputVector)
+{
+  // get the info objects
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+
+  int numPieces = 1;
+  int piece = 0;
+  int ghostLevel = 0;
+  // Use the output piece request to break up the input.
+  // If not specified, use defaults.
+  if (outInfo->Has(
+        vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()))
+    {
+    numPieces = outInfo->Get(
+      vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
+    }
+  if (outInfo->Has(
+        vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()))
+    {
+    piece = outInfo->Get(
+      vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
+    }
+  if (outInfo->Has(
+        vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS()))
+    {
+    ghostLevel = outInfo->Get(
+      vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS());
+    }
+  vtkDataObject* data = inInfo->Get(vtkDataObject::DATA_OBJECT());
+  // If input extent is piece based, just pass the update requests
+  // from the output. Even though the output extent is structured,
+  // piece-based request still gets propagated. This will not work
+  // if there was no piece based request to start with. That is handled
+  // above.
+  if(data->GetExtentType() == VTK_PIECES_EXTENT)
+    {
+    inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(),
+                numPieces);
+    inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER(),
+                piece);
+    inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
+                ghostLevel);
+    }
+  else if(data->GetExtentType() == VTK_3D_EXTENT)
+    {
+    int* inWholeExtent =
+      inInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT());
+
+    vtkExtentTranslator* translator =
+      vtkExtentTranslator::SafeDownCast(
+        inInfo->Get(vtkStreamingDemandDrivenPipeline::EXTENT_TRANSLATOR()));
+    if(translator)
+      {
+      translator->SetWholeExtent(inWholeExtent);
+      translator->SetPiece(piece);
+      translator->SetNumberOfPieces(numPieces);
+      translator->SetGhostLevel(ghostLevel);
+      translator->PieceToExtent();
+      inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(),
+                  translator->GetExtent(),
+                  6);
+      }
+    else
+      {
+      inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(),
+                  inWholeExtent,
+                  6);
+      }
+    }
+
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
 int vtkGaussianScalarSplatter::RequestInformation (
   vtkInformation * vtkNotUsed(request),
   vtkInformationVector ** vtkNotUsed( inputVector ),
@@ -137,8 +217,15 @@ int vtkGaussianScalarSplatter::RequestInformation (
   int i;
   for (i=0; i<3; i++)
     {
-    this->Spacing[i] = (this->ModelBounds[2*i+1] - this->ModelBounds[2*i])
-      / (this->SampleDimensions[i] - 1);
+    if (this->SampleDimensions[i] > 1)
+      {
+      this->Spacing[i] = (this->ModelBounds[2*i+1] - this->ModelBounds[2*i])
+        / (this->SampleDimensions[i] - 1);
+      }
+    else
+      {
+      this->Spacing[i] = 1.0;
+      }
     if ( this->Spacing[i] <= 0.0 )
       {
       this->Spacing[i] = 1.0;
@@ -151,6 +238,21 @@ int vtkGaussianScalarSplatter::RequestInformation (
                0, this->SampleDimensions[1] - 1,
                0, this->SampleDimensions[2] - 1);
   vtkDataObject::SetPointDataActiveScalarInfo(outInfo, VTK_DOUBLE, 1);
+
+  // Copied from vtkFastSplatter::RequestInformation
+  // Setup ExtentTranslator so that all downstream piece requests are
+  // converted to whole extent update requests, as need by this filter.
+  vtkStreamingDemandDrivenPipeline* sddp =
+    vtkStreamingDemandDrivenPipeline::SafeDownCast(this->GetExecutive());
+  if (strcmp(
+      sddp->GetExtentTranslator(outInfo)->GetClassName(),
+      "vtkOnePieceExtentTranslator") != 0)
+    {
+    vtkExtentTranslator* et = vtkOnePieceExtentTranslator::New();
+    sddp->SetExtentTranslator(outInfo, et);
+    et->Delete();
+    }
+
   return 1;
 }
 
@@ -269,7 +371,7 @@ int vtkGaussianScalarSplatter::RequestData(
     sliceData.sampleDimensions[i] = this->SampleDimensions[i];
 
     // This is a little odd. Shouldn't it be largest_dim < this->Spacing[i]
-    if (largest_dim > this->Spacing[i])
+    if (this->Spacing[i] > largest_dim)
       {
       largest_dim = this->Spacing[i];
       }
