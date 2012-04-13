@@ -499,7 +499,6 @@ static void vtkGaussianScalarSplatter_ProcessSlice(SliceDataType * sliceData, in
   int sliceSize = (sliceData->SampleDimensions[0] *
 		   sliceData->SampleDimensions[1]);
   double pointCoords[3]; // double[3] coords of a point
-  double voxGausWeight;
   int ptId;
   int dataArrayIdx,compIdx, numberOfComponents, idx;
   vtkDataArray * oDataArray, * iDataArray;
