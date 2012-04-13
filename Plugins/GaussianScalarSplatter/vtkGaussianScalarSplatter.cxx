@@ -534,6 +534,11 @@ static void processSlice(sliceDataType * sliceData, int sliceIndex, int threadId
       {
       closePoints->Reset();
 #ifdef USE_LOCATOR
+      // NOTE: if this is re-enabled in the future, we should
+      // make sure to check if any of the SampleDimensions is 1.
+      // If so, we need to project the data in that dimension
+      // down to zero so that the locator works correctly.
+
       pointLocator->FindPointsWithinRadius(sliceData->radius,
                                            voxLoc, closePoints);
       erfsCounted += closePoints->GetNumberOfIds();
