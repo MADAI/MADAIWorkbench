@@ -504,7 +504,7 @@ static void processSlice(sliceDataType * sliceData, int sliceIndex, int threadId
 		   sliceData->sampleDimensions[1]);
   double pointCoords[3]; // double[3] coords of a point
   double voxGausWeight;
-  int ptId, nearPoint;
+  int ptId;
   int dataArrayIdx,compIdx, numberOfComponents, idx;
   vtkDataArray * oDataArray, * iDataArray;
 
@@ -553,26 +553,30 @@ static void processSlice(sliceDataType * sliceData, int sliceIndex, int threadId
         double erfX = 1.0;
         double erfY = 1.0;
         double erfZ = 1.0;
+        double divisor = 1.0;
 
         if ( sliceData->sampleDimensions[0] > 1 )
           {
           erfX = (erf((voxMax[0] - pointCoords[0]) / sqrt2sigma) -
                   erf((voxMin[0] - pointCoords[0]) / sqrt2sigma));
+          divisor *= 2.0;
           }
 
         if ( sliceData->sampleDimensions[1] > 1 )
           {
           erfY = (erf((voxMax[1] - pointCoords[1]) / sqrt2sigma) -
                   erf((voxMin[1] - pointCoords[1]) / sqrt2sigma));
+          divisor *= 2.0;
           }
 
         if ( sliceData->sampleDimensions[2] > 1 )
           {
           erfZ = (erf((voxMax[2] - pointCoords[2]) / sqrt2sigma) -
                   erf((voxMin[2] - pointCoords[2]) / sqrt2sigma));
+          divisor *= 2.0;
           }
 
-        voxGausWeight = (erfX * erfY * erfZ) / 8.0;
+        voxGausWeight = (erfX * erfY * erfZ) / divisor;
         voxGausWeight /= sliceData->voxelVolume;
 
         if (voxGausWeight == 0.0)
