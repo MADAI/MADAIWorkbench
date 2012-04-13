@@ -82,7 +82,6 @@ public:
   vtkDoubleArray * NumberDensity;
   std::vector<vtkDataArray *> * OutputDataArrays;
   std::vector<vtkDataArray *> * InputDataArrays;
-  double VoxelVolume;
   double Sqrt2sigma;
   double Radius;
   double Origin[3];
@@ -297,7 +296,7 @@ int vtkGaussianScalarSplatter::RequestData(
   std::vector<vtkDataArray *> outputDataArrays; // pointers to the arrays I'm going to splat.
   std::vector<vtkDataArray *> inputDataArrays; // pointers to the arrays I'm splatting into
 
-  // sliceData is a chunck of memory containing information I'm going
+  // sliceData is a chunk of memory containing information I'm going
   // to pass to the vtkGaussianScalarSplatter_ProcessSlice() function.
   SliceDataType sliceData;
 
@@ -375,9 +374,6 @@ int vtkGaussianScalarSplatter::RequestData(
       largest_dim = this->Spacing[i];
       }
     }
-  sliceData.VoxelVolume = (this->Spacing[0] *
-                           this->Spacing[1] *
-                           this->Spacing[2]);
   sliceData.Sqrt2sigma = (sqrt(2.0) * this->StandardDeviation);
   sliceData.Radius = ((this->StandardDeviation * NUMBER_OF_STD_DEVIATIONS)
                       + (largest_dim / 2.0));
@@ -496,8 +492,8 @@ static void vtkGaussianScalarSplatter_ProcessSlice(SliceDataType * sliceData, in
   double sqrt2sigma = sliceData->Sqrt2sigma;
 
   voxLoc[2] = sliceData->Origin[2] + (sliceData->Spacing[2] * sliceIndex);
-  voxMin[2] = voxLoc[2] - (sliceData->Spacing[2] / 2);
-  voxMax[2] = voxLoc[2] + (sliceData->Spacing[2] / 2);
+  voxMin[2] = voxLoc[2] - (sliceData->Spacing[2] / 2.0);
+  voxMax[2] = voxLoc[2] + (sliceData->Spacing[2] / 2.0);
 
   vtkIdList * closePoints = vtkIdList::New();
   int sliceSize = (sliceData->SampleDimensions[0] *
@@ -512,8 +508,8 @@ static void vtkGaussianScalarSplatter_ProcessSlice(SliceDataType * sliceData, in
 
   for (vox[1] = 0,
          voxLoc[1] = sliceData->Origin[1],
-         voxMin[1] = voxLoc[1] - (sliceData->Spacing[1] / 2),
-         voxMax[1] = voxLoc[1] + (sliceData->Spacing[1] / 2);
+         voxMin[1] = voxLoc[1] - (sliceData->Spacing[1] / 2.0),
+         voxMax[1] = voxLoc[1] + (sliceData->Spacing[1] / 2.0);
        vox[1] < sliceData->SampleDimensions[1];
        vox[1]++,
          voxMin[1] = voxMax[1],
@@ -523,8 +519,8 @@ static void vtkGaussianScalarSplatter_ProcessSlice(SliceDataType * sliceData, in
     idx = (vox[1] * sliceData->SampleDimensions[0]) + (sliceIndex * sliceSize);
     for (vox[0] = 0,
            voxLoc[0] = sliceData->Origin[0],
-           voxMin[0] = voxLoc[0] - (sliceData->Spacing[0] / 2),
-           voxMax[0] = voxLoc[0] + (sliceData->Spacing[0] / 2);
+           voxMin[0] = voxLoc[0] - (sliceData->Spacing[0] / 2.0),
+           voxMax[0] = voxLoc[0] + (sliceData->Spacing[0] / 2.0);
          vox[0] < sliceData->SampleDimensions[0];
          vox[0]++,
            voxMin[0] = voxMax[0],
@@ -555,41 +551,23 @@ static void vtkGaussianScalarSplatter_ProcessSlice(SliceDataType * sliceData, in
         {
 #endif
         input->GetPoint(ptId, pointCoords);
-        double erfX = 1.0;
-        double erfY = 1.0;
-        double erfZ = 1.0;
-        double divisor = 1.0;
+        double voxelGaussianWeight = 1.0;
 
-        if ( sliceData->SampleDimensions[0] > 1 )
+        for (int i = 0; i < 3; ++i)
           {
-          erfX = (vtkGaussianScalarSplatter_erf((voxMax[0] - pointCoords[0]) / sqrt2sigma) -
-                  vtkGaussianScalarSplatter_erf((voxMin[0] - pointCoords[0]) / sqrt2sigma));
-          divisor *= 2.0;
+          if ( sliceData->SampleDimensions[i] > 1 )
+            {
+            voxelGaussianWeight *= 0.5*(vtkGaussianScalarSplatter_erf((voxMax[i] - pointCoords[i]) / sqrt2sigma) -
+                                        vtkGaussianScalarSplatter_erf((voxMin[i] - pointCoords[i]) / sqrt2sigma));
+            }
           }
 
-        if ( sliceData->SampleDimensions[1] > 1 )
-          {
-          erfY = (vtkGaussianScalarSplatter_erf((voxMax[1] - pointCoords[1]) / sqrt2sigma) -
-                  vtkGaussianScalarSplatter_erf((voxMin[1] - pointCoords[1]) / sqrt2sigma));
-          divisor *= 2.0;
-          }
-
-        if ( sliceData->SampleDimensions[2] > 1 )
-          {
-          erfZ = (vtkGaussianScalarSplatter_erf((voxMax[2] - pointCoords[2]) / sqrt2sigma) -
-                  vtkGaussianScalarSplatter_erf((voxMin[2] - pointCoords[2]) / sqrt2sigma));
-          divisor *= 2.0;
-          }
-
-        voxGausWeight = (erfX * erfY * erfZ) / divisor;
-        voxGausWeight /= sliceData->VoxelVolume;
-
-        if (voxGausWeight == 0.0)
+        if (voxelGaussianWeight == 0.0)
           {
           continue; //with for loop
           }
         numberDensity->SetComponent(idx, 0, (numberDensity->GetComponent(idx,0)
-                                             + voxGausWeight));
+                                             + voxelGaussianWeight));
         for(dataArrayIdx = 0;
             dataArrayIdx < outputDataArrays->size() ;
             dataArrayIdx++)
@@ -604,7 +582,7 @@ static void vtkGaussianScalarSplatter_ProcessSlice(SliceDataType * sliceData, in
             oDataArray->SetComponent(idx,compIdx,
                                      (oDataArray->GetComponent(idx,compIdx) +
                                       (iDataArray->GetComponent(ptId,compIdx) *
-                                       voxGausWeight)));
+                                       voxelGaussianWeight)));
             } //for numberOfComponents
           } //for outputDataArrays
         } // for nearby points
