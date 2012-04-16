@@ -60,6 +60,12 @@ else
 fi
 echo "Target: " ${target}
 
+# On Mac OS X 10.5, the install Python is version 2.5
+python_version="2.6"
+if [ "$4" == "10.5" ]; then
+    python_version="2.5"
+fi
+
 ###################################
 # Set up build and source directories
 ###################################
@@ -94,9 +100,9 @@ cmake \
     -D BUILD_TESTING:BOOL=OFF \
     -D PARAVIEW_ENABLE_PYTHON:BOOL=ON \
     -D PARAVIEW_ENABLE_PYTHON_FILTERS:BOOL=ON \
-    -D PYTHON_EXECUTABLE:PATH=/usr/bin/python2.6 \
-    -D PYTHON_INCLUDE_DIR:PATH=/System/Library/Frameworks/Python.framework/Versions/2.6/Headers \
-    -D PYTHON_LIBRARY:PATH=/usr/lib/libpython2.6.dylib \
+    -D PYTHON_EXECUTABLE:PATH=/usr/bin/python${python_version} \
+    -D PYTHON_INCLUDE_DIR:PATH=/System/Library/Frameworks/Python.framework/Versions/${python_version}/Headers \
+    -D PYTHON_LIBRARY:PATH=/usr/lib/libpython${python_version}.dylib \
     -D PARAVIEW_USE_VISITBRIDGE:BOOL=ON \
     -D QT_QMAKE_EXECUTABLE:PATH=$qmake \
     -D CMAKE_OSX_DEPLOYMENT_TARGET:STRING=${target} \
