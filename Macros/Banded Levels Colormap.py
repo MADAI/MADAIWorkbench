@@ -22,7 +22,7 @@ try:
 	def alert(msg):
 		QtGui.QMessageBox(QtGui.QMessageBox.Information,
 			'Alert', msg).exec_()
-except Exception as e:
+except Exception:
 	def alert(msg):
 		print '\n%s\n' % msg
 #_____________________________________________________________________

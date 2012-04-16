@@ -33,7 +33,7 @@ try:
 	def alert(msg):
 		QtGui.QMessageBox(QtGui.QMessageBox.Information,
 			'Alert', msg).exec_()
-except Exception as e:
+except Exception:
 	#print 'PyQt4 import failed. Falling back on console functions.'
 	# CONSOLE FUNCTION DEFINITIONS
 	def getItem(answers, question):
@@ -84,7 +84,7 @@ def calc_diff(data):
 
 	try:
 		myvar = getItem(keylist, "Which data field do you want to plot?")
-	except Exception as e:
+	except Exception:
 		alert("choose something!")
 		return None
 
