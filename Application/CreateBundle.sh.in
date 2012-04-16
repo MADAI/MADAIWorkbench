@@ -13,6 +13,7 @@ ParaViewBinaryDir="@ParaView_BINARY_DIR@"
 ParaViewExeOutputDir="@EXECUTABLE_OUTPUT_PATH@"
 ParaViewExeName="@PV_EXE_NAME@"
 ParaView_App="$ParaViewExeOutputDir/$ParaViewExeName.app"
+MADAIWorkbenchSourceDir="@MADAIWorkbench_SOURCE_DIR@"
 
 # Remove the previous app package so we start with a clean bundle
 #
@@ -44,6 +45,8 @@ LibrariesDir="$ParaView_App/Contents/Libraries"
 PluginsDir="$ParaView_App/Contents/Plugins"
 PythonDir="$ParaView_App/Contents/Python"
 SupportDir="$ParaView_App/Contents/Support"
+MacrosDir="$ParaView_App/Contents/Macros"
+echo $MacrosDir
 
 
 # Create directories in the install tree bundle
@@ -78,6 +81,12 @@ cp -Rp "${ParaViewBinaryDir}/Utilities/VTKPythonWrapping/site-packages/" "$Pytho
 pushd "$ParaViewBinaryDir/bin"
 cp *Python.so "$LibrariesDir/"
 popd
+
+# Add macros to installer
+echo "Copying $MADAIWorkbenchSourceDir/Macros to $MacrosDir"
+mkdir -p "$MacrosDir"
+ls $MADAIWorkbenchSourceDir/Macros/*.py
+cp -p $MADAIWorkbenchSourceDir/Macros/*.py "$MacrosDir"
 
 # Create an empty qt.conf so that we don't try to load Qt plugins.
 touch "$ParaView_App/Contents/Resources/qt.conf"
