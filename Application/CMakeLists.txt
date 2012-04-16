@@ -211,7 +211,6 @@ IF (NOT APPLE)
     QTSCRIPT QTSQL QTSVG QTTEST QTWEBKIT QTXMLPATTERNS QTXML
   )
   FOREACH(qtlib ${QT_LIBS})
-    MESSAGE("qtlib: " ${qtlib})
     IF (QT_${qtlib}_LIBRARY_RELEASE)
       IF (NOT WIN32)
         GET_FILENAME_COMPONENT(QT_LIB_DIR_tmp ${QT_${qtlib}_LIBRARY_RELEASE} PATH)
@@ -222,11 +221,22 @@ IF (NOT APPLE)
       ELSE (NOT WIN32)
         GET_FILENAME_COMPONENT(QT_DLL_PATH_tmp ${QT_QMAKE_EXECUTABLE} PATH)
         GET_FILENAME_COMPONENT(QT_LIB_NAME_tmp ${QT_${qtlib}_LIBRARY_RELEASE} NAME_WE)
-        MESSAGE("qtlib: " ${QT_DLL_PATH_tmp}/${QT_LIB_NAME_tmp}.dll)
         INSTALL(FILES ${QT_DLL_PATH_tmp}/${QT_LIB_NAME_tmp}.dll DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT "BrandedRuntime")
       ENDIF (NOT WIN32)
     ENDIF (QT_${qtlib}_LIBRARY_RELEASE)
   ENDFOREACH(qtlib)
+  
+  # Add python DLL if enabled
+  IF (PARAVIEW_ENABLE_PYTHON)
+	# Find the ParaView CMakeCache.txt file in the ParaView build
+	SET( PARAVIEW_PYTHON_DLL ${MADAIWorkbench_BINARY_DIR}/python27.dll )
+    IF ( EXISTS ${PARAVIEW_PYTHON_DLL} )
+      INSTALL(FILES ${PARAVIEW_PYTHON_DLL} DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT "BrandedRuntime")
+      INSTALL(DIRECTORY "C:\\\\Python27\\\\Lib" DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT "BrandedRuntime")
+    ELSE()
+      MESSAGE( ERROR "Could not find python27.dll. Please copy this file from C:\\Windows\\System32\\python27.dll to the MADAI Workbench build directory." )
+    ENDIF()
+  ENDIF()
 ENDIF (NOT APPLE)
 
 #------------------------------------------------------------------------
