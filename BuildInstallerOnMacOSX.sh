@@ -3,7 +3,12 @@
 ###################################
 # Options
 ###################################
-BUILD_AGAINST_PARAVIEW_VERSION="v3.14.1"
+#PARAVIEW_VERSION="v3.14.1"
+PARAVIEW_VERSION="MADAIWorkbench"
+
+#PARAVIEW_GIT_URL="git://paraview.org/ParaView.git"
+PARAVIEW_GIT_URL="git://github.com/MADAI/ParaView.git"
+
 
 ###################################
 # Argument checking
@@ -69,12 +74,13 @@ mkdir -p $src_dir
 ###################################
 cd $src_dir
 paraview_src_dir=$src_dir/ParaView
-git clone --recursive git://paraview.org/ParaView.git ParaView
+git clone ${PARAVIEW_GIT_URL} ParaView
 cd $paraview_src_dir
 
 # Switch to desired ParaView version
-git checkout "$BUILD_AGAINST_PARAVIEW_VERSION"
-git submodule update
+git fetch origin
+git checkout ${PARAVIEW_VERSION}
+git submodule update --init
 
 ###################################
 # Configure ParaView
