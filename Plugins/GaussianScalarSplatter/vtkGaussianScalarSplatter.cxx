@@ -505,6 +505,11 @@ static void vtkGaussianScalarSplatter_ProcessSlice(SliceDataType * sliceData, in
 
   long int erfsCounted = 0;
 
+  // Compute the voxel volume
+  double voxelVolume = sliceData->Spacing[0] *
+                       sliceData->Spacing[1] *
+		       sliceData->Spacing[2];
+
   for (vox[1] = 0,
          voxLoc[1] = sliceData->Origin[1],
          voxMin[1] = voxLoc[1] - (sliceData->Spacing[1] / 2.0),
@@ -581,7 +586,7 @@ static void vtkGaussianScalarSplatter_ProcessSlice(SliceDataType * sliceData, in
             oDataArray->SetComponent(idx,compIdx,
                                      (oDataArray->GetComponent(idx,compIdx) +
                                       (iDataArray->GetComponent(ptId,compIdx) *
-                                       voxelGaussianWeight)));
+                                       voxelGaussianWeight / voxelVolume)));
             } //for numberOfComponents
           } //for outputDataArrays
         } // for nearby points
