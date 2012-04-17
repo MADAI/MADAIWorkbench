@@ -237,6 +237,9 @@ IF (NOT APPLE)
       MESSAGE( ERROR "Could not find python27.dll. Please copy this file from C:\\Windows\\System32\\python27.dll to the MADAI Workbench build directory." )
     ENDIF()
   ENDIF()
+
+  # Add macros directory
+  INSTALL(DIRECTORY ${MADAIWorkbench_SOURCE_DIR}/Macros DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT "BrandedRuntime")
 ENDIF (NOT APPLE)
 
 #------------------------------------------------------------------------
