@@ -303,12 +303,16 @@ int vtkGaussianScalarSplatter::RequestData(
   // Initialize multiple threads
   vtkMultiThreader * threader = vtkMultiThreader::New();
   int numberOfThreads = vtkMultiThreader::GetGlobalDefaultNumberOfThreads();
+#ifdef IMAGE_DATA_BUG_FIXED
   vtkMultiThreader::SetGlobalMaximumNumberOfThreads(numberOfThreads);
   if (numberOfThreads > this->SampleDimensions[2])
     {
     numberOfThreads = this->SampleDimensions[2];
     }
   threader->SetNumberOfThreads(numberOfThreads);
+#else
+  threader->SetNumberOfThreads(1);
+#endif
 
   sliceData.Input = new vtkDataSet*[numberOfThreads];
   for (int threadId = 0; threadId < numberOfThreads; threadId++)
