@@ -3,11 +3,12 @@
 ###################################
 # Options
 ###################################
+PARAVIEW_VERSION="1439967260d37255e86d328424597a6e93921a3f"
 #PARAVIEW_VERSION="v3.14.1"
-PARAVIEW_VERSION="MADAIWorkbench"
+#PARAVIEW_VERSION="MADAIWorkbench"
 
-#PARAVIEW_GIT_URL="git://paraview.org/ParaView.git"
-PARAVIEW_GIT_URL="git://github.com/MADAI/ParaView.git"
+PARAVIEW_GIT_URL="git://paraview.org/ParaView.git"
+#PARAVIEW_GIT_URL="git://github.com/MADAI/ParaView.git"
 
 
 ###################################
@@ -208,7 +209,7 @@ echo "Found MPI binary directory ${mpi_bin_dir}"
 ###################################
 install_dir=`pwd`/installer-working-directory
 rm -rf ${install_dir}
-bin_dir=${install_dir}/bin/MADAIWorkbench-${version}
+bin_dir=${install_dir}/bin/MADAIWorkbench-${version}-SupportFiles
 plugin_dir=${bin_dir}/plugins
 lib_dir=${install_dir}/lib/MADAIWorkbench-${version}
 mkdir -p ${install_dir}
@@ -261,11 +262,11 @@ done
 # Configure scripts to run the
 # workbench and server
 ###################################
-script_name=$bin_dir/../MADAIWorkbench
+script_name=$bin_dir/../MADAIWorkbench-${version}
 cp ${script_dir}/scripts/MADAIWorkbench.in ${script_name}
 sed -i 's/@VERSION@/'${version}'/g' ${script_name}
 chmod 755 $script_name
-script_name=$bin_dir/../MADAIWorkbenchServer
+script_name=$bin_dir/../MADAIWorkbenchServer-${version}
 cp ${script_dir}/scripts/MADAIWorkbenchServer.in ${script_name}
 sed -i 's/@VERSION@/'${version}'/g' ${script_name}
 chmod 755 $script_name

@@ -1,6 +1,6 @@
 #!/bin/bash
 bin_dir=`dirname $0`
-bin_dir=`readlink -f "${bin_dir}/MADAIWorkbench-@VERSION@"`
+bin_dir=`readlink -f "${bin_dir}/MADAIWorkbench-@VERSION@-SupportFiles"`
 lib_dir=`readlink -f "${bin_dir}/../../lib/MADAIWorkbench-@VERSION@"`
 PATH=${bin_dir}:${lib_dir}:${PATH}
 export PATH
