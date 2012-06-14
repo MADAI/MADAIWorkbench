@@ -72,6 +72,15 @@ private:
   vtkSmartPointer< vtkShader2 > FragmentShader;
 
   vtkSmartPointer< vtkShaderProgram2 > Program;
+
+  //BTX
+  // Linear color array. The first three elements are the RGB color if one
+  // surface is to be displayed. The next three elements are the RGB color
+  // of the first surface if two surfaces are to be displayed, and the
+  // three elements after that are the RGB color of the second surface, and so
+  // on for up to eight surfaces.
+  static float SliceColors[3*(8*9)/2];
+  //ETX
 };
 
 #endif
