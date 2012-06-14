@@ -1,0 +1,43 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="representations">
+    <RepresentationProxy name="EnsembleSurfaceSlicingRepresentation"
+      class="vtkEnsembleSurfaceSlicingRepresentation"
+      processes="client|renderserver|dataserver"
+      base_proxygroup="representations"
+      base_proxyname="SurfaceRepresentation">
+      <Documentation>
+        This is a representation that enabled the Ensemble Surface
+        Slicing technique. This representation is available only for
+        multiblock datasets. To create a multiblock data set from
+        several input geometries, select the geometries and use the
+        Group Datasets filter to combine them.
+      </Documentation>
+ 
+    </RepresentationProxy>
+
+    <Extension name="GeometryRepresentation">
+      <Documentation>
+        Extends standard GeometryRepresentation by adding
+        EnsembleSurfaceSlicingRepresentation as a new type of
+        representation.
+      </Documentation>
+
+      <!-- this adds to what is already defined in PVRepresentationBase -->
+      <RepresentationType subproxy="EnsembleSurfaceSlicingRepresentation"
+        text="Ensemble Surface Slicing Mapper" subtype="Surface" />
+
+      <SubProxy>
+        <Proxy name="EnsembleSurfaceSlicingRepresentation"
+          proxygroup="representations" proxyname="EnsembleSurfaceSlicingRepresentation">
+        </Proxy>
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+          <Exception name="Representation" />
+        </ShareProperties>
+      </SubProxy>
+    </Extension>
+
+  </ProxyGroup>
+ 
+</ServerManagerConfiguration>
