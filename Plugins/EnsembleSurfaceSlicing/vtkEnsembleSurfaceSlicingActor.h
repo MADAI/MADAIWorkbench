@@ -48,16 +48,6 @@ public:
   // Actual actor render method.
   void Render(vtkRenderer *ren, vtkMapper *mapper);
 
-  // Description:
-  // We are making the input always have translucent geometry.
-  int HasTranslucentPolygonalGeometry()
-  {
-    return 1;
-  }
-
-  // Description:
-  // No, this actor is not opaque
-
 
 protected:
   vtkEnsembleSurfaceSlicingActor();
