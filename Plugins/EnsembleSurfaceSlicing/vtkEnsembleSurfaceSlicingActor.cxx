@@ -29,7 +29,7 @@
 
 vtkStandardNewMacro(vtkEnsembleSurfaceSlicingActor);
 
-const char* vertexShader =
+static const char* vertexShader =
   "#version 120\n"
   "varying vec4 position;\n"
   "varying vec3 normal;\n"
@@ -45,7 +45,7 @@ const char* vertexShader =
   "  gl_Position = ftransform();\n"
   "}\n";
 
-const char* fragmentShader =
+static const char* fragmentShader =
   "#version 120\n"
   "varying vec4 position;\n"
   "varying vec3 normal;\n"
