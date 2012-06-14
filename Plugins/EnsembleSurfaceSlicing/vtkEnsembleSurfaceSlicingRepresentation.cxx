@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkEnsembleSurfaceSlicingRepresentation.h"
 
+#include "vtkEnsembleSurfaceSlicingActor.h"
 #include "vtkCompositePolyDataMapper2.h"
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
@@ -26,6 +27,8 @@ vtkStandardNewMacro(vtkEnsembleSurfaceSlicingRepresentation);
 //----------------------------------------------------------------------------
 vtkEnsembleSurfaceSlicingRepresentation::vtkEnsembleSurfaceSlicingRepresentation()
 {
+  this->Actor = vtkEnsembleSurfaceSlicingActor::New();
+
   this->BackfaceActor = vtkPVLODActor::New();
   this->BackfaceProperty = vtkProperty::New();
   this->BackfaceMapper = vtkCompositePolyDataMapper2::New();
