@@ -1,4 +1,5 @@
 add_subdirectory(BinningFilter)
+add_subdirectory(EnsembleSurfaceSlicing)
 add_subdirectory(GaussianScalarSplatter)
 add_subdirectory(MADAILogoTextSource)
 add_subdirectory(MaskTableRows)
