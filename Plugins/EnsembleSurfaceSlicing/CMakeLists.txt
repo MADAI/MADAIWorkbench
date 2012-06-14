@@ -4,4 +4,5 @@ add_paraview_plugin(
   SERVER_MANAGER_SOURCES
     vtkEnsembleSurfaceSlicingActor.cxx
     vtkEnsembleSurfaceSlicingRepresentation.cxx
+    vtkEnsembleSurfaceSlicingPolyDataMapper.cxx
   )
