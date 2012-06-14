@@ -23,128 +23,92 @@
 #include "vtkMapper.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
+#include "vtkOpenGLRenderWindow.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkRenderer.h"
+#include "vtkShader2.h"
+#include "vtkShader2Collection.h"
+#include "vtkShaderProgram2.h"
+#include "vtkUniformVariables.h"
 
 #include <vector>
 
 vtkStandardNewMacro(vtkEnsembleSurfaceSlicingPolyDataMapper);
 
-class vtkEnsembleSurfaceSlicingPolyDataMapperInternals
+static const char* vertexShader =
+  "#version 120\n"
+  "varying vec4 position;\n"
+  "varying vec3 normal;\n"
+  "varying vec3 vertexToLightVector;\n"
+  "\n"
+  "void main(void)\n"
+  "{\n"
+  "  normal = gl_NormalMatrix * gl_Normal;\n"
+  "  vec4 vertexInModelViewSpace = gl_ModelViewMatrix * gl_Vertex;\n"
+  "  vertexToLightVector = vec3( vertexInModelViewSpace.xyz - gl_LightSource[0].position.xyz );\n"
+  "  gl_FrontColor = gl_Color;\n"
+  "  position = gl_Vertex;\n"
+  "  gl_Position = ftransform();\n"
+  "}\n";
+
+static const char* fragmentShader =
+  "#version 120\n"
+  "varying vec4 position;\n"
+  "varying vec3 normal;\n"
+  "varying vec3 vertexToLightVector;\n"
+  "uniform float sliceWidth;\n"
+  "uniform float sliceOffset;\n"
+  "\n"
+  "void main()\n"
+  "{\n"
+  "  vec3 normalizedNormal = normalize(normal);\n"
+  "  if (gl_FrontFacing)\n"
+  "    normalizedNormal = -normalizedNormal;\n"
+  "  vec3 normalizedVertexToLightVector = normalize(vertexToLightVector);\n"
+  "  float diffuseTerm = dot(normalizedNormal, normalizedVertexToLightVector);\n"
+  "  diffuseTerm = clamp(diffuseTerm, 0.0, 1.0);\n"
+  "  gl_FragColor.rgb = gl_Color.rgb * diffuseTerm;\n"
+  "  gl_FragColor.a = 1.0;\n"
+  //"  if ( step(sliceWidth, mod(position.z + sliceOffset, 1.0)) > 0.0 )\n"
+  "  float modPosition = mod(position.z, 1.0);\n"
+  "  if ( modPosition < sliceOffset || modPosition >= sliceOffset + sliceWidth )\n"
+  "    {\n"
+  "    discard;\n"
+  "    }\n"
+  "}\n";
+
+
+// Definition brought over from the superclass
+class vtkCompositePolyDataMapperInternals
 {
 public:
   std::vector<vtkPolyDataMapper*> Mappers;
 };
 
+
 vtkEnsembleSurfaceSlicingPolyDataMapper::vtkEnsembleSurfaceSlicingPolyDataMapper()
 {
-  this->Internal = new vtkEnsembleSurfaceSlicingPolyDataMapperInternals;
+  this->IsInitialized = 0;
+  this->RenderWindow = NULL;
 }
 
 vtkEnsembleSurfaceSlicingPolyDataMapper::~vtkEnsembleSurfaceSlicingPolyDataMapper()
 {
-  for(unsigned int i=0;i<this->Internal->Mappers.size();i++)
+  if ( this->VertexShader.GetPointer() )
     {
-    this->Internal->Mappers[i]->UnRegister(this);
+    this->VertexShader->ReleaseGraphicsResources();
     }
-  this->Internal->Mappers.clear();
-  
-  delete this->Internal;
-}
 
-// Specify the type of data this mapper can handle. If we are
-// working with a regular (not hierarchical) pipeline, then we
-// need vtkPolyData. For composite data pipelines, then
-// vtkCompositeDataSet is required, and we'll check when
-// building our structure whether all the part of the composite
-// data set are polydata.
-int vtkEnsembleSurfaceSlicingPolyDataMapper::FillInputPortInformation(
-  int vtkNotUsed(port), vtkInformation* info)
-{
-  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
-  return 1;
-}    
+  if ( this->FragmentShader.GetPointer() )
+    {
+    this->FragmentShader->ReleaseGraphicsResources();
+    }
 
-// When the structure is out-of-date, recreate it by
-// creating a mapper for each input data.
-void vtkEnsembleSurfaceSlicingPolyDataMapper::BuildPolyDataMapper()
-{
-  int warnOnce = 0;
-  
-  //Delete pdmappers if they already exist.
-  for(unsigned int i=0;i<this->Internal->Mappers.size();i++)
+  if ( this->Program.GetPointer() )
     {
-    this->Internal->Mappers[i]->UnRegister(this);
+    this->Program->ReleaseGraphicsResources();
     }
-  this->Internal->Mappers.clear();
-  
-  //Get the composite dataset from the input
-  vtkInformation* inInfo = this->GetExecutive()->GetInputInformation(0,0);
-  vtkCompositeDataSet *input = vtkCompositeDataSet::SafeDownCast(
-    inInfo->Get(vtkDataObject::DATA_OBJECT()));
-  
-  // If it isn't hierarchical, maybe it is just a plain vtkPolyData
-  if(!input) 
-    {
-    vtkPolyData *pd = vtkPolyData::SafeDownCast(
-      this->GetExecutive()->GetInputData(0, 0));
-    if ( pd )
-      {
-      // Make a copy of the data to break the pipeline here
-      vtkPolyData *newpd = vtkPolyData::New();
-      newpd->ShallowCopy(pd);
-      vtkPolyDataMapper *pdmapper = this->MakeAMapper();
-      pdmapper->Register( this );
-      pdmapper->SetInputData(newpd);
-      this->Internal->Mappers.push_back(pdmapper);
-      newpd->Delete();
-      pdmapper->Delete();
-      }
-    else
-      {
-      vtkDataObject* tmpInp = this->GetExecutive()->GetInputData(0, 0);
-      vtkErrorMacro("This mapper cannot handle input of type: "
-                    << (tmpInp?tmpInp->GetClassName():"(none)"));
-      }
-    }
-  else
-    {
-    //for each data set build a vtkPolyDataMapper
-    vtkCompositeDataIterator* iter = input->NewIterator();
-    iter->GoToFirstItem();  
-    while (!iter->IsDoneWithTraversal())
-      {
-      vtkPolyData* pd = 
-        vtkPolyData::SafeDownCast(iter->GetCurrentDataObject());      
-      if (pd)
-        {
-        // Make a copy of the data to break the pipeline here
-        vtkPolyData *newpd = vtkPolyData::New();
-        newpd->ShallowCopy(pd);
-        vtkPolyDataMapper *pdmapper = this->MakeAMapper();
-        pdmapper->Register(this);
-        pdmapper->SetInputData(newpd);
-        this->Internal->Mappers.push_back(pdmapper);
-        newpd->Delete();
-        pdmapper->Delete();
-        }
-      // This is not polydata - warn the user that there are non-polydata
-      // parts to this data set which will not be rendered by this mapper
-      else
-        {
-        if ( !warnOnce )
-          {
-          vtkErrorMacro("All data in the hierarchical dataset must be polydata.");
-          warnOnce = 1;
-          }
-        }
-      iter->GoToNextItem();
-      }
-    iter->Delete();
-    }
-  
-  this->InternalMappersBuildTime.Modified();
-  
 }
 
 void vtkEnsembleSurfaceSlicingPolyDataMapper::Render(vtkRenderer *ren, vtkActor *a)
@@ -157,6 +121,21 @@ void vtkEnsembleSurfaceSlicingPolyDataMapper::Render(vtkRenderer *ren, vtkActor 
     {
     this->BuildPolyDataMapper();    
     }
+
+  if ( !this->IsInitialized )
+    {
+    this->RenderWindow = vtkOpenGLRenderWindow::SafeDownCast( ren->GetRenderWindow() );
+    if ( !this->RenderWindow )
+      {
+      vtkErrorMacro( << "render window must be an vtkOpenGLRenderWindow");
+      return;
+      }
+    }
+
+  this->Initialize();
+
+  // Set the slice width
+  float sliceWidth = 1.0 / static_cast<float>( this->Internal->Mappers.size() );
   
   this->TimeToDraw = 0;
   //Call Render() on each of the PolyDataMappers
@@ -167,6 +146,17 @@ void vtkEnsembleSurfaceSlicingPolyDataMapper::Render(vtkRenderer *ren, vtkActor 
       {
       this->Internal->Mappers[i]->SetClippingPlanes( this->ClippingPlanes );
       }
+
+    // Need to disable the shader program prior to changing the uniform values
+    this->Program->Restore();
+
+    // Set the slice offset
+    float sliceOffset = sliceWidth * i;
+    this->FragmentShader->GetUniformVariables()->SetUniformf("sliceWidth", 1, &sliceWidth);
+    this->FragmentShader->GetUniformVariables()->SetUniformf("sliceOffset", 1, &sliceOffset);
+
+    // Re-enable the shader program after the uniform values have been set
+    this->Program->Use();
     
     this->Internal->Mappers[i]->SetLookupTable(
       this->GetLookupTable());
@@ -201,112 +191,56 @@ void vtkEnsembleSurfaceSlicingPolyDataMapper::Render(vtkRenderer *ren, vtkActor 
     this->Internal->Mappers[i]->Render(ren,a);    
     this->TimeToDraw += this->Internal->Mappers[i]->GetTimeToDraw();
     }
+
+  this->Cleanup();
 }
-vtkExecutive* vtkEnsembleSurfaceSlicingPolyDataMapper::CreateDefaultExecutive()
+
+int vtkEnsembleSurfaceSlicingPolyDataMapper::Initialize()
 {
-  return vtkCompositeDataPipeline::New();
+  if ( !IsInitialized )
+    {
+    this->VertexShader = vtkSmartPointer< vtkShader2 >::New();
+    this->VertexShader->SetType( VTK_SHADER_TYPE_VERTEX );
+    this->VertexShader->SetSourceCode( vertexShader );
+    this->VertexShader->SetContext( this->RenderWindow );
+
+    this->FragmentShader = vtkSmartPointer< vtkShader2 >::New();
+    this->FragmentShader->SetType( VTK_SHADER_TYPE_FRAGMENT );
+    this->FragmentShader->SetSourceCode( fragmentShader );
+    this->FragmentShader->SetContext( this->RenderWindow );
+
+    this->Program = vtkSmartPointer< vtkShaderProgram2 >::New();
+    this->Program->SetContext( this->RenderWindow );
+    this->Program->GetShaders()->AddItem( this->VertexShader );
+    this->Program->GetShaders()->AddItem( this->FragmentShader );
+
+    // Build the shader programs
+    this->Program->Build();
+    if ( this->Program->GetLastBuildStatus() != VTK_SHADER_PROGRAM2_LINK_SUCCEEDED )
+      {
+      vtkErrorMacro( "Couldn't build the vertex shader program." );
+      return 0;
+      }
+
+    this->IsInitialized = 1;
+    }
+
+  this->Program->Use();
+
+  return 1;
 }
 
-//Looks at each DataSet and finds the union of all the bounds
-void vtkEnsembleSurfaceSlicingPolyDataMapper::ComputeBounds()
+//----------------------------------------------------------------------------
+int vtkEnsembleSurfaceSlicingPolyDataMapper::Cleanup()
 {
-  vtkMath::UninitializeBounds(this->Bounds);
-  
-  vtkInformation* inInfo = this->GetExecutive()->GetInputInformation(0,0);
-  vtkCompositeDataSet *input = vtkCompositeDataSet::SafeDownCast(
-    inInfo->Get(vtkDataObject::DATA_OBJECT()));
-
-  // If we don't have hierarchical data, test to see if we have
-  // plain old polydata. In this case, the bounds are simply
-  // the bounds of the input polydata.
-  if(!input) 
+  if ( this->Program.GetPointer() )
     {
-    vtkPolyData *pd = vtkPolyData::SafeDownCast(
-      this->GetExecutive()->GetInputData(0, 0));
-    if ( pd )
-      {
-      pd->GetBounds( this->Bounds );
-      }
-    return;
-    }
-  
-  // We do have hierarchical data - so we need to loop over
-  // it and get the total bounds.
-  vtkCompositeDataIterator* iter = input->NewIterator();
-  iter->GoToFirstItem();  
-  double bounds[6];
-  int i;
-  
-  while (!iter->IsDoneWithTraversal())
-    {
-    vtkPolyData *pd = vtkPolyData::SafeDownCast(iter->GetCurrentDataObject());    
-    if (pd)
-      {
-      // If this isn't the first time through, expand bounds
-      // we've compute so far based on the bounds of this
-      // block
-      if ( vtkMath::AreBoundsInitialized(this->Bounds) )
-        {
-        pd->GetBounds(bounds);
-        for(i=0; i<3; i++)
-          {
-          this->Bounds[i*2] = 
-            (bounds[i*2]<this->Bounds[i*2])?
-            (bounds[i*2]):(this->Bounds[i*2]);
-          this->Bounds[i*2+1] = 
-            (bounds[i*2+1]>this->Bounds[i*2+1])?
-            (bounds[i*2+1]):(this->Bounds[i*2+1]);
-          }
-        }
-      // If this is our first time through, just get the bounds
-      // of the data as the initial bounds
-      else
-        {
-        pd->GetBounds(this->Bounds);
-        }
-      }
-    iter->GoToNextItem();
-    }
-  iter->Delete();
-  this->BoundsMTime.Modified();
-}
-
-double *vtkEnsembleSurfaceSlicingPolyDataMapper::GetBounds()
-{ 
-  if ( ! this->GetExecutive()->GetInputData(0, 0) ) 
-    {
-    vtkMath::UninitializeBounds(this->Bounds);
-    return this->Bounds;
+    this->Program->Restore();
     }
   else
     {
-    this->Update();
-    
-    //only compute bounds when the input data has changed
-    vtkCompositeDataPipeline * executive = vtkCompositeDataPipeline::SafeDownCast(this->GetExecutive());
-    if( executive->GetPipelineMTime() > this->BoundsMTime.GetMTime() )
-      {
-      this->ComputeBounds();
-      }
-    
-    return this->Bounds;
+    return 0;
     }
-}
 
-void vtkEnsembleSurfaceSlicingPolyDataMapper::ReleaseGraphicsResources( vtkWindow *win )
-{
-  for(unsigned int i=0;i<this->Internal->Mappers.size();i++)
-    {
-    this->Internal->Mappers[i]->ReleaseGraphicsResources( win );
-    }
-}
-
-void vtkEnsembleSurfaceSlicingPolyDataMapper::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os,indent);
-}
-
-vtkPolyDataMapper *vtkEnsembleSurfaceSlicingPolyDataMapper::MakeAMapper()
-{
-  return vtkPolyDataMapper::New();
+  return 1;
 }

@@ -27,11 +27,17 @@
 
 #include "vtkCompositePolyDataMapper.h"
 
+#include "vtkSmartPointer.h"
+
 class vtkPolyDataMapper;
 class vtkInformation;
 class vtkRenderer;
 class vtkActor;
+class vtkOpenGLRenderWindow;
 class vtkEnsembleSurfaceSlicingPolyDataMapperInternals;
+class vtkShader2;
+class vtkShaderProgram2;
+
 
 class VTK_RENDERING_EXPORT vtkEnsembleSurfaceSlicingPolyDataMapper : public vtkCompositePolyDataMapper
 {
@@ -39,67 +45,33 @@ class VTK_RENDERING_EXPORT vtkEnsembleSurfaceSlicingPolyDataMapper : public vtkC
 public:
   static vtkEnsembleSurfaceSlicingPolyDataMapper *New();
   vtkTypeMacro(vtkEnsembleSurfaceSlicingPolyDataMapper, vtkCompositePolyDataMapper);
-  virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Standard method for rendering a mapper. This method will be
   // called by the actor.
   void Render(vtkRenderer *ren, vtkActor *a);
 
-  // Description:
-  // Standard vtkProp method to get 3D bounds of a 3D prop
-  double *GetBounds();
-  void GetBounds(double bounds[6]) { this->Superclass::GetBounds( bounds ); };
-
-  // Description:
-  // Release the underlying resources associated with this mapper
-  void ReleaseGraphicsResources(vtkWindow *);
-
 protected:
   vtkEnsembleSurfaceSlicingPolyDataMapper();
   ~vtkEnsembleSurfaceSlicingPolyDataMapper();
 
-  // Description:
-  // We need to override this method because the standard streaming
-  // demand driven pipeline is not what we want - we are expecting
-  // hierarchical data as input
-  vtkExecutive* CreateDefaultExecutive();
-
-  // Description:
-  // Need to define the type of data handled by this mapper.
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
-
-  // Description:
-  // This is the build method for creating the internal polydata
-  // mapper that do the actual work
-  void BuildPolyDataMapper();
-
-  // Description:
-  // BuildPolyDataMapper uses this for each mapper. It is broken out so we can change types.
-  virtual vtkPolyDataMapper *MakeAMapper();
-
-  // Description:
-  // Need to loop over the hierarchy to compute bounds
-  void ComputeBounds();
-
-  // Description:
-  // Time stamp for computation of bounds.
-  vtkTimeStamp BoundsMTime;
-
-  // Description:
-  // These are the internal polydata mapper that do the
-  // rendering. We save then so that they can keep their
-  // display lists.
-  vtkEnsembleSurfaceSlicingPolyDataMapperInternals *Internal;
-
-  // Description:
-  // Time stamp for when we need to update the
-  // internal mappers
-  vtkTimeStamp InternalMappersBuildTime;
-
 private:
   vtkEnsembleSurfaceSlicingPolyDataMapper(const vtkEnsembleSurfaceSlicingPolyDataMapper&);  // Not implemented.
   void operator=(const vtkEnsembleSurfaceSlicingPolyDataMapper&);    // Not implemented.
+
+  int Initialize();
+
+  int Cleanup();
+
+  int IsInitialized;
+
+  vtkOpenGLRenderWindow * RenderWindow;
+
+  vtkSmartPointer< vtkShader2 > VertexShader;
+
+  vtkSmartPointer< vtkShader2 > FragmentShader;
+
+  vtkSmartPointer< vtkShaderProgram2 > Program;
 };
 
 #endif
