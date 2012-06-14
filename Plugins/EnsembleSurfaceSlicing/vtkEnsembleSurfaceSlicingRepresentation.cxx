@@ -28,7 +28,6 @@ vtkStandardNewMacro(vtkEnsembleSurfaceSlicingRepresentation);
 //----------------------------------------------------------------------------
 vtkEnsembleSurfaceSlicingRepresentation::vtkEnsembleSurfaceSlicingRepresentation()
 {
-  this->Actor = vtkEnsembleSurfaceSlicingActor::New();
   this->Mapper = vtkEnsembleSurfaceSlicingPolyDataMapper::New();
 
   this->BackfaceActor = vtkPVLODActor::New();
