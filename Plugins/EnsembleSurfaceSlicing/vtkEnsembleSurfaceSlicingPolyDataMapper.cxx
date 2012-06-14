@@ -58,6 +58,7 @@ static const char* fragmentShader =
   "varying vec3  normal;\n"
   "varying vec3  vertexToLightVector;\n"
   "uniform float sliceWidth;\n"
+  "uniform float sliceFraction;\n"
   "uniform float sliceOffset;\n"
   "uniform vec3  sliceColor;\n"
   "\n"
@@ -71,9 +72,8 @@ static const char* fragmentShader =
   "  diffuseTerm = clamp(diffuseTerm, 0.0, 1.0);\n"
   "  gl_FragColor.rgb = sliceColor * diffuseTerm;\n"
   "  gl_FragColor.a = 1.0;\n"
-  //"  if ( step(sliceWidth, mod(position.z + sliceOffset, 1.0)) > 0.0 )\n"
-  "  float modPosition = mod(position.z, 1.0);\n"
-  "  if ( modPosition < sliceOffset || modPosition >= sliceOffset + sliceWidth )\n"
+  "  float modPosition = mod(position.z*sliceFraction/sliceWidth, 1.0);\n"
+  "  if ( modPosition < sliceOffset || modPosition >= sliceOffset + sliceFraction )\n"
   "    {\n"
   "    discard;\n"
   "    }\n"
@@ -137,6 +137,8 @@ vtkEnsembleSurfaceSlicingPolyDataMapper::vtkEnsembleSurfaceSlicingPolyDataMapper
 {
   this->IsInitialized = 0;
   this->RenderWindow = NULL;
+
+  this->SliceWidth = 0.25;
 }
 
 vtkEnsembleSurfaceSlicingPolyDataMapper::~vtkEnsembleSurfaceSlicingPolyDataMapper()
@@ -180,8 +182,8 @@ void vtkEnsembleSurfaceSlicingPolyDataMapper::Render(vtkRenderer *ren, vtkActor 
 
   this->Initialize();
 
-  // Set the slice width
-  float sliceWidth = 1.0 / static_cast<float>( this->Internal->Mappers.size() );
+  // Set the slice fraction
+  float sliceFraction = 1.0 / static_cast<float>( this->Internal->Mappers.size() );
   
   this->TimeToDraw = 0;
   //Call Render() on each of the PolyDataMappers
@@ -198,10 +200,12 @@ void vtkEnsembleSurfaceSlicingPolyDataMapper::Render(vtkRenderer *ren, vtkActor 
     this->Program->Restore();
 
     // Set the slice offset
-    float sliceOffset = sliceWidth * i;
+    float sliceOffset = sliceFraction * i;
     vtkUniformVariables *uniforms = this->FragmentShader->GetUniformVariables();
-    uniforms->SetUniformf("sliceWidth", 1, &sliceWidth);
-    uniforms->SetUniformf("sliceOffset", 1, &sliceOffset);
+    uniforms->SetUniformf("sliceFraction", 1, &sliceFraction);
+
+    uniforms->SetUniformf("sliceWidth",    1, &this->SliceWidth);
+    uniforms->SetUniformf("sliceOffset",   1, &sliceOffset);
 
     int sliceColorIndex = ((numMappers-1)*numMappers / 2) + i;
     float *sliceColor = SliceColors + sliceColorIndex;

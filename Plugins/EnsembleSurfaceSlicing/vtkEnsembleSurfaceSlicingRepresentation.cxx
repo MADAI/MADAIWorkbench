@@ -28,7 +28,11 @@ vtkStandardNewMacro(vtkEnsembleSurfaceSlicingRepresentation);
 //----------------------------------------------------------------------------
 vtkEnsembleSurfaceSlicingRepresentation::vtkEnsembleSurfaceSlicingRepresentation()
 {
-  this->Mapper = vtkEnsembleSurfaceSlicingPolyDataMapper::New();
+  this->SliceWidth = 0.1;
+
+  vtkEnsembleSurfaceSlicingPolyDataMapper *mapper = vtkEnsembleSurfaceSlicingPolyDataMapper::New();
+  mapper->SetSliceWidth( this->SliceWidth );
+  this->Mapper = mapper;
 
   this->BackfaceActor = vtkPVLODActor::New();
   this->BackfaceProperty = vtkProperty::New();
@@ -43,4 +47,17 @@ vtkEnsembleSurfaceSlicingRepresentation::vtkEnsembleSurfaceSlicingRepresentation
 //----------------------------------------------------------------------------
 vtkEnsembleSurfaceSlicingRepresentation::~vtkEnsembleSurfaceSlicingRepresentation()
 {
+}
+
+//----------------------------------------------------------------------------
+void vtkEnsembleSurfaceSlicingRepresentation::SetSliceWidth(float width)
+{
+  vtkEnsembleSurfaceSlicingPolyDataMapper *mapper =
+    vtkEnsembleSurfaceSlicingPolyDataMapper::SafeDownCast( this->Mapper );
+  if ( mapper && mapper->GetSliceWidth() != width )
+    {
+    this->SliceWidth = width;
+    mapper->SetSliceWidth(width);
+    this->Modified();
+    }
 }

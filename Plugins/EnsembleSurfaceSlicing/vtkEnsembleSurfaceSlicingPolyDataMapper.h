@@ -51,6 +51,11 @@ public:
   // called by the actor.
   void Render(vtkRenderer *ren, vtkActor *a);
 
+  // Description:
+  // Width of each slice, specified in world coordinates
+  vtkSetMacro(SliceWidth, float);
+  vtkGetMacro(SliceWidth, float);
+
 protected:
   vtkEnsembleSurfaceSlicingPolyDataMapper();
   ~vtkEnsembleSurfaceSlicingPolyDataMapper();
@@ -81,6 +86,8 @@ private:
   // on for up to eight surfaces.
   static float SliceColors[3*(8*9)/2];
   //ETX
+
+  float SliceWidth;
 };
 
 #endif
