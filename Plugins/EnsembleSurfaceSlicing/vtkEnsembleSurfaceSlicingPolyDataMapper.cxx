@@ -207,7 +207,7 @@ void vtkEnsembleSurfaceSlicingPolyDataMapper::Render(vtkRenderer *ren, vtkActor 
     uniforms->SetUniformf("sliceWidth",    1, &this->SliceWidth);
     uniforms->SetUniformf("sliceOffset",   1, &sliceOffset);
 
-    int sliceColorIndex = ((numMappers-1)*numMappers / 2) + i;
+    int sliceColorIndex = 3*(((numMappers-1)*numMappers / 2) + i);
     float *sliceColor = SliceColors + sliceColorIndex;
     uniforms->SetUniformf("sliceColor", 3, sliceColor);
 
