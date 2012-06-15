@@ -29,8 +29,8 @@ public:
   static vtkEnsembleSurfaceSlicingRepresentation* New();
   vtkTypeMacro(vtkEnsembleSurfaceSlicingRepresentation, vtkGeometryRepresentationWithFaces);
 
-  void SetSliceWidth(float width);
-  vtkGetMacro(SliceWidth, float);
+  void SetSliceWidth(double width);
+  vtkGetMacro(SliceWidth, double);
 
 //BTX
 protected:
@@ -42,7 +42,7 @@ private:
   void operator=(const vtkEnsembleSurfaceSlicingRepresentation&); // Not implemented
 //ETX
 
-  float SliceWidth;
+  double SliceWidth;
 };
 
 #endif
