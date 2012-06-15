@@ -24,17 +24,19 @@
 
       <!-- this adds to what is already defined in PVRepresentationBase -->
       <RepresentationType subproxy="EnsembleSurfaceSlicingRepresentation"
-        text="Ensemble Surface Slicing Mapper" subtype="Surface" />
+        text="Ensemble Surface Slicing" subtype="Surface" />
 
       <SubProxy>
         <Proxy name="EnsembleSurfaceSlicingRepresentation"
           proxygroup="representations" proxyname="EnsembleSurfaceSlicingRepresentation">
         </Proxy>
+
         <ShareProperties subproxy="SurfaceRepresentation">
           <Exception name="Input" />
           <Exception name="Visibility" />
           <Exception name="Representation" />
         </ShareProperties>
+
       </SubProxy>
     </Extension>
 
