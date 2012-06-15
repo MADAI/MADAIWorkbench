@@ -38,22 +38,41 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Includes.
 #include "pqDisplayPanel.h"
+#include "pqDisplayProxyEditor.h"
+#include "pqPipelineRepresentation.h"
+#include "vtkSMProxy.h"
+
+// VTK includes
+#include <vtkEventQtSlotConnect.h>
+#include <vtkSmartPointer.h>
 
 
 class pqEnsembleSurfaceSlicingDecorator::pqInternals :
   public Ui::pqEnsembleSurfaceSlicingDecorator
 {
 public:
+  vtkSMProxy*                            RepresentationProxy;
+  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
+  pqPipelineRepresentation*              PipelineRepresentation;
+
   pqInternals(QWidget* parent)
   {
-    
+    this->RepresentationProxy = NULL;
+    this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
   }
 };
 
 //-----------------------------------------------------------------------------
-pqEnsembleSurfaceSlicingDecorator::pqEnsembleSurfaceSlicingDecorator(pqDisplayPanel* panel)
-  : Superclass(panel)
+pqEnsembleSurfaceSlicingDecorator::pqEnsembleSurfaceSlicingDecorator(pqDisplayPanel* displayPanel)
+  : Superclass(displayPanel)
 {
+  this->setTitle( "Ensemble Surface Slicing" );
+
+  pqDisplayProxyEditor* panel =
+      qobject_cast<pqDisplayProxyEditor*> (displayPanel);
+  pqRepresentation* representation = panel->getRepresentation();
+  vtkSMProxy* representationProxy = (representation) ? representation->getProxy() : NULL;
+
   this->Internals = new pqInternals(this);
   QVBoxLayout* vlayout = qobject_cast<QVBoxLayout*>(panel->layout());
   if (vlayout)
@@ -65,21 +84,27 @@ pqEnsembleSurfaceSlicingDecorator::pqEnsembleSurfaceSlicingDecorator(pqDisplayPa
     panel->layout()->addWidget(this);
     }
   this->Internals->setupUi(this);
+  this->Internals->RepresentationProxy = representationProxy;
 
-  this->setTitle( "Ensemble Surface Slicing" );
-
-/*
-  QWidget* frame = new QWidget(panel);
-  Ui::pqEnsembleSurfaceSlicingDecorator ui;
-  ui.setupUi(frame);
-  QVBoxLayout* l = qobject_cast<QVBoxLayout*>(panel->layout());
-  l->addWidget(frame);
-*/
+  this->setupGUIConnections();
 }
 
 //-----------------------------------------------------------------------------
 pqEnsembleSurfaceSlicingDecorator::~pqEnsembleSurfaceSlicingDecorator()
 {
+  delete this->Internals;
 }
 
+//-----------------------------------------------------------------------------
+void pqEnsembleSurfaceSlicingDecorator::setupGUIConnections()
+{
+  this->connect(this->Internals->sliceWidthEdit, SIGNAL(editingFinished()),
+                SLOT(onSliceWidthChanged()));
 
+}
+
+//-----------------------------------------------------------------------------
+void pqEnsembleSurfaceSlicingDecorator::onSliceWidthChanged()
+{
+  std::cout << this->Internals->sliceWidthEdit->text().toStdString() << std::endl;
+}

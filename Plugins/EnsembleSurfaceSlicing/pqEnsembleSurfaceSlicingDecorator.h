@@ -43,6 +43,12 @@ public:
   pqEnsembleSurfaceSlicingDecorator(pqDisplayPanel* parent);
   ~pqEnsembleSurfaceSlicingDecorator();
 
+protected:
+  void setupGUIConnections();
+
+protected slots:
+  void onSliceWidthChanged();
+
 private:
   pqEnsembleSurfaceSlicingDecorator(const pqEnsembleSurfaceSlicingDecorator&); // Not implemented.
   void operator=(const pqEnsembleSurfaceSlicingDecorator&); // Not implemented.
