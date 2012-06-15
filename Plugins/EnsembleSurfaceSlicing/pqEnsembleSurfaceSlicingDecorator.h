@@ -32,12 +32,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqEnsembleSurfaceSlicingDecorator_h
 #define __pqEnsembleSurfaceSlicingDecorator_h
 
-#include <QObject>
+#include <QGroupBox>
+
 class pqDisplayPanel;
-class pqEnsembleSurfaceSlicingDecorator : public QObject
+class pqEnsembleSurfaceSlicingDecorator : public QGroupBox
 {
   Q_OBJECT
-  typedef QObject Superclass;
+  typedef QGroupBox Superclass;
 public:
   pqEnsembleSurfaceSlicingDecorator(pqDisplayPanel* parent);
   ~pqEnsembleSurfaceSlicingDecorator();
@@ -45,6 +46,9 @@ public:
 private:
   pqEnsembleSurfaceSlicingDecorator(const pqEnsembleSurfaceSlicingDecorator&); // Not implemented.
   void operator=(const pqEnsembleSurfaceSlicingDecorator&); // Not implemented.
+
+  class        pqInternals;
+  pqInternals* Internals;
 };
 
 #endif

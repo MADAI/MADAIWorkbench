@@ -39,15 +39,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Includes.
 #include "pqDisplayPanel.h"
 
+
+class pqEnsembleSurfaceSlicingDecorator::pqInternals :
+  public Ui::pqEnsembleSurfaceSlicingDecorator
+{
+public:
+  pqInternals(QWidget* parent)
+  {
+    
+  }
+};
+
 //-----------------------------------------------------------------------------
 pqEnsembleSurfaceSlicingDecorator::pqEnsembleSurfaceSlicingDecorator(pqDisplayPanel* panel)
   : Superclass(panel)
 {
+  this->Internals = new pqInternals(this);
+  QVBoxLayout* vlayout = qobject_cast<QVBoxLayout*>(panel->layout());
+  if (vlayout)
+    {
+    vlayout->insertWidget(2, this);
+    }
+  else
+    {
+    panel->layout()->addWidget(this);
+    }
+  this->Internals->setupUi(this);
+
+  this->setTitle( "Ensemble Surface Slicing" );
+
+/*
   QWidget* frame = new QWidget(panel);
   Ui::pqEnsembleSurfaceSlicingDecorator ui;
   ui.setupUi(frame);
   QVBoxLayout* l = qobject_cast<QVBoxLayout*>(panel->layout());
   l->addWidget(frame);
+*/
 }
 
 //-----------------------------------------------------------------------------
