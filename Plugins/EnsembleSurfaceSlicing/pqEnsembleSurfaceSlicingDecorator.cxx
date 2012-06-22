@@ -137,7 +137,7 @@ void pqEnsembleSurfaceSlicingDecorator::setRepresentation(
   vtkSMProperty* sliceWidthProperty = this->Internals->RepresentationProxy->GetProperty( "SliceWidth" );
   if ( ! sliceWidthProperty )
     {
-    std::cerr << "No SliceWidth property found!";
+    std::cerr << "No SliceWidth property found!" << std::endl;
     return;
     }
 
@@ -179,10 +179,7 @@ void pqEnsembleSurfaceSlicingDecorator::onSliceWidthChanged()
   double sliceWidth = pqSMAdaptor::getElementProperty(reprProxy->GetProperty(
                                                         "SliceWidth")).toDouble();
 
-  std::cout << "Slice width in representation: " << sliceWidth << std::endl;
-
   double newSliceWidth = this->Internals->SliceWidthEdit->value();
-  std::cout << "newSlice width: " << newSliceWidth << std::endl;
 
   reprProxy->UpdateProperty( "SliceWidth" );
   reprProxy->UpdateVTKObjects();

@@ -29,7 +29,7 @@
 
       <!-- this adds to what is already defined in PVRepresentationBase -->
       <RepresentationType subproxy="EnsembleSurfaceSlicing"
-        text="Special Mapper" subtype="Surface" />
+        text="Ensemble Surface Slicing" subtype="Surface" />
 
       <SubProxy>
         <Proxy name="EnsembleSurfaceSlicing"
