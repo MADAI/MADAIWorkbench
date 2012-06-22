@@ -11,14 +11,14 @@ add_paraview_display_panel_decorator(
 add_paraview_plugin(
   EnsembleSurfaceSlicing "1.0"
   GUI_INTERFACES ${IFACES}
-  SERVER_MANAGER_XML EnsembleSurfaceSlicing.xml
+  SERVER_MANAGER_XML
+    EnsembleSurfaceSlicing.xml
   SOURCES
     pqEnsembleSurfaceSlicingDecorator.cxx
     ${MOC_SRCS}
     ${UI_SRCS}
     ${IFACE_SRCS}
   SERVER_MANAGER_SOURCES
-    vtkEnsembleSurfaceSlicingActor.cxx
     vtkEnsembleSurfaceSlicingRepresentation.cxx
     vtkEnsembleSurfaceSlicingPolyDataMapper.cxx
 )

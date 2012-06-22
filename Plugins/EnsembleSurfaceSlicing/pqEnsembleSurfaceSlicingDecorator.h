@@ -35,6 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGroupBox>
 
 class pqDisplayPanel;
+class pqPipelineRepresentation;
+class pqWidgetRangeDomain;
+
+class vtkSMProperty;
+
 class pqEnsembleSurfaceSlicingDecorator : public QGroupBox
 {
   Q_OBJECT
@@ -45,6 +50,11 @@ public:
 
 protected:
   void setupGUIConnections();
+
+  // called when the representation has been modified to update the menus
+  void setRepresentation(pqPipelineRepresentation* repr);
+
+  void  LinkWithRange(QWidget* widget, const char* signal, vtkSMProperty* prop, pqWidgetRangeDomain*& widgetRangeDomain);
 
 protected slots:
   void onSliceWidthChanged();

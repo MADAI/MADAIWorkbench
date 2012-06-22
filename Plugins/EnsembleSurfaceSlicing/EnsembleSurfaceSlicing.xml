@@ -1,45 +1,52 @@
-<ServerManagerConfiguration>
+<ServerManaerConfiguration>
   <ProxyGroup name="representations">
-    <RepresentationProxy name="EnsembleSurfaceSlicingRepresentation"
+    <RepresentationProxy name="EnsembleSurfaceSlicing"
       class="vtkEnsembleSurfaceSlicingRepresentation"
       processes="client|renderserver|dataserver"
       base_proxygroup="representations"
       base_proxyname="SurfaceRepresentation">
       <Documentation>
-        This is a representation that enabled the Ensemble Surface
-        Slicing technique. This representation is available only for
-        multiblock datasets. To create a multiblock data set from
-        several input geometries, select the geometries and use the
-        Group Datasets filter to combine them.
+        This is the new representation type we are adding. This is identical to
+        the SurfaceRepresentation except that we are overriding the mapper with
+        our mapper.
       </Documentation>
- 
+
+      <DoubleVectorProperty name="SliceWidth"
+                            command="SetSliceWidth"
+                            default_values="1.0"
+                            number_of_elements="1"
+                            animateable="1">
+      </DoubleVectorProperty>
+
+    <!-- End of EnsembleSurfaceSlicing -->
     </RepresentationProxy>
 
     <Extension name="GeometryRepresentation">
       <Documentation>
         Extends standard GeometryRepresentation by adding
-        EnsembleSurfaceSlicingRepresentation as a new type of
-        representation.
+        EnsembleSurfaceSlicing as a new type of representation.
       </Documentation>
 
       <!-- this adds to what is already defined in PVRepresentationBase -->
-      <RepresentationType subproxy="EnsembleSurfaceSlicingRepresentation"
-        text="Ensemble Surface Slicing" subtype="Surface" />
+      <RepresentationType subproxy="EnsembleSurfaceSlicing"
+        text="Special Mapper" subtype="Surface" />
 
       <SubProxy>
-        <Proxy name="EnsembleSurfaceSlicingRepresentation"
-          proxygroup="representations" proxyname="EnsembleSurfaceSlicingRepresentation">
+        <Proxy name="EnsembleSurfaceSlicing"
+          proxygroup="representations" proxyname="EnsembleSurfaceSlicing">
         </Proxy>
-
         <ShareProperties subproxy="SurfaceRepresentation">
           <Exception name="Input" />
           <Exception name="Visibility" />
           <Exception name="Representation" />
         </ShareProperties>
 
+        <ExposedProperties>
+          <Property name="SliceWidth"/>
+        </ExposedProperties>
+
       </SubProxy>
     </Extension>
-
   </ProxyGroup>
- 
-</ServerManagerConfiguration>
+
+</ServerManaerConfiguration>

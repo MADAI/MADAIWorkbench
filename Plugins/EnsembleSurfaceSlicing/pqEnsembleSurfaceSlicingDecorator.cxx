@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -40,7 +40,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDisplayPanel.h"
 #include "pqDisplayProxyEditor.h"
 #include "pqPipelineRepresentation.h"
+#include "pqPropertyLinks.h"
+#include "pqSMAdaptor.h"
+#include "pqWidgetRangeDomain.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProperty.h"
 
 // VTK includes
 #include <vtkEventQtSlotConnect.h>
@@ -51,14 +55,17 @@ class pqEnsembleSurfaceSlicingDecorator::pqInternals :
   public Ui::pqEnsembleSurfaceSlicingDecorator
 {
 public:
+  pqPropertyLinks                        Links;
   vtkSMProxy*                            RepresentationProxy;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   pqPipelineRepresentation*              PipelineRepresentation;
+  pqWidgetRangeDomain*                   SliceWidthRangeDomain;
 
   pqInternals(QWidget* parent)
   {
     this->RepresentationProxy = NULL;
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+    this->SliceWidthRangeDomain = NULL;
   }
 };
 
@@ -87,6 +94,12 @@ pqEnsembleSurfaceSlicingDecorator::pqEnsembleSurfaceSlicingDecorator(pqDisplayPa
   this->Internals->RepresentationProxy = representationProxy;
 
   this->setupGUIConnections();
+
+  this->setRepresentation(
+    static_cast<pqPipelineRepresentation*>( panel->getRepresentation()));
+  QObject::connect(&this->Internals->Links, SIGNAL(smPropertyChanged()), panel,
+      SLOT(updateAllViews()), Qt::QueuedConnection);
+
 }
 
 //-----------------------------------------------------------------------------
@@ -98,13 +111,84 @@ pqEnsembleSurfaceSlicingDecorator::~pqEnsembleSurfaceSlicingDecorator()
 //-----------------------------------------------------------------------------
 void pqEnsembleSurfaceSlicingDecorator::setupGUIConnections()
 {
-  this->connect(this->Internals->sliceWidthEdit, SIGNAL(editingFinished()),
+  this->connect(this->Internals->SliceWidthEdit, SIGNAL(editingFinished()),
                 SLOT(onSliceWidthChanged()));
 
 }
 
 //-----------------------------------------------------------------------------
+void pqEnsembleSurfaceSlicingDecorator::setRepresentation(
+  pqPipelineRepresentation* repr)
+{
+  if (this->Internals->PipelineRepresentation == repr)
+    {
+    return;
+    }
+
+  vtkSMProperty* prop;
+  if (this->Internals->PipelineRepresentation)
+    {
+    // break all old links.
+    this->Internals->Links.removeAllPropertyLinks();
+    }
+
+  this->Internals->PipelineRepresentation = repr;
+
+  vtkSMProperty* sliceWidthProperty = this->Internals->RepresentationProxy->GetProperty( "SliceWidth" );
+  if ( ! sliceWidthProperty )
+    {
+    std::cerr << "No SliceWidth property found!";
+    return;
+    }
+
+  this->LinkWithRange(this->Internals->SliceWidthEdit, SIGNAL(valueChanged(double)),
+                      sliceWidthProperty, this->Internals->SliceWidthRangeDomain);
+}
+
+//-----------------------------------------------------------------------------
+void pqEnsembleSurfaceSlicingDecorator::LinkWithRange(QWidget* widget,
+                                                      const char* signal,
+                                                      vtkSMProperty* prop,
+                                                      pqWidgetRangeDomain* & widgetRangeDomain)
+{
+  if (!prop || !widget)
+    return;
+
+  prop->UpdateDependentDomains();
+
+  if (widgetRangeDomain != NULL)
+    {
+    delete widgetRangeDomain;
+    }
+  widgetRangeDomain = new pqWidgetRangeDomain(widget, "minimum", "maximum",
+      prop);
+
+  this->Internals->Links.addPropertyLink(widget, "value", signal,
+      this->Internals->RepresentationProxy, prop);
+}
+
+
+//-----------------------------------------------------------------------------
 void pqEnsembleSurfaceSlicingDecorator::onSliceWidthChanged()
 {
-  std::cout << this->Internals->sliceWidthEdit->text().toStdString() << std::endl;
+  pqPipelineRepresentation* repr = this->Internals->PipelineRepresentation;
+  vtkSMProxy* reprProxy = (repr) ? repr->getProxy() : NULL;
+  if (!reprProxy)
+    return;
+
+  double sliceWidth = pqSMAdaptor::getElementProperty(reprProxy->GetProperty(
+                                                        "SliceWidth")).toDouble();
+
+  std::cout << "Slice width in representation: " << sliceWidth << std::endl;
+
+  double newSliceWidth = this->Internals->SliceWidthEdit->value();
+  std::cout << "newSlice width: " << newSliceWidth << std::endl;
+
+  reprProxy->UpdateProperty( "SliceWidth" );
+  reprProxy->UpdateVTKObjects();
+
+  if (this->Internals->PipelineRepresentation)
+    {
+    this->Internals->PipelineRepresentation->renderViewEventually();
+    }
 }
