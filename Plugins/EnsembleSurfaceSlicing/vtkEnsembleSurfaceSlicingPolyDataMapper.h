@@ -53,8 +53,14 @@ public:
 
   // Description:
   // Width of each slice, specified in world coordinates
-  vtkSetMacro(SliceWidth, float);
-  vtkGetMacro(SliceWidth, float);
+  vtkSetMacro(SliceWidth, double);
+  vtkGetMacro(SliceWidth, double);
+
+  // Description:
+  // Displacement of each slice, specified in world coordinates
+  vtkSetMacro(SliceDisplacement, double);
+  vtkGetMacro(SliceDisplacement, double);
+
 
 protected:
   vtkEnsembleSurfaceSlicingPolyDataMapper();
@@ -87,7 +93,9 @@ private:
   static float SliceColors[3*(8*9)/2];
   //ETX
 
-  float SliceWidth;
+  double SliceWidth;
+
+  double SliceDisplacement;
 };
 
 #endif

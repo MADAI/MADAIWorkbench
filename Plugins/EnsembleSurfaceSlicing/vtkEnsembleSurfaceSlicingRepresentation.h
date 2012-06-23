@@ -32,6 +32,9 @@ public:
   void SetSliceWidth(double width);
   vtkGetMacro(SliceWidth, double);
 
+  void SetSliceDisplacement(double displacement);
+  vtkGetMacro(SliceDisplacement, double);
+
 //BTX
 protected:
   vtkEnsembleSurfaceSlicingRepresentation();
@@ -43,6 +46,8 @@ private:
 //ETX
 
   double SliceWidth;
+
+  double SliceDisplacement;
 };
 
 #endif

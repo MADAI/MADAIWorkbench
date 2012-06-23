@@ -60,12 +60,14 @@ public:
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   pqPipelineRepresentation*              PipelineRepresentation;
   pqWidgetRangeDomain*                   SliceWidthRangeDomain;
+  pqWidgetRangeDomain*                   SliceDisplacementRangeDomain;
 
   pqInternals(QWidget* parent)
   {
     this->RepresentationProxy = NULL;
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
     this->SliceWidthRangeDomain = NULL;
+    this->SliceDisplacementRangeDomain = NULL;
   }
 };
 
@@ -113,7 +115,6 @@ void pqEnsembleSurfaceSlicingDecorator::setupGUIConnections()
 {
   this->connect(this->Internals->SliceWidthEdit, SIGNAL(editingFinished()),
                 SLOT(onSliceWidthChanged()));
-
 }
 
 //-----------------------------------------------------------------------------
@@ -143,6 +144,16 @@ void pqEnsembleSurfaceSlicingDecorator::setRepresentation(
 
   this->LinkWithRange(this->Internals->SliceWidthEdit, SIGNAL(valueChanged(double)),
                       sliceWidthProperty, this->Internals->SliceWidthRangeDomain);
+
+  vtkSMProperty* sliceDisplacementProperty = this->Internals->RepresentationProxy->GetProperty( "SliceDisplacement" );
+  if ( ! sliceDisplacementProperty )
+    {
+    std::cerr << "No SliceDisplacement property found!" << std::endl;
+    return;
+    }
+
+  this->LinkWithRange(this->Internals->SliceDisplacementEdit, SIGNAL(valueChanged(double)),
+                      sliceDisplacementProperty, this->Internals->SliceDisplacementRangeDomain);
 }
 
 //-----------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-<ServerManaerConfiguration>
+<ServerManagerConfiguration>
   <ProxyGroup name="representations">
     <RepresentationProxy name="EnsembleSurfaceSlicing"
       class="vtkEnsembleSurfaceSlicingRepresentation"
@@ -6,9 +6,11 @@
       base_proxygroup="representations"
       base_proxyname="SurfaceRepresentation">
       <Documentation>
-        This is the new representation type we are adding. This is identical to
-        the SurfaceRepresentation except that we are overriding the mapper with
-        our mapper.
+      The Ensemble Surface Slice representation enables comparison of
+      multiple geometries contained within a multiblock data set. To use
+      it, select one or more geometries and group them using the
+      Group Datasets filter. Then switch to the Ensemble Surface Slice
+      representation.
       </Documentation>
 
       <DoubleVectorProperty name="SliceWidth"
@@ -16,6 +18,13 @@
                             default_values="1.0"
                             number_of_elements="1"
                             animateable="1">
+      </DoubleVectorProperty>
+
+      <DoubleVectorPropery name="SliceDisplacement"
+                           command="SetSliceDisplacement"
+                           default_values="1.0"
+                           number_of_elements="1"
+                           animateable="1">
       </DoubleVectorProperty>
 
     <!-- End of EnsembleSurfaceSlicing -->
@@ -49,4 +58,4 @@
     </Extension>
   </ProxyGroup>
 
-</ServerManaerConfiguration>
+</ServerManagerConfiguration>
