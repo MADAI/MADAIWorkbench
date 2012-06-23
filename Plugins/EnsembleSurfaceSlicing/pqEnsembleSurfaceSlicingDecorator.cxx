@@ -115,6 +115,8 @@ void pqEnsembleSurfaceSlicingDecorator::setupGUIConnections()
 {
   this->connect(this->Internals->SliceWidthEdit, SIGNAL(editingFinished()),
                 SLOT(onSliceWidthChanged()));
+  this->connect(this->Internals->SliceDisplacementEdit, SIGNAL(editingFinished()),
+                SLOT(onSliceDisplacementChanged()));
 }
 
 //-----------------------------------------------------------------------------
@@ -187,12 +189,25 @@ void pqEnsembleSurfaceSlicingDecorator::onSliceWidthChanged()
   if (!reprProxy)
     return;
 
-  double sliceWidth = pqSMAdaptor::getElementProperty(reprProxy->GetProperty(
-                                                        "SliceWidth")).toDouble();
-
-  double newSliceWidth = this->Internals->SliceWidthEdit->value();
-
   reprProxy->UpdateProperty( "SliceWidth" );
+  reprProxy->UpdateVTKObjects();
+
+  if (this->Internals->PipelineRepresentation)
+    {
+    this->Internals->PipelineRepresentation->renderViewEventually();
+    }
+}
+
+
+//-----------------------------------------------------------------------------
+void pqEnsembleSurfaceSlicingDecorator::onSliceDisplacementChanged()
+{
+  pqPipelineRepresentation* repr = this->Internals->PipelineRepresentation;
+  vtkSMProxy* reprProxy = (repr) ? repr->getProxy() : NULL;
+  if (!reprProxy)
+    return;
+
+  reprProxy->UpdateProperty( "SliceDisplacement" );
   reprProxy->UpdateVTKObjects();
 
   if (this->Internals->PipelineRepresentation)

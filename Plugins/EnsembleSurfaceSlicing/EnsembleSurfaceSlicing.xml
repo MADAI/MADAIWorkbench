@@ -20,7 +20,7 @@
                             animateable="1">
       </DoubleVectorProperty>
 
-      <DoubleVectorPropery name="SliceDisplacement"
+      <DoubleVectorProperty name="SliceDisplacement"
                            command="SetSliceDisplacement"
                            default_values="1.0"
                            number_of_elements="1"
@@ -52,6 +52,7 @@
 
         <ExposedProperties>
           <Property name="SliceWidth"/>
+          <Property name="SliceDisplacement"/>
         </ExposedProperties>
 
       </SubProxy>

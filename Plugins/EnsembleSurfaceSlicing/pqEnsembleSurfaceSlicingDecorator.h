@@ -58,6 +58,7 @@ protected:
 
 protected slots:
   void onSliceWidthChanged();
+  void onSliceDisplacementChanged();
 
 private:
   pqEnsembleSurfaceSlicingDecorator(const pqEnsembleSurfaceSlicingDecorator&); // Not implemented.

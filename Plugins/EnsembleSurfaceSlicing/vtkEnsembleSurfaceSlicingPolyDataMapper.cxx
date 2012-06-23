@@ -189,8 +189,8 @@ void vtkEnsembleSurfaceSlicingPolyDataMapper::Render(vtkRenderer *ren, vtkActor 
   
   this->TimeToDraw = 0;
   //Call Render() on each of the PolyDataMappers
-  int numMappers = this->Internal->Mappers.size();
-  for(unsigned int i=0;i<numMappers;i++)
+  size_t numMappers = this->Internal->Mappers.size();
+  for(size_t i=0;i<numMappers;i++)
     {
     if ( this->ClippingPlanes != 
          this->Internal->Mappers[i]->GetClippingPlanes() )
@@ -212,7 +212,9 @@ void vtkEnsembleSurfaceSlicingPolyDataMapper::Render(vtkRenderer *ren, vtkActor 
     uniforms->SetUniformf("sliceDisplacement", 1, &sliceDisplacement);
     uniforms->SetUniformf("sliceOffset",       1, &sliceOffset);
 
-    int sliceColorIndex = 3*(((numMappers-1)*numMappers / 2) + i);
+    std::cout << "sliceDisplacement: " << sliceDisplacement << std::endl;
+
+    size_t sliceColorIndex = 3*(((numMappers-1)*numMappers / 2) + i);
     float *sliceColor = SliceColors + sliceColorIndex;
     uniforms->SetUniformf("sliceColor", 3, sliceColor);
 

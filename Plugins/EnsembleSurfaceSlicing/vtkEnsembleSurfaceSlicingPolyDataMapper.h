@@ -39,7 +39,7 @@ class vtkShader2;
 class vtkShaderProgram2;
 
 
-class VTK_RENDERING_EXPORT vtkEnsembleSurfaceSlicingPolyDataMapper : public vtkCompositePolyDataMapper
+class VTK_EXPORT vtkEnsembleSurfaceSlicingPolyDataMapper : public vtkCompositePolyDataMapper
 {
 
 public:
