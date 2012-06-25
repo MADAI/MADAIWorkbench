@@ -27,6 +27,13 @@
                            animateable="1">
       </DoubleVectorProperty>
 
+      <DoubleVectorProperty name="PlaneNormal"
+                            command="SetPlaneNormal"
+                            default_values="1.0 0.0 0.0"
+                            number_of_elements="3"
+                            animateable="0">
+      </DoubleVectorProperty>
+
     <!-- End of EnsembleSurfaceSlicing -->
     </RepresentationProxy>
 
@@ -53,6 +60,7 @@
         <ExposedProperties>
           <Property name="SliceWidth"/>
           <Property name="SliceDisplacement"/>
+          <Property name="PlaneNormal"/>
         </ExposedProperties>
 
       </SubProxy>

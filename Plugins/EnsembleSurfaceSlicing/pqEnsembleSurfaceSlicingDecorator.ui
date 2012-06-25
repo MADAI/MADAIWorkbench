@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>342</width>
+    <width>340</width>
     <height>198</height>
    </rect>
   </property>
@@ -14,10 +14,20 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QLabel" name="SliceWidthLabel">
+   <item row="2" column="1">
+    <widget class="QDoubleSpinBox" name="SliceDisplacementEdit">
+     <property name="maximum">
+      <double>10000.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.010000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="SliceDisplacementLabel">
      <property name="text">
-      <string>Slice width</string>
+      <string>Slice displacement</string>
      </property>
     </widget>
    </item>
@@ -37,21 +47,42 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="SliceDisplacementLabel">
+   <item row="0" column="0">
+    <widget class="QLabel" name="SliceWidthLabel">
      <property name="text">
-      <string>Slice displacement</string>
+      <string>Slice width</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
-    <widget class="QDoubleSpinBox" name="SliceDisplacementEdit">
-     <property name="maximum">
-      <double>10000.000000000000000</double>
+   <item row="3" column="0">
+    <widget class="QLabel" name="PlaneNormalLabel">
+     <property name="text">
+      <string>Plane normal</string>
      </property>
-     <property name="singleStep">
-      <double>0.010000000000000</double>
-     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QWidget" name="PlaneNormalWidget" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>-1</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QLineEdit" name="PlaneNormalXEdit"/>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="PlaneNormalYEdit"/>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="PlaneNormalZEdit"/>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>

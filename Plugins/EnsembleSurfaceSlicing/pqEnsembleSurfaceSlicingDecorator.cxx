@@ -117,6 +117,12 @@ void pqEnsembleSurfaceSlicingDecorator::setupGUIConnections()
                 SLOT(onSliceWidthChanged()));
   this->connect(this->Internals->SliceDisplacementEdit, SIGNAL(editingFinished()),
                 SLOT(onSliceDisplacementChanged()));
+  this->connect(this->Internals->PlaneNormalXEdit, SIGNAL(editingFinished()),
+                SLOT(onPlaneNormalChanged()));
+  this->connect(this->Internals->PlaneNormalYEdit, SIGNAL(editingFinished()),
+                SLOT(onPlaneNormalChanged()));
+  this->connect(this->Internals->PlaneNormalZEdit, SIGNAL(editingFinished()),
+                SLOT(onPlaneNormalChanged()));
 }
 
 //-----------------------------------------------------------------------------
@@ -156,6 +162,20 @@ void pqEnsembleSurfaceSlicingDecorator::setRepresentation(
 
   this->LinkWithRange(this->Internals->SliceDisplacementEdit, SIGNAL(valueChanged(double)),
                       sliceDisplacementProperty, this->Internals->SliceDisplacementRangeDomain);
+
+  vtkSMProperty* planeNormalProperty = this->Internals->RepresentationProxy->GetProperty( "PlaneNormal" );
+  this->Internals->Links.addPropertyLink(this->Internals->PlaneNormalXEdit, 
+                                         "text", SIGNAL(textChanged(QString)),
+                                         this->Internals->RepresentationProxy,
+                                         planeNormalProperty, 0);
+  this->Internals->Links.addPropertyLink(this->Internals->PlaneNormalYEdit,
+                                         "text", SIGNAL(textChanged(QString)),
+                                         this->Internals->RepresentationProxy,
+                                         planeNormalProperty, 1);
+  this->Internals->Links.addPropertyLink(this->Internals->PlaneNormalZEdit,
+                                         "text", SIGNAL(textChanged(QString)),
+                                         this->Internals->RepresentationProxy,
+                                         planeNormalProperty, 2);
 }
 
 //-----------------------------------------------------------------------------
@@ -189,6 +209,7 @@ void pqEnsembleSurfaceSlicingDecorator::onSliceWidthChanged()
   if (!reprProxy)
     return;
 
+  // Not sure if this is needed
   reprProxy->UpdateProperty( "SliceWidth" );
   reprProxy->UpdateVTKObjects();
 
@@ -207,7 +228,26 @@ void pqEnsembleSurfaceSlicingDecorator::onSliceDisplacementChanged()
   if (!reprProxy)
     return;
 
+  // Not sure if this is needed
   reprProxy->UpdateProperty( "SliceDisplacement" );
+  reprProxy->UpdateVTKObjects();
+
+  if (this->Internals->PipelineRepresentation)
+    {
+    this->Internals->PipelineRepresentation->renderViewEventually();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqEnsembleSurfaceSlicingDecorator::onPlaneNormalChanged()
+{
+  pqPipelineRepresentation* repr = this->Internals->PipelineRepresentation;
+  vtkSMProxy* reprProxy = (repr) ? repr->getProxy() : NULL;
+  if (!reprProxy)
+    return;
+
+  // Not sure if this is needed
+  reprProxy->UpdateProperty( "PlaneNormal" );
   reprProxy->UpdateVTKObjects();
 
   if (this->Internals->PipelineRepresentation)
