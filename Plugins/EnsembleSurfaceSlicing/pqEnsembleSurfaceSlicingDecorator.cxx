@@ -123,6 +123,13 @@ void pqEnsembleSurfaceSlicingDecorator::setRepresentation(
     return;
     }
 
+  if (this->Internals->RepresentationProxy &&
+      this->Internals->RepresentationProxy->GetXMLName() &&
+      strcmp(this->Internals->RepresentationProxy->GetXMLName(), "GeometryRepresentation") != 0)
+    {
+    return;
+    }
+
   vtkSMProperty* prop;
   if (this->Internals->PipelineRepresentation)
     {
