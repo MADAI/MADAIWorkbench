@@ -74,7 +74,8 @@ static const char* fragmentShader =
   "  diffuseTerm = clamp(diffuseTerm, 0.0, 1.0);\n"
   "  gl_FragColor.rgb = sliceColor * diffuseTerm;\n"
   "  gl_FragColor.a = 1.0;\n"
-  "  float modPosition = mod((position.z-sliceDisplacement)*sliceFraction/sliceWidth, 1.0);\n"
+  "  float distance = dot( sliceNormal, position.xyz );\n"
+  "  float modPosition = mod((distance-sliceDisplacement)*sliceFraction/sliceWidth, 1.0);\n"
   "  if ( modPosition < sliceOffset || modPosition >= sliceOffset + sliceFraction )\n"
   "    {\n"
   "    discard;\n"
@@ -221,6 +222,7 @@ void vtkEnsembleSurfaceSlicingPolyDataMapper::Render(vtkRenderer *ren, vtkActor 
     sliceNormal[0] = static_cast<float>( this->PlaneNormal[0] );
     sliceNormal[1] = static_cast<float>( this->PlaneNormal[1] );
     sliceNormal[2] = static_cast<float>( this->PlaneNormal[2] );
+    vtkMath::Normalize( sliceNormal );
     uniforms->SetUniformf("sliceNormal", 3, sliceNormal);
 
     size_t sliceColorIndex = 3*(((numMappers-1)*numMappers / 2) + i);
