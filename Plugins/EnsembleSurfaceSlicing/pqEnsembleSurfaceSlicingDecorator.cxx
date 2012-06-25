@@ -95,6 +95,11 @@ pqEnsembleSurfaceSlicingDecorator::pqEnsembleSurfaceSlicingDecorator(pqDisplayPa
   this->Internals->setupUi(this);
   this->Internals->RepresentationProxy = representationProxy;
 
+  QDoubleValidator* validator = new QDoubleValidator(this);
+  this->Internals->PlaneNormalXEdit->setValidator( validator );
+  this->Internals->PlaneNormalYEdit->setValidator( validator );
+  this->Internals->PlaneNormalZEdit->setValidator( validator );
+
   this->setupGUIConnections();
 
   this->setRepresentation(
