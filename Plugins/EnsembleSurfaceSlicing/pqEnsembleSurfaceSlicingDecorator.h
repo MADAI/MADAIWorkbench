@@ -54,11 +54,6 @@ protected:
 
   void  LinkWithRange(QWidget* widget, const char* signal, vtkSMProperty* prop, pqWidgetRangeDomain*& widgetRangeDomain);
 
-protected slots:
-  void onSliceWidthChanged();
-  void onSliceDisplacementChanged();
-  void onPlaneNormalChanged();
-
 private:
   pqEnsembleSurfaceSlicingDecorator(const pqEnsembleSurfaceSlicingDecorator&); // Not implemented.
   void operator=(const pqEnsembleSurfaceSlicingDecorator&); // Not implemented.
