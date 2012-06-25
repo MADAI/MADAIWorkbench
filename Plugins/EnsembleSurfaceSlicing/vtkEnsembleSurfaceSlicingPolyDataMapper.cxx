@@ -141,6 +141,10 @@ vtkEnsembleSurfaceSlicingPolyDataMapper::vtkEnsembleSurfaceSlicingPolyDataMapper
 
   this->SliceWidth = 0.25;
   this->SliceDisplacement = 0.0;
+
+  this->PlaneNormal[0] = 1.0;
+  this->PlaneNormal[1] = 0.0;
+  this->PlaneNormal[2] = 0.0;
 }
 
 vtkEnsembleSurfaceSlicingPolyDataMapper::~vtkEnsembleSurfaceSlicingPolyDataMapper()
@@ -211,8 +215,6 @@ void vtkEnsembleSurfaceSlicingPolyDataMapper::Render(vtkRenderer *ren, vtkActor 
     float sliceDisplacement = static_cast<float>(this->SliceDisplacement);
     uniforms->SetUniformf("sliceDisplacement", 1, &sliceDisplacement);
     uniforms->SetUniformf("sliceOffset",       1, &sliceOffset);
-
-    std::cout << "sliceDisplacement: " << sliceDisplacement << std::endl;
 
     size_t sliceColorIndex = 3*(((numMappers-1)*numMappers / 2) + i);
     float *sliceColor = SliceColors + sliceColorIndex;

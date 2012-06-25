@@ -52,27 +52,16 @@ vtkEnsembleSurfaceSlicingRepresentation::~vtkEnsembleSurfaceSlicingRepresentatio
 }
 
 //----------------------------------------------------------------------------
-void vtkEnsembleSurfaceSlicingRepresentation::SetSliceWidth(double width)
+void vtkEnsembleSurfaceSlicingRepresentation::UpdateColoringParameters()
 {
-  vtkEnsembleSurfaceSlicingPolyDataMapper *mapper =
-    vtkEnsembleSurfaceSlicingPolyDataMapper::SafeDownCast( this->Mapper );
-  if ( mapper && mapper->GetSliceWidth() != width )
-    {
-    this->SliceWidth = width;
-    mapper->SetSliceWidth(static_cast<float>(width));
-    this->Modified();
-    }
-}
+  this->Superclass::UpdateColoringParameters();
 
-//----------------------------------------------------------------------------
-void vtkEnsembleSurfaceSlicingRepresentation::SetSliceDisplacement(double displacement)
-{
   vtkEnsembleSurfaceSlicingPolyDataMapper *mapper =
     vtkEnsembleSurfaceSlicingPolyDataMapper::SafeDownCast( this->Mapper );
-  if ( mapper && mapper->GetSliceDisplacement() != displacement )
+  if ( mapper )
     {
-    this->SliceDisplacement = displacement;
-    mapper->SetSliceDisplacement( displacement );
-    this->Modified();
+    mapper->SetSliceWidth( this->SliceWidth );
+    mapper->SetSliceDisplacement( this->SliceDisplacement );
+    mapper->SetPlaneNormal( this->PlaneNormal );
     }
 }

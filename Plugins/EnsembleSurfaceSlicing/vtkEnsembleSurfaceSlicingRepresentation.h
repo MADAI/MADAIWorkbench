@@ -29,25 +29,39 @@ public:
   static vtkEnsembleSurfaceSlicingRepresentation* New();
   vtkTypeMacro(vtkEnsembleSurfaceSlicingRepresentation, vtkGeometryRepresentationWithFaces);
 
-  void SetSliceWidth(double width);
+  // Description:
+  // Width of each slice, specified in world coordinates
+  vtkSetMacro(SliceWidth, double);
   vtkGetMacro(SliceWidth, double);
 
-  void SetSliceDisplacement(double displacement);
+  // Description:
+  // Displacement of each slice, specified in world coordinates
+  vtkSetMacro(SliceDisplacement, double);
   vtkGetMacro(SliceDisplacement, double);
+
+  // Description:
+  // Plane with which the slices should be parallel
+  vtkSetVector3Macro(PlaneNormal, double);
+  vtkGetVector3Macro(PlaneNormal, double);
 
 //BTX
 protected:
   vtkEnsembleSurfaceSlicingRepresentation();
   ~vtkEnsembleSurfaceSlicingRepresentation();
 
+  // Description:
+  // Passes on parameters to vtkProperty and vtkMapper
+  virtual void UpdateColoringParameters();
+
+  double SliceWidth;
+  double SliceDisplacement;
+  double PlaneNormal[3];
+
 private:
   vtkEnsembleSurfaceSlicingRepresentation(const vtkEnsembleSurfaceSlicingRepresentation&); // Not implemented
   void operator=(const vtkEnsembleSurfaceSlicingRepresentation&); // Not implemented
 //ETX
 
-  double SliceWidth;
-
-  double SliceDisplacement;
 };
 
 #endif

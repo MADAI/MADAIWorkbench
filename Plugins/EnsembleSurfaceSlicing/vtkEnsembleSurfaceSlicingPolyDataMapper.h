@@ -61,6 +61,10 @@ public:
   vtkSetMacro(SliceDisplacement, double);
   vtkGetMacro(SliceDisplacement, double);
 
+  // Description:
+  // Plane with which the slices should be parallel
+  vtkSetVector3Macro(PlaneNormal, double);
+  vtkGetVector3Macro(PlaneNormal, double);
 
 protected:
   vtkEnsembleSurfaceSlicingPolyDataMapper();
@@ -96,6 +100,8 @@ private:
   double SliceWidth;
 
   double SliceDisplacement;
+
+  double PlaneNormal[3];
 };
 
 #endif
