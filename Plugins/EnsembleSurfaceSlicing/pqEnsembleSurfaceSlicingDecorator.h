@@ -49,8 +49,6 @@ public:
   ~pqEnsembleSurfaceSlicingDecorator();
 
 protected:
-  void setupGUIConnections();
-
   // called when the representation has been modified to update the menus
   void setRepresentation(pqPipelineRepresentation* repr);
 

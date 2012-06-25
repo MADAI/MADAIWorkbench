@@ -100,8 +100,6 @@ pqEnsembleSurfaceSlicingDecorator::pqEnsembleSurfaceSlicingDecorator(pqDisplayPa
   this->Internals->PlaneNormalYEdit->setValidator( validator );
   this->Internals->PlaneNormalZEdit->setValidator( validator );
 
-  this->setupGUIConnections();
-
   this->setRepresentation(
     static_cast<pqPipelineRepresentation*>( panel->getRepresentation()));
   QObject::connect(&this->Internals->Links, SIGNAL(smPropertyChanged()), panel,
@@ -112,22 +110,8 @@ pqEnsembleSurfaceSlicingDecorator::pqEnsembleSurfaceSlicingDecorator(pqDisplayPa
 //-----------------------------------------------------------------------------
 pqEnsembleSurfaceSlicingDecorator::~pqEnsembleSurfaceSlicingDecorator()
 {
+  delete this->Internals->PlaneNormalXEdit->validator();
   delete this->Internals;
-}
-
-//-----------------------------------------------------------------------------
-void pqEnsembleSurfaceSlicingDecorator::setupGUIConnections()
-{
-  this->connect(this->Internals->SliceWidthEdit, SIGNAL(editingFinished()),
-                SLOT(onSliceWidthChanged()));
-  this->connect(this->Internals->SliceDisplacementEdit, SIGNAL(editingFinished()),
-                SLOT(onSliceDisplacementChanged()));
-  this->connect(this->Internals->PlaneNormalXEdit, SIGNAL(editingFinished()),
-                SLOT(onPlaneNormalChanged()));
-  this->connect(this->Internals->PlaneNormalYEdit, SIGNAL(editingFinished()),
-                SLOT(onPlaneNormalChanged()));
-  this->connect(this->Internals->PlaneNormalZEdit, SIGNAL(editingFinished()),
-                SLOT(onPlaneNormalChanged()));
 }
 
 //-----------------------------------------------------------------------------
