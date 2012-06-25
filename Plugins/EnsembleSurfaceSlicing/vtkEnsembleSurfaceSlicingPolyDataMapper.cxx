@@ -61,6 +61,7 @@ static const char* fragmentShader =
   "uniform float sliceDisplacement;\n"
   "uniform float sliceFraction;\n"
   "uniform float sliceOffset;\n"
+  "uniform vec3  sliceNormal;\n"
   "uniform vec3  sliceColor;\n"
   "\n"
   "void main()\n"
@@ -215,6 +216,12 @@ void vtkEnsembleSurfaceSlicingPolyDataMapper::Render(vtkRenderer *ren, vtkActor 
     float sliceDisplacement = static_cast<float>(this->SliceDisplacement);
     uniforms->SetUniformf("sliceDisplacement", 1, &sliceDisplacement);
     uniforms->SetUniformf("sliceOffset",       1, &sliceOffset);
+
+    float sliceNormal[3];
+    sliceNormal[0] = static_cast<float>( this->PlaneNormal[0] );
+    sliceNormal[1] = static_cast<float>( this->PlaneNormal[1] );
+    sliceNormal[2] = static_cast<float>( this->PlaneNormal[2] );
+    uniforms->SetUniformf("sliceNormal", 3, sliceNormal);
 
     size_t sliceColorIndex = 3*(((numMappers-1)*numMappers / 2) + i);
     float *sliceColor = SliceColors + sliceColorIndex;
