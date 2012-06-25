@@ -36,6 +36,8 @@
 
 vtkStandardNewMacro(vtkEnsembleSurfaceSlicingPolyDataMapper);
 
+/* TODO - make the following shaders mimic the lighting done with the
+* standard Surface representation. */
 static const char* vertexShader =
   "#version 120\n"
   "varying vec4 position;\n"
