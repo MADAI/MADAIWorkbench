@@ -130,7 +130,6 @@ void pqEnsembleSurfaceSlicingDecorator::setRepresentation(
     return;
     }
 
-  vtkSMProperty* prop;
   if (this->Internals->PipelineRepresentation)
     {
     // break all old links.
