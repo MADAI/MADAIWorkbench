@@ -86,6 +86,7 @@ set(MW_PLUGINS
   MADAILogoTextSourcePlugin
   BinningFilter
   BooleanOperationFilter
+  EnsembleSurfaceSlicing
   GaussianScalarSplatter
   MaskTableRows
 )
