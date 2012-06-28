@@ -190,8 +190,6 @@ if(APPLE)
   set(OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT
     "${CMAKE_CURRENT_BINARY_DIR}/MADAIWorkbench_OSX_MakeStandAloneBundle.sh")
 
-  set (QT_SQLLITE_PLUGINS_DIR ${QT_PLUGINS_DIR}/sqldrivers)
-
   # override settings from ParaView
   set(PARAVIEW_APPLICATION_NAME "${APP_NAME}")
   set(PARAVIEW_VERSION_FULL "${MW_VERSION_STRING}")
@@ -210,6 +208,7 @@ IF (NOT APPLE)
     QTDESIGNER QTGUI QTHELP QTMULTIMEDIA QTNETWORK QTOPENGL QTSCRIPTTOOLS
     QTSCRIPT QTSQL QTSVG QTTEST QTWEBKIT QTXMLPATTERNS QTXML
   )
+
   FOREACH(qtlib ${QT_LIBS})
     IF (QT_${qtlib}_LIBRARY_RELEASE)
       IF (NOT WIN32)
@@ -222,10 +221,27 @@ IF (NOT APPLE)
         GET_FILENAME_COMPONENT(QT_DLL_PATH_tmp ${QT_QMAKE_EXECUTABLE} PATH)
         GET_FILENAME_COMPONENT(QT_LIB_NAME_tmp ${QT_${qtlib}_LIBRARY_RELEASE} NAME_WE)
         INSTALL(FILES ${QT_DLL_PATH_tmp}/${QT_LIB_NAME_tmp}.dll DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT "BrandedRuntime")
+
       ENDIF (NOT WIN32)
     ENDIF (QT_${qtlib}_LIBRARY_RELEASE)
   ENDFOREACH(qtlib)
-  
+
+  # We need the plugins for Qt to do thing like load the help documents
+  set(QT_PLUGINS_DIRS
+    accessible bearer codecs designer graphicssystems iconengines
+    imageformats phonon_backend qmltooling sqldrivers
+  )
+
+  FOREACH(plugin ${QT_PLUGINS_DIRS})
+    SET(plugindir ${QT_PLUGINS_DIR}/${plugin})
+    message(STATUS ${plugindir})
+    IF (EXISTS ${plugindir})
+      INSTALL(DIRECTORY ${plugindir} DESTINATION ${PV_INSTALL_BIN_DIR}/${plugin} COMPONENT Runtime
+            FILES_MATCHING PATTERN "*.dll"
+            )
+    ENDIF()
+  ENDFOREACH(plugin)
+
   # Add python DLL on Windows if enabled
   IF (PARAVIEW_ENABLE_PYTHON)
     IF (WIN32)
@@ -235,7 +251,7 @@ IF (NOT APPLE)
         INSTALL(FILES ${PARAVIEW_PYTHON_DLL} DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT "BrandedRuntime")
         INSTALL(DIRECTORY "C:\\\\Python27\\\\Lib" DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT "BrandedRuntime")
       ELSE()
-        MESSAGE( ERROR "Could not find python27.dll. Please copy this file from C:\\Windows\\System32\\python27.dll to the MADAI Workbench build directory." )
+        MESSAGE( ERROR "Could not find python27.dll. Please copy this file from C:\\Windows\\System32\\python27.dll to ${MADAIWorkbench_BINARY_DIR}." )
       ENDIF()
     ENDIF()
   ENDIF()
