@@ -5,6 +5,10 @@
 
 #include <QObject>
 
+class vtkPVXMLElement;
+class vtkSMProxyLocator;
+class pqPipelineSource;
+
 class pqMADAILogoTextSourceStarter : public QObject
 {
   Q_OBJECT
@@ -25,11 +29,15 @@ public slots:
 protected slots:
   void createSource();
   void newServerAdded();
-
+  void removeLogoXMLElement(vtkPVXMLElement*);
 
 private:
   pqMADAILogoTextSourceStarter(const pqMADAILogoTextSourceStarter&); // Not implemented.
   void operator=(const pqMADAILogoTextSourceStarter&); // Not implemented.
+
+  pqPipelineSource* textSourceProxy;
+
+  pqServer* associatedServer;
 };
 
 #endif

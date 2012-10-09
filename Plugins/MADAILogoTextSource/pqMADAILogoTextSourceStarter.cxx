@@ -11,16 +11,26 @@
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 
+#include "vtkPVXMLElement.h"
 #include "vtkSMProperty.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyIterator.h"
+#include "vtkSMSessionProxyManager.h"
 
 #include <QtDebug>
 
 //-----------------------------------------------------------------------
 pqMADAILogoTextSourceStarter::pqMADAILogoTextSourceStarter(QObject * p)
-  : QObject(p)
+  : QObject(p), textSourceProxy(NULL), associatedServer(NULL)
 {
+  QObject::connect(pqApplicationCore::instance(),
+                   SIGNAL(aboutToLoadState(vtkPVXMLElement*)),
+                   this, SLOT(removeLogoXMLElement(vtkPVXMLElement*)));
+  QObject::connect(pqApplicationCore::instance(),
+                   SIGNAL(stateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)),
+                   this, SLOT(createSource()), Qt::QueuedConnection);
 }
 
 //-----------------------------------------------------------------------
@@ -43,13 +53,6 @@ void pqMADAILogoTextSourceStarter::newServerAdded()
   QObject::connect(&pqActiveObjects::instance(),
 		   SIGNAL(viewChanged(pqView*)),
                    this, SLOT(createSource()), Qt::QueuedConnection);
-
-  // We want to add the plugin only once, so we'll disconnect
-  // the preServerAdded sgnal.
-  pqApplicationCore* core = pqApplicationCore::instance();
-  QObject::disconnect(core->getServerManagerModel(),
-		      SIGNAL(preServerAdded(pqServer*)),
-		      this, SLOT(newServerAdded()));
 }
 
 //-----------------------------------------------------------------------
@@ -57,20 +60,22 @@ void pqMADAILogoTextSourceStarter::createSource()
 {
   if (pqActiveObjects::instance().activeView())
     {
-    QObject::disconnect(&pqActiveObjects::instance(),
-			SIGNAL(viewChanged(pqView*)),
-                        this, SLOT(createSource()));
     pqApplicationCore* app = pqApplicationCore::instance();
     pqObjectBuilder* builder = app->getObjectBuilder();
-    pqPipelineSource *text =
-      builder->createSource("sources", "MADAILogoTextSource",
-			    pqActiveObjects::instance().activeServer());
-    text->rename(tr("MADAI Logo"));
-    text->setModifiedState(pqProxy::UNMODIFIED);
+    if ( !this->textSourceProxy || pqActiveObjects::instance().activeServer() != associatedServer )
+      {
+      this->textSourceProxy =
+        builder->createSource("sources", "MADAILogoTextSource",
+                              pqActiveObjects::instance().activeServer());
+      this->associatedServer = pqActiveObjects::instance().activeServer();
+      }
+
+    this->textSourceProxy->rename(tr("MADAI Logo"));
+    this->textSourceProxy->setModifiedState(pqProxy::UNMODIFIED);
     pqDisplayPolicy* displayPolicy =
       pqApplicationCore::instance()->getDisplayPolicy();
     displayPolicy->setRepresentationVisibility(
-      text->getOutputPort(0), pqActiveObjects::instance().activeView(),
+      this->textSourceProxy->getOutputPort(0), pqActiveObjects::instance().activeView(),
       true);
 
     // The text source is now the active object and its representation
@@ -82,16 +87,34 @@ void pqMADAILogoTextSourceStarter::createSource()
       // Set the logo properties here. For additional properties, see
       // ParaView/Qt/Components/pqTextDisplayPropertiesWidget.cxx.
       vtkSMProxy *repProxy = rep->getProxy();
-      vtkSMIntVectorProperty *italicProperty =
-        vtkSMIntVectorProperty::SafeDownCast(repProxy->GetProperty("Italic"));
-
-      if (italicProperty)
-        {
-        italicProperty->SetElement(0, 1);
-        repProxy->UpdateProperty("Italic");
-        }
+      vtkSMPropertyHelper( repProxy, "Italic").Set( 1 );
+      repProxy->UpdateVTKObjects();
       }
     }
 
 }
 
+//-----------------------------------------------------------------------
+void pqMADAILogoTextSourceStarter::removeLogoXMLElement(vtkPVXMLElement* xml)
+{
+  if (!xml)
+    {
+    return;
+    }
+
+  vtkPVXMLElement *sms = xml->FindNestedElementByName("ServerManagerState");
+  if (sms)
+    {
+    // Iterate through the Proxies looking for MADAILogoTextSources
+      for (unsigned int i = 0; i < sms->GetNumberOfNestedElements(); ++i)
+        {
+        vtkPVXMLElement *proxy = sms->GetNestedElement( i );
+        if ( proxy && strcmp( proxy->GetName(), "Proxy" ) == 0 &&
+             strcmp( proxy->GetAttribute( "type" ), "MADAILogoTextSource" ) == 0)
+          {
+            sms->RemoveNestedElement( proxy );
+            i--;
+          }
+        }
+    }
+}
