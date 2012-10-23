@@ -89,8 +89,8 @@ fi
 ###################################
 # Build MPI
 ###################################
-#nice make -j $num_cores
-nice make -j 3
+# Parallel builds are apparently not supported
+nice make
 nice make install
 popd
 
@@ -118,6 +118,16 @@ git submodule update --init
 
 # Get python version
 python_version=`python -c 'import sys; print sys.version[:3]'`
+python_exe=`which python`
+python_file_text=`file -L ${python_exe}`
+python64_string=`echo "${python_file_text}" grep x86-64`
+if [ "${python64_string}" != '' ]; then
+    if [ -a '/usr/lib64/libpython${python_version}.so' ]; then
+	python_lib="/usr/lib64/libpython${python_version}.so"
+    else
+	python_lib="/usr/lib/libpython${python_version}.so"
+    fi
+fi
 
 ###################################
 # Copy Macro directory
@@ -144,7 +154,7 @@ cmake \
     -D PARAVIEW_ENABLE_PYTHON_FILTERS:BOOL=ON \
     -D PYTHON_EXECUTABLE:PATH=/usr/bin/python \
     -D PYTHON_INCLUDE_DIR:PATH=/usr/include/python${python_version} \
-    -D PYTHON_LIBRARY:PATH=/usr/lib64/libpython${python_version}.so \
+    -D PYTHON_LIBRARY:PATH=${python_lib} \
     -D PARAVIEW_USE_VISITBRIDGE:BOOL=ON \
     -D QT_QMAKE_EXECUTABLE:PATH=${qmake} \
     $paraview_src_dir
