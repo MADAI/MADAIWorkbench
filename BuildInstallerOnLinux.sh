@@ -150,6 +150,7 @@ cmake \
     -D MPI_LIBRARY:PATH=${install_dir}/lib/libmpich.a \
     -D MPI_EXTRA_LIBRARY:PATH=${install_dir}/lib/libmpichcxx.a\;${install_dir}/lib/libmpl.a \
     -D MPI_INCLUDE_PATH:PATH=${install_dir}/include \
+    -D MPIEXEC:PATH=${install_dir}/bin/mpiexec \
     -D PARAVIEW_ENABLE_PYTHON:BOOL=ON \
     -D PARAVIEW_ENABLE_PYTHON_FILTERS:BOOL=ON \
     -D PYTHON_EXECUTABLE:PATH=/usr/bin/python \
