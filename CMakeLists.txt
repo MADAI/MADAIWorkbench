@@ -16,6 +16,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin CACHE PATH
 find_package(ParaView REQUIRED)
 include(${PARAVIEW_USE_FILE})
 
+# Delete the list of ParaView plugins to prevent the same plugins from
+# being listed over and over each time the project is reconfigured
+set(PARAVIEW_AUTOLOAD_PLUGINLIST "" CACHE INTERNAL "Docs" FORCE)
+set(PARAVIEW_PLUGINLIST "" CACHE INTERNAL "Docs" FORCE)
+
 get_filename_component(ParaView_SOURCE_DIR "${ParaView_CMAKE_DIR}/.." ABSOLUTE)
 
 add_subdirectory(Plugins)
