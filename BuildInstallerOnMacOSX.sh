@@ -3,13 +3,9 @@
 ###################################
 # Options
 ###################################
-PARAVIEW_VERSION="1439967260d37255e86d328424597a6e93921a3f"
-#PARAVIEW_VERSION="v3.14.1"
-#PARAVIEW_VERSION="MADAIWorkbench"
-
 PARAVIEW_GIT_URL="git://paraview.org/ParaView.git"
-#PARAVIEW_GIT_URL="git://github.com/MADAI/ParaView.git"
 
+source SetParaViewVersion.sh
 
 ###################################
 # Argument checking
@@ -86,7 +82,7 @@ cd $paraview_src_dir
 
 # Switch to desired ParaView version
 git fetch origin
-git checkout ${PARAVIEW_VERSION}
+git checkout ${PARAVIEW_COMMIT}
 git submodule update --init
 
 ###################################
