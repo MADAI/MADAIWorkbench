@@ -1,7 +1,7 @@
 # Set the version number
 set(MW_VERSION_MAJOR 1)
-set(MW_VERSION_MINOR 2)
-set(MW_VERSION_PATCH 2)
+set(MW_VERSION_MINOR 3)
+set(MW_VERSION_PATCH 0)
 set(MW_VERSION_STRING "${MW_VERSION_MAJOR}.${MW_VERSION_MINOR}.${MW_VERSION_PATCH}")
 
 # Now build the MADAI workbench as a branded ParaView
@@ -139,7 +139,7 @@ include_directories(${PARAVIEW_INCLUDE_DIRS} ${PARAVIEW_APPLICATION_DIR})
 target_link_libraries(MADAIWorkbench
   ${QT_QTCORE_LIBRARY}
   ${QT_QTGUI_LIBRARY}
-  vtkCommon
+  ${VTK_LIBRARIES}
   vtkPVCommon
   pqCore
   pqComponents
