@@ -30,7 +30,7 @@ fullpath () (
 ###################################
 qmake=$1
 [ -x "$qmake" ] || die "qmake: \"${qmake}\" not found."
-build_dir=$2
+build_dir=`fullpath $2`
 script_relative_path=`dirname $0`
 script_dir=`fullpath $script_relative_path`
 madaiworkbench_src_dir=$script_dir
@@ -48,11 +48,11 @@ if [ "$3" == Debug ]; then
 fi
 echo "Build type:" ${build_type}
 
-target=10.6
+target="10.6"
 if [ "$4" == "10.5" -o "$4" == "10.6" ]; then
     target="$4"
 else
-    echo "Invalid target ${target}. Must be 10.5 or 10.6."
+    echo "Invalid target $4. Must be 10.5 or 10.6."
     exit
 fi
 echo "Target: " ${target}
