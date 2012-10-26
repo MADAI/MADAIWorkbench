@@ -29,7 +29,7 @@ fullpath () (
 # Define important variables
 ###################################
 qmake=$1
-[ -x "$qmake" ] || die "qmake: \"${qmake}\" not found."
+[ -x "${qmake}" ] || die "qmake: \"${qmake}\" not found."
 mkdir -p $2
 build_dir=`fullpath $2`
 script_relative_path=`dirname $0`
@@ -67,19 +67,49 @@ fi
 ###################################
 # Set up build and source directories
 ###################################
-mkdir -p $build_dir
-bin_dir=$build_dir/bin
-mkdir -p $bin_dir
-src_dir=$build_dir/src
-mkdir -p $src_dir
+mkdir -p ${build_dir}
+bin_dir=${build_dir}/bin
+mkdir -p ${bin_dir}
+src_dir=${build_dir}/src
+mkdir -p ${src_dir}
+
+###################################
+# Clone VRPN
+###################################
+cd ${src_dir}
+vrpn_src_dir=${src_dir}/VRPN
+if [ ! -d ${src_dir}/VRPN ]
+    then git clone git://git.cs.unc.edu/vrpn.git VRPN || die "Could not clone VRPN"
+fi
+cd ${vrpn_src_dir}
+
+###################################
+# Configure VRPN
+###################################
+vrpn_build_dir=${bin_dir}/VRPN-build
+mkdir -p ${vrpn_build_dir}
+cd ${vrpn_build_dir}
+cmake \
+    -D CMAKE_BUILD_TYPE:STRING=${build_type} \
+    -D BUILD_SHARD_LIBS:BOOL=ON \
+    -D BUILD_TESTING:BOOL=OFF \
+    -D CMAKE_OSX_DEPLOYMENT_TARGET:STRING=${target} \
+    -D CMAKE_OSX_SYSROOT:PATH=/Developer/SDKs/MacOSX${target}.sdk \
+    ${vrpn_src_dir}
+cmake .
+
+# Build VRPN
+make -j ${num_cores}
 
 ###################################
 # Clone ParaView
 ###################################
-cd $src_dir
-paraview_src_dir=$src_dir/ParaView
-git clone ${PARAVIEW_GIT_URL} ParaView
-cd $paraview_src_dir
+cd ${src_dir}
+paraview_src_dir=${src_dir}/ParaView
+if [ ! -d ${src_dir}/ParaView ]
+    then git clone ${PARAVIEW_GIT_URL} ParaView || die "Could not clone ParaView"
+fi
+cd ${paraview_src_dir}
 
 # Switch to desired ParaView version
 git fetch origin
@@ -89,9 +119,9 @@ git submodule update --init
 ###################################
 # Configure ParaView
 ###################################
-paraview_build_dir=$bin_dir/ParaView-build
-mkdir -p $paraview_build_dir
-cd $paraview_build_dir
+paraview_build_dir=${bin_dir}/ParaView-build
+mkdir -p ${paraview_build_dir}
+cd ${paraview_build_dir}
 cmake \
     -D CMAKE_BUILD_TYPE:STRING=${build_type} \
     -D BUILD_SHARED_LIBS:BOOL=ON \
@@ -102,35 +132,40 @@ cmake \
     -D PYTHON_INCLUDE_DIR:PATH=/System/Library/Frameworks/Python.framework/Versions/${python_version}/Headers \
     -D PYTHON_LIBRARY:PATH=/usr/lib/libpython${python_version}.dylib \
     -D PARAVIEW_USE_VISITBRIDGE:BOOL=ON \
-    -D QT_QMAKE_EXECUTABLE:PATH=$qmake \
+    -D PARAVIEW_BUILD_PLUGIN_VRPlugin:BOOL=ON \
+    -D PARAVIEW_USE_VRPN:BOOL=ON \
+    -D PARAVIEW_USE_VRUI:BOOL=OFF \
+    -D VRPN_INCLUDE_DIR:PATH=${vrpn_src_dir} \
+    -D VRPN_LIBRARY:FILEPATH=${vrpn_build_dir}/libvrpn.a \
+    -D QT_QMAKE_EXECUTABLE:PATH=${qmake} \
     -D CMAKE_OSX_DEPLOYMENT_TARGET:STRING=${target} \
     -D CMAKE_OSX_SYSROOT:PATH=/Developer/SDKs/MacOSX${target}.sdk \
-    $paraview_src_dir
+    ${paraview_src_dir}
 cmake .
 
 # Build ParaView
-make -j $num_cores
+make -j ${num_cores}
 
 ###################################
 # Configure MADAIWorkbench
 ###################################
-madaiworkbench_build_dir=$bin_dir/MADAIWorkbench-build
-mkdir -p $madaiworkbench_build_dir
-cd $madaiworkbench_build_dir
+madaiworkbench_build_dir=${bin_dir}/MADAIWorkbench-build
+mkdir -p ${madaiworkbench_build_dir}
+cd ${madaiworkbench_build_dir}
 cmake \
     -D CMAKE_BUILD_TYPE:STRING=${build_type} \
     -D BUILD_APPLICATION:BOOL=ON \
     -D BUILD_SHARED_LIBS:BOOL=ON \
-    -D ParaView_DIR:PATH=$paraview_build_dir \
+    -D ParaView_DIR:PATH=${paraview_build_dir} \
     -D CMAKE_OSX_DEPLOYMENT_TARGET:STRING=${target} \
     -D CMAKE_OSX_SYSROOT:PATH=/Developer/SDKs/MacOSX${target}.sdk \
-    $madaiworkbench_src_dir
+    ${madaiworkbench_src_dir}
 cmake .
 
 # Build MADAIWorkbench
-make -j $num_cores
+make -j ${num_cores}
 
 ###################################
 # Make the installer
 ###################################
-cpack -G DragNDrop --config $madaiworkbench_build_dir/Application/CPackMADAIWorkbenchConfig.cmake
+cpack -G DragNDrop --config ${madaiworkbench_build_dir}/Application/CPackMADAIWorkbenchConfig.cmake
