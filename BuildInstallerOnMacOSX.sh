@@ -30,6 +30,7 @@ fullpath () (
 ###################################
 qmake=$1
 [ -x "$qmake" ] || die "qmake: \"${qmake}\" not found."
+mkdir -p $2
 build_dir=`fullpath $2`
 script_relative_path=`dirname $0`
 script_dir=`fullpath $script_relative_path`
