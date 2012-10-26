@@ -82,6 +82,35 @@ pushd "$ParaViewBinaryDir/bin"
 cp *Python.so "$LibrariesDir/"
 popd
 
+# Copy ParaView plugins to plugin directory
+ParaViewPluginList=`grep PARAVIEW_PLUGINLIST ${ParaViewBinaryDir}/CMakeCache.txt`
+ParaViewPluginList=`echo $ParaViewPluginList | cut -d'=' -f 2 | sed 's/;/ /g'`
+
+for ParaViewPlugin in ${ParaViewPluginList}
+do
+    cp "${ParaViewBinaryDir}/lib/lib${ParaViewPlugin}.dylib" "${PluginsDir}"
+done
+
+# Patch up the .plugins file
+PluginsFile="${PluginsDir}/.plugins"
+numLines=`cat "${PluginsFile}" | wc -l`
+numLines=`expr ${numLines} - 1`
+
+PluginsFileContent=`cat "${PluginsFile}"`
+echo "${PluginsFileContent}" | head -n ${numLines} > "${PluginsFile}"
+for ParaViewPlugin in ${ParaViewPluginList}
+do
+    echo " -Adding ParaView plugin ${ParaViewPlugin}"
+
+    # Make the VRPlugin autoload
+    if [ ${ParaViewPlugin} == "VRPlugin" ]
+        then echo "  <Plugin name=\"${ParaViewPlugin}\" auto_load=\"1\"/>" >> "${PluginsFile}"
+        else echo "  <Plugin name=\"${ParaViewPlugin}\" auto_load=\"0\"/>" >> "${PluginsFile}"
+    fi
+done
+
+echo "</Plugins>" >> "${PluginsFile}"
+
 # Add macros to installer
 echo "Copying $MADAIWorkbenchSourceDir/Macros to $MacrosDir"
 mkdir -p "$MacrosDir"
