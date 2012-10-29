@@ -79,7 +79,7 @@ mkdir -p ${src_dir}
 cd ${src_dir}
 vrpn_src_dir=${src_dir}/VRPN
 if [ ! -d ${src_dir}/VRPN ]
-    then git clone git://git.cs.unc.edu/vrpn.git VRPN || die "Could not clone VRPN"
+    then git clone git://git.cs.unc.edu/vrpn.git VRPN || die "Could not clone VRPN"; git submodule update --init
 fi
 cd ${vrpn_src_dir}
 
@@ -91,10 +91,11 @@ mkdir -p ${vrpn_build_dir}
 cd ${vrpn_build_dir}
 cmake \
     -D CMAKE_BUILD_TYPE:STRING=${build_type} \
-    -D BUILD_SHARD_LIBS:BOOL=ON \
     -D BUILD_TESTING:BOOL=OFF \
     -D CMAKE_OSX_DEPLOYMENT_TARGET:STRING=${target} \
     -D CMAKE_OSX_SYSROOT:PATH=/Developer/SDKs/MacOSX${target}.sdk \
+    -D VRPN_USE_HID:BOOL=ON \
+    -D VRPN_USE_LOCAL_HIDAPI:BOOL=ON \
     ${vrpn_src_dir}
 cmake .
 
