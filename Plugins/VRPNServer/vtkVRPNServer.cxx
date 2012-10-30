@@ -39,7 +39,7 @@ void vtkVRPNServer::Stop()
 //----------------------------------------------------------------------------
 void vtkVRPNServer::run()
 {
-  vrpn_Connection * connection = vrpn_create_server_connection( 7120 );
+  vrpn_Connection * connection = vrpn_create_server_connection();
   this->SpaceNavigator = new vrpn_3DConnexion_Navigator( "device0", connection );
 
   while ( !this->Stopped )
@@ -50,6 +50,6 @@ void vtkVRPNServer::run()
     
     connection->mainloop();
 
-    QThread::msleep( 60 );
+    //QThread::msleep( 60 );
     }
 }
