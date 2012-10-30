@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+class vtkVRPNServer;
+
 class pqVRPNServerStarter : public QObject
 {
   Q_OBJECT
@@ -21,6 +23,7 @@ public:
 private:
   Q_DISABLE_COPY(pqVRPNServerStarter);
 
+  vtkVRPNServer* Server;
 };
 
 #endif // __pqVRPNServerStarter_h
