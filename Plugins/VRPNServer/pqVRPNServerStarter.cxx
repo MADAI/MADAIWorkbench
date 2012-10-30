@@ -23,15 +23,11 @@ pqVRPNServerStarter::~pqVRPNServerStarter()
 //-----------------------------------------------------------------------------
 void pqVRPNServerStarter::onStartup()
 {
-  qWarning() << "Starting VRPN server";
-
   this->Server->Start();
 }
 
 //-----------------------------------------------------------------------------
 void pqVRPNServerStarter::onShutdown()
 {
-  qWarning() << "Stopping VRPN server";
-
   this->Server->Stop();
 }

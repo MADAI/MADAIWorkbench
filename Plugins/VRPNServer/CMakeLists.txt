@@ -20,6 +20,11 @@ message( "VTK_INCLUDE_DIR: '${VTK_INCLUDE_DIR}'" )
 message( "VRPN_INCLUDE_DIR: '${VRPN_INCLUDE_DIR}'" )
 message( "VRPN_LIBRARY: '${VRPN_LIBRARY}'" )
 
+# Get the path to the VRPN server library
+get_filename_component( VRPN_PATH "${VRPN_LIBRARY}" PATH )
+message( "VRPN_PATH: '${VRPN_PATH}'" )
+set( VRPN_SERVER_LIBRARY "${VRPN_PATH}/libvrpnserver.a" )
+
 if (PARAVIEW_USE_VRPN)
     include_directories(${VRPN_INCLUDE_DIR})
     set(VRPN_SOURCE_FILES
@@ -69,5 +74,8 @@ if (PARAVIEW_USE_VRPN)
       ${MOC_SRCS}
       ${IFACE_SRCS}
     )
-  target_link_libraries( VRPNServer "${VRPN_LIBRARY}" )
+  target_link_libraries( VRPNServer
+    "${VRPN_LIBRARY}"
+    "${VRPN_SERVER_LIBRARY}"
+    )
 endif()

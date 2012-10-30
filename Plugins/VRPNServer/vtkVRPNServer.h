@@ -5,6 +5,9 @@
 
 #include "vtkObject.h"
 
+class vrpn_3DConnexion_Navigator;
+class vrpn_Connection;
+
 class vtkVRPNServer : public QThread
 {
   Q_OBJECT
@@ -28,6 +31,8 @@ private:
   void operator=(const vtkVRPNServer&); // Not implemented
 
   bool Stopped;
+
+  vrpn_3DConnexion_Navigator* SpaceNavigator;
 };
 
 #endif // __vtkVRPNServer_h
