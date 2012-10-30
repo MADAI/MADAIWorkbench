@@ -38,8 +38,6 @@ if (PARAVIEW_USE_VRPN)
 
 endif(PARAVIEW_USE_VRPN)
 
-
-# todo - QT4_WRAP_CPP 
 qt4_wrap_cpp( MOC_SRCS
   pqVRPNServerStarter.h
   vtkVRPNServer.h
