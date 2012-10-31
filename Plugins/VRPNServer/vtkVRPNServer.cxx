@@ -35,7 +35,7 @@ void vtkVRPNServer::run()
 {
   vrpn_Connection * connection = vrpn_create_server_connection();
   vrpn_3DConnexion_Navigator *navigator =
-    new vrpn_3DConnexion_Navigator( "device0", connection );
+    new vrpn_3DConnexion_Navigator( "spaceNavigator", connection );
 
   while ( !this->Stopped )
     {
