@@ -43,7 +43,7 @@ void vtkVRPNServer::run()
     
     connection->mainloop();
 
-    QThread::msleep( 10 );
+    //QThread::msleep( 10 );
     }
 
   delete navigator;
