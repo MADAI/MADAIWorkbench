@@ -12,13 +12,6 @@ GetCMakeCacheValue( "${ParaView_BINARY_DIR}/CMakeCache.txt"
   VRPN_INCLUDE_DIR
   VRPN_LIBRARY
 )
-message( "PARAVIEW_INCLUDE_DIRS: '${PARAVIEW_INCLUDE_DIRS}'" )
-message( "PARAVIEW_GUI_INCLUDE_DIRS: '${PARAVIEW_GUI_INCLUDE_DIRS}'" )
-message( "PARAVIEW_KWSYS_INCLUDE_DIRS: '${PARAVIEW_KWSYS_INCLUDE_DIRS}'" )
-message( "PARAVIEW_USE_VRPN: '${PARAVIEW_USE_VRPN}'" )
-message( "VTK_INCLUDE_DIR: '${VTK_INCLUDE_DIR}'" )
-message( "VRPN_INCLUDE_DIR: '${VRPN_INCLUDE_DIR}'" )
-message( "VRPN_LIBRARY: '${VRPN_LIBRARY}'" )
 
 # Get the path to the VRPN server library
 get_filename_component( VRPN_PATH "${VRPN_LIBRARY}" PATH )
