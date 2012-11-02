@@ -15,7 +15,6 @@ GetCMakeCacheValue( "${ParaView_BINARY_DIR}/CMakeCache.txt"
 
 # Get the path to the VRPN server library
 get_filename_component( VRPN_PATH "${VRPN_LIBRARY}" PATH )
-message( "VRPN_PATH: '${VRPN_PATH}'" )
 set( VRPN_SERVER_LIBRARY "${VRPN_PATH}/libvrpnserver.a" )
 
 if (PARAVIEW_USE_VRPN)
@@ -51,6 +50,10 @@ include_directories(
 
 if (PARAVIEW_USE_VRPN)
 
+  if ( NOT APPLE AND UNIX )
+    find_package( USB1 REQUIRED )
+  endif()
+
   add_paraview_auto_start( IFACES IFACE_SRCS CLASS_NAME pqVRPNServerStarter
     STARTUP onStartup
     SHUTDOWN onShutdown
@@ -68,5 +71,7 @@ if (PARAVIEW_USE_VRPN)
   target_link_libraries( VRPNServer
     "${VRPN_LIBRARY}"
     "${VRPN_SERVER_LIBRARY}"
+    "${USB1_LIBRARY}"
     )
+
 endif()
