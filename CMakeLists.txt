@@ -1,6 +1,11 @@
 project( MADAIWorkbench )
 cmake_minimum_required(VERSION 2.8.4)
 
+set( CMAKE_MODULE_PATH
+     ${CMAKE_MODULE_PATH}
+     ${MADAIWorkbench_SOURCE_DIR}/CMake
+)
+
 include( "CMake/GetCMakeCacheValue.cmake" )
 
 option(BUILD_APPLICATION "Build the MADAI Workbench application." OFF)
