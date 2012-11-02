@@ -33,9 +33,10 @@ qmake=$1
 [ -x "$qmake" ] || die "qmake: \"${qmake}\" not found."
 mkdir -p $2
 build_dir=`fullpath $2`
+echo "Build dir: ${build_dir}"
 script_relative_path=`dirname $0`
-script_dir=`fullpath $script_relative_path`
-madaiworkbench_src_dir=$script_dir
+script_dir=`fullpath ${script_relative_path}`
+madaiworkbench_src_dir=${script_dir}
 num_cores=`cat /proc/cpuinfo | grep "core id" | wc -l`
 
 build_type=Release
@@ -47,27 +48,30 @@ echo "Build type:" ${build_type}
 ###################################
 # Set up build and source directories
 ###################################
-mkdir -p $build_dir
-bin_dir=$build_dir/bin
-mkdir -p $bin_dir
-src_dir=$build_dir/src
-mkdir -p $src_dir
-install_dir=$build_dir/install
-mkdir -p $install_dir
+mkdir -p "${build_dir}"
+bin_dir="${build_dir}/bin"
+mkdir -p "${bin_dir}"
+src_dir="${build_dir}/src"
+mkdir -p "${src_dir}"
+install_dir="${build_dir}/install"
+mkdir -p "${install_dir}"
+
+echo "bin dir: ${bin_dir}"
+echo "src dir: ${src_dir}"
 
 ###################################
 # Add /usr/lib64/nvidia/tls to
 # LD_LIBRARY_PATH to find necessary
 # link libraries on ntheory-3d.phy.duke.edu
 ####################################
-set LD_LIBRARY_PATH=/usr/lib64/nvidia/tls:$LD_LIBRARY_PATH
+set LD_LIBRARY_PATH=/usr/lib64/nvidia/tls:${LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH
 
 ###################################
 # Get MPI
 ###################################
-cd $src_dir
-mpich2_src_dir=$src_dir/mpich2-1.4
+cd ${src_dir}
+mpich2_src_dir=${src_dir}/mpich2-1.4
 wget --timestamping http://www.mcs.anl.gov/research/projects/mpich2/downloads/tarballs/1.4/mpich2-1.4.tar.gz
 tar xzf mpich2-1.4.tar.gz
 
@@ -79,7 +83,7 @@ export CXXFLAGS=-fPIC
 ###################################
 pushd mpich2-1.4
 if [ ! -f config.log ]; then
-    ./configure --prefix=$install_dir --enable-threads=runtime --disable-f77 --disable-fc --enable-cxx
+    ./configure --prefix=${install_dir} --enable-threads=runtime --disable-f77 --disable-fc --enable-cxx
 fi
 
 ###################################
@@ -96,16 +100,45 @@ unset CXXFLAGS
 ###################################
 # All following libraries require MPI-enabled compilers
 ###################################
-export CC=$install_dir/bin/mpicc
-export CXX=$install_dir/bin/mpicxx
+export CC=${install_dir}/bin/mpicc
+export CXX=${install_dir}/bin/mpicxx
+
+###################################
+# Clone VRPN
+###################################
+cd ${src_dir}
+vrpn_src_dir=${src_dir}/VRPN
+if [ ! -d ${src_dir}/VRPN ]
+    then git clone --recursive git://git.cs.unc.edu/vrpn.git VRPN || die "Could not clone VRPN"
+fi
+cd ${vrpn_src_dir}
+
+###################################
+# Configure VRPN
+###################################
+vrpn_build_dir=${bin_dir}/VRPN-build
+mkdir -p ${vrpn_build_dir}
+cd ${vrpn_build_dir}
+cmake \
+    -D CMAKE_BUILD_TYPE:STRING=${build_type} \
+    -D BUILD_TESTING:BOOL=OFF \
+    -D CMAKE_OSX_DEPLOYMENT_TARGET:STRING=${target} \
+    -D CMAKE_OSX_SYSROOT:PATH=/Developer/SDKs/MacOSX${target}.sdk \
+    -D VRPN_USE_HID:BOOL=ON \
+    -D VRPN_USE_LOCAL_HIDAPI:BOOL=ON \
+    ${vrpn_src_dir}
+cmake .
+
+# Build VRPN
+make -j ${num_cores} || die "Failed to build VRPN"
 
 ###################################
 # Clone ParaView
 ###################################
-cd $src_dir
-paraview_src_dir=$src_dir/ParaView
+cd ${src_dir}
+paraview_src_dir=${src_dir}/ParaView
 git clone ${PARAVIEW_GIT_URL} ParaView
-cd $paraview_src_dir
+cd ${paraview_src_dir}
 
 # Checkout desired version of ParaView
 git fetch origin
@@ -115,15 +148,7 @@ git submodule update --init
 # Get python version
 python_version=`python -c 'import sys; print sys.version[:3]'`
 python_exe=`which python`
-python_file_text=`file -L ${python_exe}`
-python64_string=`echo "${python_file_text}" grep x86-64`
-if [ "${python64_string}" != '' ]; then
-    if [ -a '/usr/lib64/libpython${python_version}.so' ]; then
-	python_lib="/usr/lib64/libpython${python_version}.so"
-    else
-	python_lib="/usr/lib/libpython${python_version}.so"
-    fi
-fi
+python_lib=`ldd ${python_exe} | grep python | cut -d ' ' -f 3`
 
 ###################################
 # Copy Macro directory
@@ -133,16 +158,16 @@ cp -r --preserve=timestamps "${script_dir}/Macros" "${bin_dir}/"
 ###################################
 # Configure ParaView
 ###################################
-paraview_build_dir=$bin_dir/ParaView-build
-mkdir -p $paraview_build_dir
-cd $paraview_build_dir
+paraview_build_dir="${bin_dir}/ParaView-build"
+mkdir -p ${paraview_build_dir}
+cd ${paraview_build_dir}
 cmake \
     -D CMAKE_BUILD_TYPE:STRING=${build_type} \
     -D BUILD_SHARED_LIBS:BOOL=ON \
     -D BUILD_TESTING:BOOL=OFF \
     -D PARAVIEW_USE_MPI:BOOL=ON \
-    -D MPI_C_COMPILER:PATH=$CC \
-    -D MPI_CXX_COMPILER:PATH=$CXX \
+    -D MPI_C_COMPILER:PATH=${CC} \
+    -D MPI_CXX_COMPILER:PATH=${CXX} \
     -D MPI_LIBRARY:PATH=${install_dir}/lib/libmpich.a \
     -D MPI_EXTRA_LIBRARY:PATH=${install_dir}/lib/libmpichcxx.a\;${install_dir}/lib/libmpl.a \
     -D MPI_INCLUDE_PATH:PATH=${install_dir}/include \
@@ -153,37 +178,43 @@ cmake \
     -D PYTHON_INCLUDE_DIR:PATH=/usr/include/python${python_version} \
     -D PYTHON_LIBRARY:PATH=${python_lib} \
     -D PARAVIEW_USE_VISITBRIDGE:BOOL=ON \
+    -D PARAVIEW_BUILD_PLUGIN_VRPlugin:BOOL=ON \
+    -D PARAVIEW_USE_VRPN:BOOL=ON \
+    -D PARAVIEW_USE_VRUI:BOOL=OFF \
+    -D VRPN_INCLUDE_DIR:PATH=${vrpn_src_dir} \
+    -D VRPN_LIBRARY:FILEPATH=${vrpn_build_dir}/libvrpn.a \
     -D QT_QMAKE_EXECUTABLE:PATH=${qmake} \
-    $paraview_src_dir
-cmake .
+    ${paraview_src_dir}
+cmake . || die "Could not configure ParaView"
 
 ###################################
 # Build ParaView
 ###################################
-nice make -j $num_cores
+nice make -j ${num_cores} || die "Failed to build ParaView"
 
 ###################################
 # Configure MADAIWorkbench
 ###################################
-madaiworkbench_build_dir=$bin_dir/MADAIWorkbench-build
-mkdir -p $madaiworkbench_build_dir
-cd $madaiworkbench_build_dir
+madaiworkbench_build_dir="${bin_dir}/MADAIWorkbench-build"
+mkdir -p ${madaiworkbench_build_dir}
+cd ${madaiworkbench_build_dir}
 cmake \
     -D CMAKE_BUILD_TYPE:STRING=${build_type} \
     -D BUILD_APPLICATION:BOOL=ON \
     -D BUILD_SHARED_LIBS:BOOL=ON \
-    -D ParaView_DIR:PATH=$paraview_build_dir \
-    $madaiworkbench_src_dir
-cmake .
+    -D ParaView_DIR:PATH=${paraview_build_dir} \
+    ${madaiworkbench_src_dir}
+cmake . || die "Could not configure MADAIWorkbench"
 
 ###################################
 # Build MADAIWorkbench
 ###################################
-nice make -j $num_cores
+nice make -j ${num_cores} || die "Failed to build MADAIWorkbench"
 
 ###################################
 # Get version string
 ###################################
+echo ${madaiworkbench_build_dir}
 version=`grep "SET(CPACK_PACKAGE_VERSION " ${madaiworkbench_build_dir}/CPackSourceConfig.cmake | cut -d '"' -f 2`
 echo "Creating installer for MADAI Workbench ${version}"
 
@@ -206,7 +237,7 @@ echo "Found Qt binary directory ${qt_lib_dir}"
 # (assumes MPICH-2 is used)
 ###################################
 #mpi_include_dir=`grep "MPI_INCLUDE_PATH:" ${paraview_build_dir}/CMakeCache.txt | cut -d '=' -f 2`
-mpi_include_dir=$install_dir/include
+mpi_include_dir=${install_dir}/include
 mpi_bin_dir=`dirname ${mpi_include_dir}`/bin
 echo "Found MPI binary directory ${mpi_bin_dir}"
 
@@ -234,7 +265,7 @@ do
 done
 
 # Copy ParaView libraries
-cp -r ${paraview_build_dir}/bin/*.so*             ${lib_dir}
+cp -r ${paraview_build_dir}/bin/*.so* ${lib_dir}
 
 # Copy MADAIWorkbench binaries
 cp -r ${madaiworkbench_build_dir}/bin/MADAIWorkbench ${bin_dir}
@@ -272,11 +303,11 @@ done
 script_name=$bin_dir/../MADAIWorkbench-${version}
 cp ${script_dir}/scripts/MADAIWorkbench.in ${script_name}
 sed -i 's/@VERSION@/'${version}'/g' ${script_name}
-chmod 755 $script_name
-script_name=$bin_dir/../MADAIWorkbenchServer-${version}
+chmod 755 ${script_name}
+script_name=${bin_dir}/../MADAIWorkbenchServer-${version}
 cp ${script_dir}/scripts/MADAIWorkbenchServer.in ${script_name}
 sed -i 's/@VERSION@/'${version}'/g' ${script_name}
-chmod 755 $script_name
+chmod 755 ${script_name}
 
 ###################################
 # Now tar up the file
