@@ -161,6 +161,10 @@ cp -r --preserve=timestamps "${script_dir}/Macros" "${bin_dir}/"
 paraview_build_dir="${bin_dir}/ParaView-build"
 mkdir -p ${paraview_build_dir}
 cd ${paraview_build_dir}
+# NOTES
+# - the PointSprite plugin leads to the error
+#   make[2]: execvp: /bin/sh: Argument list too long
+#   We don't need it, so I turn it off here
 cmake \
     -D CMAKE_BUILD_TYPE:STRING=${build_type} \
     -D BUILD_SHARED_LIBS:BOOL=ON \
@@ -174,6 +178,7 @@ cmake \
     -D MPIEXEC:PATH=${install_dir}/bin/mpiexec \
     -D PARAVIEW_ENABLE_PYTHON:BOOL=ON \
     -D PARAVIEW_ENABLE_PYTHON_FILTERS:BOOL=ON \
+    -D PARAVIEW_BUILD_PLUGIN_PointSprite:BOOL=OFF \
     -D PYTHON_EXECUTABLE:PATH=/usr/bin/python \
     -D PYTHON_INCLUDE_DIR:PATH=/usr/include/python${python_version} \
     -D PYTHON_LIBRARY:PATH=${python_lib} \
