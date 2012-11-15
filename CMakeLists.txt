@@ -24,6 +24,7 @@ set(PARAVIEW_AUTOLOAD_PLUGINLIST "" CACHE INTERNAL "Docs" FORCE)
 set(PARAVIEW_PLUGINLIST "" CACHE INTERNAL "Docs" FORCE)
 
 get_filename_component(ParaView_SOURCE_DIR "${ParaView_CMAKE_DIR}/.." ABSOLUTE)
+get_filename_component(ParaView_BINARY_DIR "${ParaView_DIR}" ABSOLUTE)
 
 add_subdirectory(Plugins)
 
