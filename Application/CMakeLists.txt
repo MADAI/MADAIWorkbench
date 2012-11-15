@@ -168,8 +168,7 @@ if (EXISTS "${PARAVIEW_EXTRA_INSTALL_RULES_FILE}")
 endif (EXISTS "${PARAVIEW_EXTRA_INSTALL_RULES_FILE}")
 
 #------------------------------------------------------------------------
-# Install the .plugins configuration file.
-#write_plugins_file()
+# Configure plugins
 pv_process_plugins( "${MADAIWorkbench_SOURCE_DIR}/Plugins" "${MADAIWorkbench_BINARY_DIR}/Plugins" )
 install(FILES "${EXECUTABLE_OUTPUT_PATH}/.plugins"
         DESTINATION ${PV_INSTALL_PLUGIN_DIR}
