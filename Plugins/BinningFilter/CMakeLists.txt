@@ -14,3 +14,6 @@ add_paraview_plugin(
   SERVER_MANAGER_SOURCES vtkBinningFilter.cxx
   GUI_RESOURCE_FILES BinningFilterGUI.xml
   )
+
+# TODO - remove the line below when ParaView is fixed
+target_link_libraries( BinningFilter vtkRenderingMatplotlib )

@@ -23,3 +23,6 @@ add_paraview_plugin(
     vtkEnsembleSurfaceSlicingPolyDataMapper.cxx
 )
 
+
+# TODO - remove the line below when ParaView is fixed
+target_link_libraries( EnsembleSurfaceSlicing vtkRenderingMatplotlib )

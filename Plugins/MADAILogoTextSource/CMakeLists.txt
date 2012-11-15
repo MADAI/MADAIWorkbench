@@ -33,7 +33,6 @@ add_paraview_auto_start(IFACES IFACE_SRCS CLASS_NAME pqMADAILogoTextSourceStarte
 
 add_paraview_plugin(
   MADAILogoTextSourcePlugin "1.0"
-  AUTOLOAD ON
   GUI_INTERFACES ${IFACES}
   SOURCES pqMADAILogoTextSourceStarter.cxx
     ${MOC_SRCS}
@@ -43,3 +42,6 @@ add_paraview_plugin(
   )
 
 target_link_libraries(MADAILogoTextSourcePlugin pqApplicationComponents)
+
+# TODO - remove the line below when ParaView is fixed
+target_link_libraries( MADAILogoTextSourcePlugin vtkRenderingMatplotlib )
