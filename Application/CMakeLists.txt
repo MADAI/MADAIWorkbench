@@ -7,6 +7,9 @@ set(MW_VERSION_STRING "${MW_VERSION_MAJOR}.${MW_VERSION_MINOR}.${MW_VERSION_PATC
 # Now build the MADAI workbench as a branded ParaView
 include(${ParaView_CMAKE_DIR}/ParaViewBranding.cmake)
 include(${ParaView_CMAKE_DIR}/ParaViewPlugins.cmake)
+include(${ParaView_CMAKE_DIR}/ParaViewPluginsMacros.cmake)
+include(${ParaView_CMAKE_DIR}/ParaViewBrandingCPack.cmake)
+include(${ParaView_SOURCE_DIR}/VTK/CMake/vtkModuleMacros.cmake)
 
 set(PARAVIEW_APPLICATION_DIR "${ParaView_SOURCE_DIR}/Applications/ParaView")
 
@@ -98,6 +101,8 @@ else()
 endif()
 
 #------------------------------------------------------------------------------
+link_directories( ${ParaView_BINARY_DIR}/lib )
+
 set(APP_NAME "MADAIWorkbench")
 build_paraview_client("${APP_NAME}"
   APPLICATION_NAME "MADAIWorkbench"
@@ -117,7 +122,7 @@ build_paraview_client("${APP_NAME}"
       ${PARAVIEW_APPLICATION_DIR}/ParaViewReaders.xml
       ${PARAVIEW_APPLICATION_DIR}/ParaViewWriters.xml
       ${PARAVIEW_EXTRA_GUI_RESOURCES} # Add any compiled in GUI configuration xmls
-  COMPRESSED_HELP_FILE "${ParaView_BINARY_DIR}/Documentation/paraview.qch"
+  COMPRESSED_HELP_FILE "${ParaView_BINARY_DIR}/Applications/ParaView/Documentation/paraview.qch"
   SOURCES ${ParaView_SOURCE_FILES}
   REQUIRED_PLUGINS ${MW_PLUGINS}
   INSTALL_BIN_DIR "${PV_INSTALL_BIN_DIR}"
@@ -130,17 +135,22 @@ if(NOT BUILD_SHARED_LIBS)
 endif(NOT BUILD_SHARED_LIBS)
 
 # This ensure that the paraview.qch file is generated.
-add_dependencies(${paraview_client_real_exe_name}
+#add_dependencies(${paraview_client_real_exe_name}
+add_dependencies( MADAIWorkbench
   ParaViewOnlineHelp)
 
 # add include directories
-include_directories(${PARAVIEW_INCLUDE_DIRS} ${PARAVIEW_APPLICATION_DIR})
+include_directories(${PARAVIEW_INCLUDE_DIRS}
+  ${PARAVIEW_APPLICATION_DIR}
+  ${PARAVIEW_APPLICATION_DIR}/Documentation
+)
 
 target_link_libraries(MADAIWorkbench
   ${QT_QTCORE_LIBRARY}
   ${QT_QTGUI_LIBRARY}
   ${VTK_LIBRARIES}
   vtkPVCommon
+  vtkParaViewDocumentation
   pqCore
   pqComponents
 )
@@ -159,7 +169,8 @@ endif (EXISTS "${PARAVIEW_EXTRA_INSTALL_RULES_FILE}")
 
 #------------------------------------------------------------------------
 # Install the .plugins configuration file.
-write_plugins_file()
+#write_plugins_file()
+pv_process_plugins( "${MADAIWorkbench_SOURCE_DIR}/Plugins" "${MADAIWorkbench_BINARY_DIR}/Plugins" )
 install(FILES "${EXECUTABLE_OUTPUT_PATH}/.plugins"
         DESTINATION ${PV_INSTALL_PLUGIN_DIR}
         COMPONENT BrandedRuntime
