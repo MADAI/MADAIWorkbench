@@ -43,7 +43,7 @@ void pqMADAILogoTextSourceStarter::onStartup()
 {
   pqApplicationCore* core = pqApplicationCore::instance();
   QObject::connect(core->getServerManagerModel(),
-		   SIGNAL(preServerAdded(pqServer*)),
+                   SIGNAL(preServerAdded(pqServer*)),
                    this, SLOT(newServerAdded()));
 }
 
@@ -51,15 +51,17 @@ void pqMADAILogoTextSourceStarter::onStartup()
 void pqMADAILogoTextSourceStarter::newServerAdded()
 {
   QObject::connect(&pqActiveObjects::instance(),
-		   SIGNAL(viewChanged(pqView*)),
+                   SIGNAL(viewChanged(pqView*)),
                    this, SLOT(createSource()), Qt::QueuedConnection);
 }
 
 //-----------------------------------------------------------------------
 void pqMADAILogoTextSourceStarter::createSource()
 {
-  if (pqActiveObjects::instance().activeView())
+  pqView* view = pqActiveObjects::instance().activeView();
+  if (view)
     {
+    std::cout << "Object name: " << view->objectName().toStdString() << std::endl;
     pqApplicationCore* app = pqApplicationCore::instance();
     pqObjectBuilder* builder = app->getObjectBuilder();
     if ( !this->textSourceProxy || pqActiveObjects::instance().activeServer() != associatedServer )
@@ -87,8 +89,11 @@ void pqMADAILogoTextSourceStarter::createSource()
       // Set the logo properties here. For additional properties, see
       // ParaView/Qt/Components/pqTextDisplayPropertiesWidget.cxx.
       vtkSMProxy *repProxy = rep->getProxy();
-      vtkSMPropertyHelper( repProxy, "Italic").Set( 1 );
-      repProxy->UpdateVTKObjects();
+      if ( repProxy->GetProperty( "Italic", 0 ) )
+        {
+        vtkSMPropertyHelper( repProxy, "Italic").Set( 1 );
+        repProxy->UpdateVTKObjects();
+        }
       }
     }
 
