@@ -80,6 +80,14 @@ void pqMADAILogoTextSourceStarter::createSource()
       this->textSourceProxy->getOutputPort(0), pqActiveObjects::instance().activeView(),
       true);
 
+    pqPipelineSource * source = pqActiveObjects::instance().activeSource();
+    char * proxyXMLName = source->getProxy()->GetXMLName();
+    std::cout << source->getProxy()->GetXMLName() << std::endl;
+    if ( source && strcmp( proxyXMLName, "MADAILogoTextSource" ) == 0 )
+      {
+      return;
+      }
+
     // The text source is now the active object and its representation
     // is active.
     pqDataRepresentation *rep =
