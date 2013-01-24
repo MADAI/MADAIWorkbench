@@ -42,6 +42,3 @@ add_paraview_plugin(
   )
 
 target_link_libraries(MADAILogoTextSourcePlugin pqApplicationComponents)
-
-# TODO - remove the line below when ParaView is fixed
-target_link_libraries( MADAILogoTextSourcePlugin vtkRenderingMatplotlib )
