@@ -10,6 +10,9 @@
 
 # MADAI Workbench 1.4.0
 #export PARAVIEW_COMMIT="1a6245cd454493c7aff82d4b460988179498cb79"
-export PARAVIEW_COMMIT="v3.98.0-RC2"
+#export PARAVIEW_COMMIT="v3.98.0-RC2"
+
+# MADAI Workbench 1.5.0
+export PARAVIEW_COMMIT="v3.98.0"
 
 echo "Using ParaView version ${PARAVIEW_COMMIT} as base for MADAI Workbench"
