@@ -5,6 +5,9 @@
 
 #include "vtkObject.h"
 
+#include <vrpn_Analog.h>
+
+
 class vtkVRPNClient : public QThread
 {
   Q_OBJECT
@@ -28,6 +31,9 @@ private:
   void operator=(const vtkVRPNClient&); // Not implemented
 
   bool Stopped;
+
+  static void VRPN_CALLBACK AnalogChangeHandler( void * userData, const vrpn_ANALOGCB a );
+
 };
 
 #endif // __vtkVRPNClient_h
