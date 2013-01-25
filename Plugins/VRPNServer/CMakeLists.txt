@@ -6,7 +6,7 @@ if(NOT ParaView_SOURCE_DIR)
   INCLUDE(${PARAVIEW_USE_FILE})
 endif()
 
-GetCMakeCacheValue( "${ParaView_BINARY_DIR}/CMakeCache.txt"
+GetCMakeCacheValue( "${ParaView_BINARY_DIR}"
   PARAVIEW_USE_VRPN
   VTK_INCLUDE_DIR
   VRPN_INCLUDE_DIR
