@@ -1,0 +1,75 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ================================================================== -->
+    <SourceProxy name="ThresholdPoints" class="vtkThresholdPoints" label="Threshold Points Filter">
+      <Documentation
+         long_help="This filter extracts points from a dataset that satisfy a threshold criterion. The criterion can take three forms: 1) greater than a particular value; 2) less than a particular value; or 3) between a particular value. The output of the filter is polygonal data."
+         short_help="Extracts points whose scalar value satisfies threshold criterion.">
+      </Documentation>
+ 
+      <InputProperty
+         name="Input"
+         command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array"
+                          attribute_type="point"
+                          number_of_components="1">
+          <RequiredProperties>
+            <Property function="FieldDataSelection"
+                      name="SelectInputScalars" />
+          </RequiredProperties>
+        </InputArrayDomain>
+        <Documentation>This property specifies the input to the Threshold
+        filter.</Documentation>
+      </InputProperty>
+ 
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            element_types="0 0 0 0 2"
+                            label="Scalars"
+                            name="SelectInputScalars"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Scalars"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>The value of this property contains the name of the
+        scalar array from which to perform thresholding.</Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty command="ThresholdBetween"
+                            default_values="0 0"
+                            label="Threshold Range"
+                            name="ThresholdBetween"
+                            number_of_elements="2">
+        <ArrayRangeDomain name="range">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="Input" />
+            <Property function="ArraySelection"
+                      name="SelectInputScalars" />
+          </RequiredProperties>
+        </ArrayRangeDomain>
+        <Documentation>The values of this property specify the upper and lower
+        bounds of the thresholding operation.</Documentation>
+      </DoubleVectorProperty>
+
+    </SourceProxy>
+    <!-- End LandmarkTransformFilter -->
+  </ProxyGroup>
+  <!-- End Filters Group -->
+</ServerManagerConfiguration>
