@@ -2,16 +2,16 @@
 #define __vtkVRPNClient_h
 
 #include <QThread>
+#include <QTimer>
 
 #include "vtkObject.h"
 
 #include <vrpn_Analog.h>
 
 
-class vtkVRPNClient : public QThread
+class vtkVRPNClient : public QObject
 {
   Q_OBJECT
-  typedef QThread Superclass;
 
 public:
   vtkVRPNClient();
@@ -24,13 +24,19 @@ public:
   void Stop();
 
 protected slots:
-  void run();
+  void render();
 
 private:
   vtkVRPNClient(const vtkVRPNClient&); // Not implemented
   void operator=(const vtkVRPNClient&); // Not implemented
 
   bool Stopped;
+
+  bool EventSinceLastRender;
+
+  QTimer Timer;
+
+  vrpn_Analog_Remote * Navigator;
 
   static void VRPN_CALLBACK AnalogChangeHandler( void * userData, const vrpn_ANALOGCB a );
 
