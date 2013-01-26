@@ -79,7 +79,7 @@ mkdir -p ${src_dir}
 cd ${src_dir}
 vrpn_src_dir=${src_dir}/VRPN
 if [ ! -d ${src_dir}/VRPN ]
-    then git clone git://git.cs.unc.edu/vrpn.git VRPN || die "Could not clone VRPN"; git submodule update --init
+    then git clone --recursive git://git.cs.unc.edu/vrpn.git VRPN || die "Could not clone VRPN"; git submodule update --init
 fi
 cd ${vrpn_src_dir}
 
