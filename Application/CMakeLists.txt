@@ -1,6 +1,6 @@
 # Set the version number
 set(MW_VERSION_MAJOR 1)
-set(MW_VERSION_MINOR 4)
+set(MW_VERSION_MINOR 5)
 set(MW_VERSION_PATCH 0)
 set(MW_VERSION_STRING "${MW_VERSION_MAJOR}.${MW_VERSION_MINOR}.${MW_VERSION_PATCH}")
 
@@ -92,6 +92,8 @@ set(MW_PLUGINS
   EnsembleSurfaceSlicing
   GaussianScalarSplatter
   MaskTableRows
+  ThresholdPoints
+  VRPNClient
   VRPNServer
 )
 
