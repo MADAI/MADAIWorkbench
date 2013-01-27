@@ -38,6 +38,9 @@ script_relative_path=`dirname $0`
 script_dir=`fullpath ${script_relative_path}`
 madaiworkbench_src_dir=${script_dir}
 num_cores=`cat /proc/cpuinfo | grep "core id" | wc -l`
+if [ "${num_cores}" == "0" ]; then
+  num_cores=1
+fi
 
 build_type=Release
 if [ "$3" == Debug ]; then
