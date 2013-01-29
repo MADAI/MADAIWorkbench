@@ -1,18 +1,20 @@
-#ifndef __pqVRPNClientStarter_h
-#define __pqVRPNClientStarter_h
+#ifndef __pqVRPNClientServerStarter_h
+#define __pqVRPNClientServerStarter_h
 
 #include <QObject>
 
 class vtkVRPNClient;
+class vtkVRPNServer;
 
-class pqVRPNClientStarter : public QObject
+
+class pqVRPNClientServerStarter : public QObject
 {
   Q_OBJECT
   typedef QObject Superclass;
 
 public:
-  pqVRPNClientStarter(QObject* p=0);
-  ~pqVRPNClientStarter();
+  pqVRPNClientServerStarter(QObject* p=0);
+  ~pqVRPNClientServerStarter();
 
   // Start up a VRPN server
   void onStartup();
@@ -21,9 +23,11 @@ public:
   void onShutdown();
 
 private:
-  Q_DISABLE_COPY(pqVRPNClientStarter);
+  Q_DISABLE_COPY(pqVRPNClientServerStarter);
 
   vtkVRPNClient* Client;
+
+  vtkVRPNServer* Server;
 };
 
-#endif // __pqVRPNClientStarter_h
+#endif // __pqVRPNClientServerStarter_h

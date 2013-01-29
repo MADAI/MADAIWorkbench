@@ -35,6 +35,7 @@ if (PARAVIEW_USE_VRPN)
     include_directories(${VRPN_INCLUDE_DIR})
     set(VRPN_SOURCE_FILES
       vtkVRPNClient.cxx
+      vtkVRPNServer.cxx
       )
 
     if(NOT EXISTS VRPN_INCLUDE_DIR)
@@ -45,8 +46,9 @@ if (PARAVIEW_USE_VRPN)
 endif(PARAVIEW_USE_VRPN)
 
 qt4_wrap_cpp( MOC_SRCS
-  pqVRPNClientStarter.h
+  pqVRPNClientServerStarter.h
   vtkVRPNClient.h
+  vtkVRPNServer.h
 )
 
 include( ${QT_USE_FILE} )
@@ -68,21 +70,22 @@ if (PARAVIEW_USE_VRPN)
     find_package( USB1 REQUIRED )
   endif()
 
-  add_paraview_auto_start( IFACES IFACE_SRCS CLASS_NAME pqVRPNClientStarter
+  add_paraview_auto_start( IFACES IFACE_SRCS CLASS_NAME pqVRPNClientServerStarter
     STARTUP onStartup
     SHUTDOWN onShutdown
     )
 
   add_paraview_plugin(
-    VRPNClient "1.0"
+    VRPNDevices "1.0"
     GUI_INTERFACES ${IFACES}
     SOURCES
-      pqVRPNClientStarter.cxx
+      pqVRPNClientServerStarter.cxx
       vtkVRPNClient.cxx
+      vtkVRPNServer.cxx
       ${MOC_SRCS}
       ${IFACE_SRCS}
     )
-  target_link_libraries( VRPNClient
+  target_link_libraries( VRPNDevices
     "${VRPN_LIBRARY}"
     "${VRPN_SERVER_LIBRARY}"
     "${USB1_LIBRARY}"
