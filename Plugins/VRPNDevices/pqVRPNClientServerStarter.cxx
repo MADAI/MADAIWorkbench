@@ -12,19 +12,20 @@ pqVRPNClientServerStarter::pqVRPNClientServerStarter(QObject* p/*=0*/)
 {
   this->Server = new vtkVRPNServer();
   this->Client = new vtkVRPNClient();
+  this->Client->SetServer( this->Server );
 }
 
 //-----------------------------------------------------------------------------
 pqVRPNClientServerStarter::~pqVRPNClientServerStarter()
 {
-  if ( this->Server )
-    {
-    delete this->Server;
-    }
-
   if ( this->Client )
     {
     delete this->Client;
+    }
+
+  if ( this->Server )
+    {
+    delete this->Server;
     }
 }
 

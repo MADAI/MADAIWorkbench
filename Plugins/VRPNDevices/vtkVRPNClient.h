@@ -8,6 +8,8 @@
 
 #include <vrpn_Analog.h>
 
+class vtkVRPNServer;
+
 
 class vtkVRPNClient : public QObject
 {
@@ -16,6 +18,10 @@ class vtkVRPNClient : public QObject
 public:
   vtkVRPNClient();
   virtual ~vtkVRPNClient();
+
+  // Set a reference to the server. This is needed to acquire the
+  // server's lock before calling VRPN methods.
+  void SetServer( vtkVRPNServer * server );
 
   // Start the thread
   void Start();
@@ -35,6 +41,8 @@ private:
   bool EventSinceLastRender;
 
   QTimer Timer;
+
+  vtkVRPNServer * Server;
 
   vrpn_Analog_Remote * Navigator;
 

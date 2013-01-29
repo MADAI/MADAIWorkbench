@@ -12,6 +12,8 @@
 #include <pqActiveObjects.h>
 #include <pqView.h>
 
+#include "vtkVRPNServer.h"
+
 
 //----------------------------------------------------------------------------
 vtkVRPNClient::vtkVRPNClient()
@@ -25,18 +27,42 @@ vtkVRPNClient::vtkVRPNClient()
 
   connect( &this->Timer, SIGNAL( timeout() ), this, SLOT( render() ) );
 
-  this->Navigator = new vrpn_Analog_Remote( "spaceNavigator@localhost" );
-  this->Navigator->register_change_handler( this, AnalogChangeHandler );
+  this->Server = NULL;
+
+  this->Navigator = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkVRPNClient::~vtkVRPNClient()
 {
+  this->Server->Lock();
+  //delete this->Navigator;
+  this->Server->Unlock();
+}
+
+//----------------------------------------------------------------------------
+void vtkVRPNClient::SetServer( vtkVRPNServer * server )
+{
+  this->Server = server;
 }
 
 //----------------------------------------------------------------------------
 void vtkVRPNClient::Start()
 {
+  if ( !this->Server )
+    {
+    std::cerr << "Server not set! Cannot start client." << std::endl;
+    return;
+    }
+
+  if ( !this->Navigator )
+    {
+    this->Server->Lock();
+    this->Navigator = new vrpn_Analog_Remote( "spaceNavigator@localhost" );
+    this->Navigator->register_change_handler( this, AnalogChangeHandler );
+    this->Server->Unlock();
+    }
+
   this->Stopped = false;
   this->Timer.start();
 }
@@ -51,7 +77,9 @@ void vtkVRPNClient::Stop()
 //----------------------------------------------------------------------------
 void vtkVRPNClient::render()
 {
+  this->Server->Lock();
   this->Navigator->mainloop();
+  this->Server->Unlock();
 
   if ( !this->EventSinceLastRender )
     {
