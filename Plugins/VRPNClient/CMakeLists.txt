@@ -17,7 +17,21 @@ GetCMakeCacheValue( "${ParaView_BINARY_DIR}"
 get_filename_component( VRPN_PATH "${VRPN_LIBRARY}" PATH )
 set( VRPN_SERVER_LIBRARY "${VRPN_PATH}/libvrpnserver.a" )
 
+cmake_policy(SET CMP0005 NEW)
+
 if (PARAVIEW_USE_VRPN)
+
+    # Look to see if we are building against VRPN that exists in a CMake-
+    # configured build tree.
+    set( VRPN_CMAKECACHE_FILE "${VRPN_PATH}/CMakeCache.txt" )
+
+    if ( UNIX AND EXISTS "${VRPN_CMAKECACHE_FILE}" )
+      # We need to add a compiler definition to tell VRPN that we want to use
+      # the vrpn_Configure.h file in the CMake build directory instead of the
+      # source directory. We need only do this on Mac and Linux
+      add_definitions(-DVRPN_USING_CMAKE="${VRPN_PATH}/vrpn_Configure.h")
+    endif()
+
     include_directories(${VRPN_INCLUDE_DIR})
     set(VRPN_SOURCE_FILES
       vtkVRPNClient.cxx
