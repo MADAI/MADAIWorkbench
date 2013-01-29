@@ -54,7 +54,6 @@ qt4_wrap_cpp( MOC_SRCS
 include( ${QT_USE_FILE} )
 
 include_directories(
-  ${VTK_INCLUDE_DIRS}
   ${PARAVIEW_INCLUDE_DIRS}
   ${PARAVIEW_GUI_INCLUDE_DIRS}
   ${PARAVIEW_KWSYS_INCLUDE_DIRS}
