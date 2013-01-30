@@ -23,20 +23,15 @@ public:
   // server's lock before calling VRPN methods.
   void SetServer( vtkVRPNServer * server );
 
-  // Start the thread
   void Start();
-
-  // Stop the thread
   void Stop();
 
 protected slots:
-  void render();
+  void Process();
 
 private:
   vtkVRPNClient(const vtkVRPNClient&); // Not implemented
   void operator=(const vtkVRPNClient&); // Not implemented
-
-  bool Stopped;
 
   bool EventSinceLastRender;
 

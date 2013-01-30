@@ -18,14 +18,12 @@
 //----------------------------------------------------------------------------
 vtkVRPNClient::vtkVRPNClient()
 {
-  this->Stopped = true;
-
   this->EventSinceLastRender = false;
 
   this->Timer.setSingleShot( true );
   this->Timer.setInterval( 1 );
 
-  connect( &this->Timer, SIGNAL( timeout() ), this, SLOT( render() ) );
+  connect( &this->Timer, SIGNAL( timeout() ), this, SLOT( Process() ) );
 
   this->Server = NULL;
 
@@ -63,19 +61,17 @@ void vtkVRPNClient::Start()
     this->Server->Unlock();
     }
 
-  this->Stopped = false;
   this->Timer.start();
 }
 
 //----------------------------------------------------------------------------
 void vtkVRPNClient::Stop()
 {
-  this->Stopped = true;
   this->Timer.stop();
 }
 
 //----------------------------------------------------------------------------
-void vtkVRPNClient::render()
+void vtkVRPNClient::Process()
 {
   this->Server->Lock();
   this->Navigator->mainloop();
