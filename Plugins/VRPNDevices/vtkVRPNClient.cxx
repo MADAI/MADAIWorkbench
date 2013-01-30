@@ -12,8 +12,6 @@
 #include <pqActiveObjects.h>
 #include <pqView.h>
 
-#include "vtkVRPNServer.h"
-
 
 //----------------------------------------------------------------------------
 vtkVRPNClient::vtkVRPNClient()
@@ -21,11 +19,9 @@ vtkVRPNClient::vtkVRPNClient()
   this->EventSinceLastRender = false;
 
   this->Timer.setSingleShot( true );
-  this->Timer.setInterval( 1 );
+  this->Timer.setInterval( 20 );
 
   connect( &this->Timer, SIGNAL( timeout() ), this, SLOT( Process() ) );
-
-  this->Server = NULL;
 
   this->Navigator = NULL;
 }
@@ -33,32 +29,16 @@ vtkVRPNClient::vtkVRPNClient()
 //----------------------------------------------------------------------------
 vtkVRPNClient::~vtkVRPNClient()
 {
-  this->Server->Lock();
   //delete this->Navigator;
-  this->Server->Unlock();
-}
-
-//----------------------------------------------------------------------------
-void vtkVRPNClient::SetServer( vtkVRPNServer * server )
-{
-  this->Server = server;
 }
 
 //----------------------------------------------------------------------------
 void vtkVRPNClient::Start()
 {
-  if ( !this->Server )
-    {
-    std::cerr << "Server not set! Cannot start client." << std::endl;
-    return;
-    }
-
   if ( !this->Navigator )
     {
-    this->Server->Lock();
     this->Navigator = new vrpn_Analog_Remote( "spaceNavigator@localhost" );
     this->Navigator->register_change_handler( this, AnalogChangeHandler );
-    this->Server->Unlock();
     }
 
   this->Timer.start();
@@ -73,31 +53,21 @@ void vtkVRPNClient::Stop()
 //----------------------------------------------------------------------------
 void vtkVRPNClient::Process()
 {
-  this->Server->Lock();
   this->Navigator->mainloop();
-  this->Server->Unlock();
-
-  if ( !this->EventSinceLastRender )
-    {
-    this->Timer.start();
-    return;
-    }
 
   pqView * view = pqActiveObjects::instance().activeView();
-  if ( !view )
-    {
-    this->Timer.start();
-    return;
-    }
+  vtkSMRenderViewProxy * viewProxy = NULL;
 
-  vtkSMRenderViewProxy * viewProxy =
-    vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
-  if ( viewProxy )
+  if ( this->EventSinceLastRender && view )
     {
-    viewProxy->StillRender();
-    }
+    viewProxy = vtkSMRenderViewProxy::SafeDownCast( view->getViewProxy() );
+    if ( viewProxy )
+      {
+      viewProxy->StillRender();
+      }
 
-  this->EventSinceLastRender = false;
+    this->EventSinceLastRender = false;
+    }
 
   // Restart the one-shot timer
   this->Timer.start();

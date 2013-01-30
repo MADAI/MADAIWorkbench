@@ -9,69 +9,57 @@
 //----------------------------------------------------------------------------
 vtkVRPNServer::vtkVRPNServer()
 {
-  this->Stopped = true;
-  this->Mutex = new vtkSimpleMutexLock();
+  this->Timer.setSingleShot( true );
+  this->Timer.setInterval( 2 );
+
+  connect( &this->Timer, SIGNAL( timeout() ), this, SLOT( Process() ) );
+
+  this->Connection = NULL;
+  this->Navigator = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkVRPNServer::~vtkVRPNServer()
 {
-  if ( this->Mutex )
+  if ( this->Navigator )
     {
-    delete this->Mutex;
-    }  
+    delete this->Navigator;
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkVRPNServer::Start()
 {
-  this->Stopped = false;
-  this->start();
+  if ( !this->Connection )
+    {
+    this->Connection = vrpn_create_server_connection();
+    }
+  if ( !this->Navigator )
+    {
+    this->Navigator = new vrpn_3DConnexion_Navigator( "spaceNavigator",
+                                                      this->Connection );
+    }
+  this->Timer.start();
 }
 
 //----------------------------------------------------------------------------
 void vtkVRPNServer::Stop()
 {
-  this->Stopped = true;
-  QThread::wait();
+  this->Timer.stop();
 }
 
 //----------------------------------------------------------------------------
-void vtkVRPNServer::Lock()
+void vtkVRPNServer::Process()
 {
-  this->Mutex->Lock();
-}
-
-//----------------------------------------------------------------------------
-void vtkVRPNServer::Unlock()
-{
-  this->Mutex->Unlock();
-}
-
-//----------------------------------------------------------------------------
-void vtkVRPNServer::run()
-{
-  this->Lock();
-  vrpn_Connection * connection = vrpn_create_server_connection();
-  vrpn_3DConnexion_Navigator *navigator =
-    new vrpn_3DConnexion_Navigator( "spaceNavigator", connection );
-  this->Unlock();
-
-  while ( !this->Stopped )
+  if ( this->Navigator )
     {
-    this->Lock();
-
-    navigator->mainloop();
-    
-    connection->mainloop();
-
-    this->Unlock();
-
-    //QThread::msleep( 10 );
+    this->Navigator->mainloop();  
     }
 
-  this->Lock();
-  delete navigator;
-  delete connection;
-  this->Unlock();
+  if ( this->Connection )
+    {
+    this->Connection->mainloop();
+    }
+
+  this->Timer.start();
 }

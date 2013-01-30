@@ -12,7 +12,6 @@ pqVRPNClientServerStarter::pqVRPNClientServerStarter(QObject* p/*=0*/)
 {
   this->Server = new vtkVRPNServer();
   this->Client = new vtkVRPNClient();
-  this->Client->SetServer( this->Server );
 }
 
 //-----------------------------------------------------------------------------

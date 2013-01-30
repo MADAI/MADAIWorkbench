@@ -1,43 +1,37 @@
 #ifndef __vtkVRPNServer_h
 #define __vtkVRPNServer_h
 
-#include <QThread>
+#include <QTimer>
 
 #include <vtkObject.h>
 #include <vtkMutexLock.h>
 
+#include <vrpn_3DConnexion.h>
 
-class vtkVRPNServer : public QThread
+
+class vtkVRPNServer : public QObject
 {
   Q_OBJECT
-  typedef QThread Superclass;
 
 public:
   vtkVRPNServer();
   virtual ~vtkVRPNServer();
 
-  // Start the thread
   void Start();
-
-  // Stop the thread
   void Stop();
 
-  // Acquire the lock around VRPN calls
-  void Lock();
-
-  // Release lock around VRPN calls
-  void Unlock();
-
 protected slots:
-  void run();
+  void Process();
 
 private:
   vtkVRPNServer(const vtkVRPNServer&); // Not implemented
   void operator=(const vtkVRPNServer&); // Not implemented
 
-  bool Stopped;
+  QTimer Timer;
 
-  vtkSimpleMutexLock * Mutex;
+  vrpn_Connection * Connection;
+
+  vrpn_3DConnexion_Navigator * Navigator;
 };
 
 #endif // __vtkVRPNServer_h
