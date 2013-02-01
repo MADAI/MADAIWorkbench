@@ -9,57 +9,49 @@
 //----------------------------------------------------------------------------
 vtkVRPNServer::vtkVRPNServer()
 {
-  this->Timer.setSingleShot( true );
-  this->Timer.setInterval( 2 );
-
-  connect( &this->Timer, SIGNAL( timeout() ), this, SLOT( Process() ) );
-
-  this->Connection = NULL;
-  this->Navigator = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkVRPNServer::~vtkVRPNServer()
 {
-  if ( this->Navigator )
-    {
-    delete this->Navigator;
-    }
 }
 
 //----------------------------------------------------------------------------
 void vtkVRPNServer::Start()
 {
-  if ( !this->Connection )
+  this->Process.start( "/Users/quammen/dev/madai/installers/MADAIWorkbench-1.5.0-Release/bin/MADAIWorkbench-build/bin/vrpn_server" );
+  this->Process.waitForStarted( 5000 );
+  QProcess::ProcessError error = this->Process.error();
+  switch ( error )
     {
-    this->Connection = vrpn_create_server_connection();
+    case QProcess::FailedToStart:
+      std::cerr << "vrpn_server failed to start" << std::endl;
+      break;
+
+    case QProcess::Crashed:
+      std::cerr << "vrpn_server crashed" << std::endl;
+      break;
+
+    case QProcess::Timedout:
+      std::cerr << "vrpn_server timed out" << std::endl;
+      break;
+
+    case QProcess::WriteError:
+      std::cerr << "vrpn_server write error" << std::endl;
+      break;
+
+    case QProcess::ReadError:
+      std::cerr << "vrpn_server read error" << std::endl;
+      break;
+
+    default:
+      break;
     }
-  if ( !this->Navigator )
-    {
-    this->Navigator = new vrpn_3DConnexion_Navigator( "spaceNavigator",
-                                                      this->Connection );
-    }
-  this->Timer.start();
 }
 
 //----------------------------------------------------------------------------
 void vtkVRPNServer::Stop()
 {
-  this->Timer.stop();
-}
-
-//----------------------------------------------------------------------------
-void vtkVRPNServer::Process()
-{
-  if ( this->Navigator )
-    {
-    this->Navigator->mainloop();  
-    }
-
-  if ( this->Connection )
-    {
-    this->Connection->mainloop();
-    }
-
-  this->Timer.start();
+  this->Process.terminate();
+  this->Process.waitForFinished( 5000 );
 }
