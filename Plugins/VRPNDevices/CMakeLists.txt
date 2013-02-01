@@ -91,4 +91,22 @@ if (PARAVIEW_USE_VRPN)
     "${USB1_LIBRARY}"
     )
 
+  # I'm not sure why I have to explicity include these Apple
+  # frameworks when I don't have to for the plugin. Perhaps the
+  # frameworks are included as target link libraries for the plugins
+  # or ParaView, so they don't need to be included above.
+  if ( APPLE )
+    find_library( CORE_FOUNDATION NAMES CoreFoundation )
+    find_library( IO_KIT NAMES IOKit )
+  endif()
+
+  add_executable( vrpn_server vrpn_server.cxx )
+  target_link_libraries( vrpn_server
+    "${VRPN_LIBRARY}"
+    "${VRPN_SERVER_LIBRARY}"
+    "${USB1_LIBRARY}"
+    "${CORE_FOUNDATION}"
+    "${IO_KIT}"
+    )
+
 endif()
