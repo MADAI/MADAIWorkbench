@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include <QCoreApplication>
+
 #include <vrpn_Connection.h>
 #include <vrpn_3DConnexion.h>
 
@@ -19,7 +21,10 @@ vtkVRPNServer::~vtkVRPNServer()
 //----------------------------------------------------------------------------
 void vtkVRPNServer::Start()
 {
-  this->Process.start( "/Users/quammen/dev/madai/installers/MADAIWorkbench-1.5.0-Release/bin/MADAIWorkbench-build/bin/vrpn_server" );
+  QString appName = QCoreApplication::applicationDirPath();
+  appName.append("/vrpn_server");
+
+  this->Process.start( appName );
   this->Process.waitForStarted( 5000 );
   QProcess::ProcessError error = this->Process.error();
   switch ( error )
