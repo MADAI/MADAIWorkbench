@@ -125,8 +125,7 @@ cd ${vrpn_build_dir}
 cmake \
     -D CMAKE_BUILD_TYPE:STRING=${build_type} \
     -D BUILD_TESTING:BOOL=OFF \
-    -D CMAKE_OSX_DEPLOYMENT_TARGET:STRING=${target} \
-    -D CMAKE_OSX_SYSROOT:PATH=/Developer/SDKs/MacOSX${target}.sdk \
+    -D CMAKE_INSTALL_PREFIX:PATH=${install_dir} \
     -D VRPN_USE_HID:BOOL=ON \
     -D VRPN_USE_LOCAL_HIDAPI:BOOL=ON \
     ${vrpn_src_dir}
@@ -134,6 +133,7 @@ cmake .
 
 # Build VRPN
 make -j ${num_cores} || die "Failed to build VRPN"
+make install         || die "Failed to install VRPN"
 
 ###################################
 # Clone ParaView
@@ -189,8 +189,9 @@ cmake \
     -D PARAVIEW_BUILD_PLUGIN_VRPlugin:BOOL=ON \
     -D PARAVIEW_USE_VRPN:BOOL=ON \
     -D PARAVIEW_USE_VRUI:BOOL=OFF \
-    -D VRPN_INCLUDE_DIR:PATH=${vrpn_src_dir} \
-    -D VRPN_LIBRARY:FILEPATH=${vrpn_build_dir}/libvrpn.a \
+    -D VRPN_INCLUDE_DIR:PATH=${install_dir}/include \
+    -D VRPN_LIBRARY:FILEPATH=${install_dir}/lib/libvrpn.a \
+    -D CMAKE_CXX_FLAGS:STRING=-I/usr/include/libusb-1.0 \
     -D QT_QMAKE_EXECUTABLE:PATH=${qmake} \
     ${paraview_src_dir}
 cmake . || die "Could not configure ParaView"
@@ -273,16 +274,21 @@ do
 done
 
 # Copy ParaView libraries
-cp -r ${paraview_build_dir}/bin/*.so* ${lib_dir}
+cp -r ${paraview_build_dir}/lib/*.so* ${lib_dir}
 
 # Copy MADAIWorkbench binaries
 cp -r ${madaiworkbench_build_dir}/bin/MADAIWorkbench ${bin_dir}
+cp -r ${madaiworkbench_build_dir}/bin/vrpn_server ${bin_dir}
 
 # Get list of plugins
-plugin_list=`grep PARAVIEW_PLUGINLIST ${madaiworkbench_build_dir}/CMakeCache.txt | cut -d'=' -f 2 | sed 's/;/\n/g' | sort | uniq`
+#plugin_list=`grep PARAVIEW_PLUGINLIST ${madaiworkbench_build_dir}/CMakeCache.txt | cut -d'=' -f 2 | sed 's/;/\n/g' | sort | uniq`
+plugin_list=(BinningFilter BooleanOperationFilter \
+             EnsembleSurfaceSlicing GaussianScalarSplatter \
+             MADAILogoTextSourcePlugin MaskTableRows \
+             ThresholdPointsFilter VRPNDevices)
 
 pushd ${plugin_dir}
-for plugin in ${plugin_list}
+for plugin in ${plugin_list[*]}
 do
     echo "Copying plugin ${plugin}"
     plugin_lib=lib${plugin}.so
