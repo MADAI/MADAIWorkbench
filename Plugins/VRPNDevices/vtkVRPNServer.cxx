@@ -21,11 +21,28 @@ vtkVRPNServer::~vtkVRPNServer()
 //----------------------------------------------------------------------------
 void vtkVRPNServer::Start()
 {
+  this->Timer.start( 1000 );
+  this->connect( &this->Timer, SIGNAL( timeout() ),
+                 this, SLOT( TryToStartServer() ) );
+
+}
+
+//----------------------------------------------------------------------------
+void vtkVRPNServer::TryToStartServer()
+{
+
   QString appName = QCoreApplication::applicationDirPath();
-  appName.append("/vrpn_server");
+
+  // WARNING!!! You must add quotation marks around the process name
+  // on Mac OS X (and probably linux as well) to handle spaces in the
+  // path correctly. Otherwise QProcess.start() will treat everything
+  // after the space as argument(s).
+  appName.prepend( "\"" );
+  appName.append("/vrpn_server\"");
 
   this->Process.start( appName );
   this->Process.waitForStarted( 5000 );
+
   QProcess::ProcessError error = this->Process.error();
   switch ( error )
     {
@@ -50,6 +67,7 @@ void vtkVRPNServer::Start()
       break;
 
     default:
+      this->Timer.stop();
       break;
     }
 }

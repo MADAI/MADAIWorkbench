@@ -40,6 +40,7 @@ fi
 ParaView_App="$InstallPrefix/@PARAVIEW_APPLICATION_NAME@ @PARAVIEW_VERSION_FULL@.app"
 
 BinDir="$ParaView_App/Contents/bin"
+MacOSDir="$ParaView_App/Contents/MacOS"
 FrameworksDir="$ParaView_App/Contents/Frameworks"
 LibrariesDir="$ParaView_App/Contents/Libraries"
 PluginsDir="$ParaView_App/Contents/Plugins"
@@ -68,6 +69,9 @@ cp -p "@EXECUTABLE_OUTPUT_PATH@/pvdataserver" "$BinDir"
 cp -p "@EXECUTABLE_OUTPUT_PATH@/pvpython" "$BinDir"
 cp -p "@EXECUTABLE_OUTPUT_PATH@/pvrenderserver" "$BinDir"
 cp -p "@EXECUTABLE_OUTPUT_PATH@/pvserver" "$BinDir"
+
+# Copy the VRPN server into Contents/MacOS
+cp -p "@EXECUTABLE_OUTPUT_PATH@/vrpn_server" "$MacOSDir"
 
 # Copy the ".plugins" configuration file.
 echo "Copying $ParaViewExeOutputDir/.plugins to $PluginsDir"
