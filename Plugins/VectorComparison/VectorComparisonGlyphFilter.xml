@@ -41,19 +41,19 @@
         </Documentation>
       </InputProperty>
 
-<!--	  <DoubleVectorProperty
-		name="Standard Deviation"
-		command="SetStandardDeviation"
-		number_of_elements="1"
-		default_values="0.1">
+	    <DoubleVectorProperty
+		     name="Scale Factor"
+		     command="SetScaleFactor"
+		     number_of_elements="1"
+		     default_values="1.0">
       </DoubleVectorProperty>
-	  <IntVectorProperty
-		name="Sample Dimensions"
-		command="SetSampleDimensions"
-		number_of_elements="3"
-		default_values="50 50 50">
+
+	    <IntVectorProperty
+		     name="Disk Resolution"
+		     command="SetDiskResolution"
+		     number_of_elements="1"
+		     default_values="8">
       </IntVectorProperty>
--->
 
     </SourceProxy>
   </ProxyGroup>
