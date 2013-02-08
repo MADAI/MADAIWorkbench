@@ -1,6 +1,7 @@
 #include "vtkVectorComparisonGlyphFilter.h"
 
 #include "vtkAlgorithm.h"
+#include "vtkCellArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
@@ -13,7 +14,7 @@ vtkStandardNewMacro(vtkVectorComparisonGlyphFilter);
 vtkVectorComparisonGlyphFilter::vtkVectorComparisonGlyphFilter()
 {
   this->SetNumberOfInputPorts(2);
-  this->SetNumberOfOutputPorts(1);
+  //this->SetNumberOfOutputPorts(1);
 }
 
 //----------------------------------------------------------------------------
@@ -34,6 +35,42 @@ int vtkVectorComparisonGlyphFilter::RequestData(
   vtkInformationVector **inputVector,
   vtkInformationVector *outputVector)
 {
+  // Get the information objects
+  vtkInformation *inInfo0 = inputVector[0]->GetInformationObject(0);
+  vtkInformation *inInfo1 = inputVector[1]->GetInformationObject(0);
+  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+  // Get the input and output
+  vtkDataSet *input0 = vtkDataSet::SafeDownCast(
+    inInfo0->Get(vtkDataObject::DATA_OBJECT()));
+  vtkDataSet *input1 = vtkDataSet::SafeDownCast(
+    inInfo1->Get(vtkDataObject::DATA_OBJECT()));
+  vtkPolyData *output = vtkPolyData::SafeDownCast(
+    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+  int numInput0Points = input0->GetNumberOfPoints();
+
+  vtkPoints * newPoints = vtkPoints::New();
+  newPoints->Allocate(numInput0Points);
+
+  vtkCellArray * polys = vtkCellArray::New();
+  polys->Allocate(numInput0Points);
+
+  std::cout << "numInput0Points: " << numInput0Points << std::endl;
+
+  for ( vtkIdType id = 0; id < numInput0Points; ++id )
+    {
+    double pt[3];
+    input0->GetPoint(id, pt);
+    newPoints->InsertNextPoint(pt);
+    polys->InsertNextCell(1, &id );
+    }
+
+  output->SetPoints(newPoints);
+  newPoints->Delete();
+  //output->SetPolys(polys);
+  polys->Delete();
+
   return 1;
 }
 
