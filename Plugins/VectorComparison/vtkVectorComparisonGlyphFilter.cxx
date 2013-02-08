@@ -7,6 +7,7 @@
 #include "vtkMath.h"
 #include "vtkPointData.h"
 #include "vtkPolygon.h"
+#include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTransform.h"
 
@@ -77,11 +78,12 @@ int vtkVectorComparisonGlyphFilter::RequestData(
     return 0;
     }
 
-  vtkPoints * newPoints = vtkPoints::New();
+  vtkSmartPointer< vtkPoints > newPoints = vtkSmartPointer< vtkPoints >::New();
   newPoints->Allocate(numInput0Points);
+  output->SetPoints(newPoints);
 
-  vtkCellArray * polys = vtkCellArray::New();
-  polys->Allocate(numInput0Points);
+  vtkSmartPointer< vtkPolygon > poly = vtkSmartPointer< vtkPolygon >::New();
+  vtkSmartPointer< vtkTransform > tform = vtkSmartPointer< vtkTransform >::New();
 
   for ( vtkIdType id = 0; id < numInput0Points; ++id )
     {
@@ -135,7 +137,7 @@ int vtkVectorComparisonGlyphFilter::RequestData(
 
     double maxTheta = acos( vtkMath::Dot( v0, v1 ) );
 
-    vtkPolygon * poly = vtkPolygon::New();
+    poly->GetPointIds()->Reset();
     poly->GetPointIds()->SetNumberOfIds( this->DiskResolution );
 
     double r = ( r0 > r1 ) ? r0 : r1;
@@ -149,7 +151,7 @@ int vtkVectorComparisonGlyphFilter::RequestData(
       double theta = t * maxTheta;
 
       // Now rotate b by theta
-      vtkTransform * tform = vtkTransform::New();
+      tform->Identity();
       tform->RotateWXYZ( vtkMath::DegreesFromRadians( -theta ), up );
 
       double rot[3] = {0.0, 0.0, 0.0};
@@ -170,10 +172,6 @@ int vtkVectorComparisonGlyphFilter::RequestData(
 
     output->InsertNextCell( poly->GetCellType(), poly->GetPointIds() );
     }
-
-  output->SetPoints(newPoints);
-  newPoints->Delete();
-  polys->Delete();
 
   return 1;
 }
