@@ -21,6 +21,17 @@ public:
   // Description:
   static vtkVectorComparisonGlyphFilter *New();
 
+  // Description:
+  // Set the scale factor for vector glyphs. Default is 1.0.
+  vtkSetMacro(ScaleFactor, double);
+  vtkGetMacro(ScaleFactor, double);
+
+
+  // Description:
+  // Set the number of points on the outside of the disk. Default is 8.
+  vtkSetMacro(DiskResolution, int);
+  vtkGetMacro(DiskResolution, int);
+
 protected:
   vtkVectorComparisonGlyphFilter();
   ~vtkVectorComparisonGlyphFilter();
@@ -34,6 +45,9 @@ private:
   vtkVectorComparisonGlyphFilter(const vtkVectorComparisonGlyphFilter&);
   void operator=(const vtkVectorComparisonGlyphFilter&);
 
+  double ScaleFactor;
+
+  int DiskResolution;
 };
 
 
