@@ -6,7 +6,9 @@
 #include "vtkInformationVector.h"
 #include "vtkMath.h"
 #include "vtkPointData.h"
+#include "vtkPolygon.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkTransform.h"
 
 
 vtkStandardNewMacro(vtkVectorComparisonGlyphFilter);
@@ -54,6 +56,8 @@ int vtkVectorComparisonGlyphFilter::RequestData(
     outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   int numInput0Points = input0->GetNumberOfPoints();
+
+  output->Allocate( numInput0Points );
 
   vtkPointData * pd0 = input0->GetPointData();
   vtkDataArray * vectors0 = pd0->GetVectors();
@@ -113,16 +117,62 @@ int vtkVectorComparisonGlyphFilter::RequestData(
       tip1[i] = r1 * v1[i];
       }
 
-    newPoints->InsertNextPoint(pt);
-    newPoints->InsertNextPoint(tip0);
-    newPoints->InsertNextPoint(tip1);
+    // Pick an up vector
+    double up[3] = {0.0, 0.0, 0.0};
+    if ( fabs( vtkMath::Dot( v0, v1) ) < 1-1.0e-5)
+      {
+      vtkMath::Cross( v0, v1, up );
+      }
+    else
+      {
+      double dummy[3];
+      vtkMath::Perpendiculars( v0, up, dummy, 0 );
+      }
 
-    polys->InsertNextCell(1, &id );
+    double right[3] = { v1[0], v1[1], v1[2] };
+    double forward[3] = { 0.0, 0.0, 0.0 };
+    vtkMath::Cross( right, up, forward );
+
+    double maxTheta = acos( vtkMath::Dot( v0, v1 ) );
+
+    vtkPolygon * poly = vtkPolygon::New();
+    poly->GetPointIds()->SetNumberOfIds( this->DiskResolution );
+
+    double r = ( r0 > r1 ) ? r0 : r1;
+
+    int pointsPerArc = this->DiskResolution - 1;
+    for ( int j = 0; j < pointsPerArc; ++j )
+      {
+      double t = static_cast< double >( j ) /
+        static_cast< double >( pointsPerArc - 1 );
+
+      double theta = t * maxTheta;
+
+      // Now rotate b by theta
+      vtkTransform * tform = vtkTransform::New();
+      tform->RotateWXYZ( vtkMath::DegreesFromRadians( -theta ), up );
+
+      double rot[3] = {0.0, 0.0, 0.0};
+      tform->TransformPoint( v1, rot );
+
+      double diskPoint[3];
+      for ( int i = 0; i < 3; ++i )
+        {
+        diskPoint[i] = pt[i] + r * rot[i];
+        }
+
+      newPoints->InsertNextPoint( diskPoint );
+      poly->GetPointIds()->SetId( j, this->DiskResolution * id + j );
+      }
+
+    newPoints->InsertNextPoint( pt );
+    poly->GetPointIds()->SetId( pointsPerArc, this->DiskResolution * id + pointsPerArc );
+
+    output->InsertNextCell( poly->GetCellType(), poly->GetPointIds() );
     }
 
   output->SetPoints(newPoints);
   newPoints->Delete();
-  //output->SetPolys(polys);
   polys->Delete();
 
   return 1;
