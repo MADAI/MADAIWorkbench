@@ -1,0 +1,41 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <SourceProxy 
+        name="VectorComparisonGlyphFilter"
+        class="vtkVectorComparisonGlyphFilter"
+        label="Vector Comparison Glyph Filter">
+      <Documentation
+          long_help=""
+          short_help="">
+      </Documentation>
+
+<!--	  <DoubleVectorProperty
+		name="Standard Deviation"
+		command="SetStandardDeviation"
+		number_of_elements="1"
+		default_values="0.1">
+      </DoubleVectorProperty>
+	  <IntVectorProperty
+		name="Sample Dimensions"
+		command="SetSampleDimensions"
+		number_of_elements="3"
+		default_values="50 50 50">
+      </IntVectorProperty>
+      <InputProperty
+          name="Input"
+          command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+      </InputProperty>
+-->
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
+
+
+		

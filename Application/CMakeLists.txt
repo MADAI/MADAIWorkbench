@@ -93,6 +93,7 @@ set(MW_PLUGINS
   GaussianScalarSplatter
   MaskTableRows
   ThresholdPointsFilter
+  VectorComparisonGlyphFilter
   VRPNDevices
 )
 
