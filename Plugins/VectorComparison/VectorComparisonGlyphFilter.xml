@@ -9,6 +9,38 @@
           short_help="">
       </Documentation>
 
+      <InputProperty
+         name="FirstDataSet"
+         port_index="0"
+         command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+        <Documentation>
+          Set the first data set containing a vector field to be compared.
+        </Documentation>
+      </InputProperty>
+
+      <InputProperty
+         name="SecondDataSet"
+         port_index="1"
+         command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+        <Documentation>
+          Set the second data set containing a vector field to be compared.
+        </Documentation>
+      </InputProperty>
+
 <!--	  <DoubleVectorProperty
 		name="Standard Deviation"
 		command="SetStandardDeviation"
@@ -21,18 +53,8 @@
 		number_of_elements="3"
 		default_values="50 50 50">
       </IntVectorProperty>
-      <InputProperty
-          name="Input"
-          command="SetInputConnection">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources"/>
-          <Group name="filters"/>
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkDataSet"/>
-        </DataTypeDomain>
-      </InputProperty>
 -->
+
     </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
