@@ -44,12 +44,16 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   ${PARAVIEW_APPLICATION_DIR}/ParaViewMainWindow.h)
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
-  ${PARAVIEW_APPLICATION_DIR}/ParaViewMainWindow.ui
+  #${PARAVIEW_APPLICATION_DIR}/ParaViewMainWindow.ui
+  ${CMAKE_CURRENT_SOURCE_DIR}/MADAIWorkbenchMainWindow.ui
 )
+
+PARAVIEW_QT4_ADD_RESOURCES(QT_RCS "${CMAKE_CURRENT_SOURCE_DIR}/icons.qrc")
 
 source_group("Generated" FILES
   ${MOC_BUILT_SOURCES}
   ${UI_BUILT_SOURCES}
+  ${QT_RCS}
 )
 
 set (QT_USE_QTNETWORK TRUE)
@@ -60,10 +64,12 @@ include_directories(
   ${CMAKE_CURRENT_BINARY_DIR})
 
 set(ParaView_SOURCE_FILES
-  ${PARAVIEW_APPLICATION_DIR}/ParaViewMainWindow.cxx
-  ${PARAVIEW_APPLICATION_DIR}/ParaViewMainWindow.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/MADAIWorkbenchMainWindow.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/MADAIWorkbenchMainWindow.h
   ${MOC_BUILT_SOURCES}
-  ${UI_BUILT_SOURCES})
+  ${UI_BUILT_SOURCES}
+  ${QT_RCS}
+)
 
 #------------------------------------------------------------------------------
 # Add install rules for required system runtimes such as MSVCRxx.dll
