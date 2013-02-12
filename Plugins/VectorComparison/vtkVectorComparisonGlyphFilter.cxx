@@ -4,6 +4,7 @@
 #include "vtkCellArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkLine.h"
 #include "vtkMath.h"
 #include "vtkPointData.h"
 #include "vtkPolygon.h"
@@ -21,8 +22,8 @@ vtkVectorComparisonGlyphFilter::vtkVectorComparisonGlyphFilter()
   this->ScaleFactor = 1.0;
   this->DiskResolution = 8;
 
-  this->SetNumberOfInputPorts(2);
-  this->SetNumberOfOutputPorts(1);
+  this->SetNumberOfInputPorts( 2 );
+  this->SetNumberOfOutputPorts( 2 );
 }
 
 //----------------------------------------------------------------------------
@@ -44,21 +45,22 @@ int vtkVectorComparisonGlyphFilter::RequestData(
   vtkInformationVector *outputVector)
 {
   // Get the information objects
-  vtkInformation *inInfo0 = inputVector[0]->GetInformationObject(0);
-  vtkInformation *inInfo1 = inputVector[1]->GetInformationObject(0);
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  vtkInformation *inInfo0 = inputVector[0]->GetInformationObject( 0 );
+  vtkInformation *inInfo1 = inputVector[1]->GetInformationObject( 0 );
+  vtkInformation *diskInfo      = outputVector->GetInformationObject( 0 );
+  vtkInformation *magnitudeInfo = outputVector->GetInformationObject( 1 );
 
   // Get the input and output
   vtkDataSet *input0 = vtkDataSet::SafeDownCast(
     inInfo0->Get(vtkDataObject::DATA_OBJECT()));
   vtkDataSet *input1 = vtkDataSet::SafeDownCast(
     inInfo1->Get(vtkDataObject::DATA_OBJECT()));
-  vtkPolyData *output = vtkPolyData::SafeDownCast(
-    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkPolyData *diskOutput = vtkPolyData::SafeDownCast(
+    diskInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkPolyData *magnitudeOutput = vtkPolyData::SafeDownCast(
+    magnitudeInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   int numInput0Points = input0->GetNumberOfPoints();
-
-  output->Allocate( numInput0Points );
 
   vtkPointData * pd0 = input0->GetPointData();
   vtkDataArray * vectors0 = pd0->GetVectors();
@@ -78,21 +80,37 @@ int vtkVectorComparisonGlyphFilter::RequestData(
     return 0;
     }
 
-  vtkSmartPointer< vtkPoints > newPoints = vtkSmartPointer< vtkPoints >::New();
-  newPoints->Allocate(numInput0Points);
-  output->SetPoints(newPoints);
+  /////////////////////////////////
+  // Disk glyphs
+  /////////////////////////////////
 
-  vtkSmartPointer< vtkPolygon > poly = vtkSmartPointer< vtkPolygon >::New();
-  vtkSmartPointer< vtkTransform > tform = vtkSmartPointer< vtkTransform >::New();
+  diskOutput->Allocate( numInput0Points );
+  vtkSmartPointer< vtkPoints > diskPoints =
+    vtkSmartPointer< vtkPoints >::New();
+  diskPoints->Allocate( numInput0Points );
+  diskOutput->SetPoints( diskPoints );
+
+  magnitudeOutput->Allocate( numInput0Points );
+  vtkSmartPointer< vtkPoints > magnitudePoints =
+    vtkSmartPointer< vtkPoints >::New();
+  magnitudePoints->Allocate( 2 * numInput0Points );
+  magnitudeOutput->SetPoints( magnitudePoints );
+
+  vtkSmartPointer< vtkPolygon > poly =
+    vtkSmartPointer< vtkPolygon >::New();
+  vtkSmartPointer< vtkTransform > tform =
+    vtkSmartPointer< vtkTransform >::New();
+  vtkSmartPointer< vtkLine > line =
+    vtkSmartPointer< vtkLine >::New();
 
   for ( vtkIdType id = 0; id < numInput0Points; ++id )
     {
     double pt[3];
-    input0->GetPoint(id, pt);
+    input0->GetPoint( id, pt );
 
     double v0[3], v1[3];
-    vectors0->GetTuple(id, v0);
-    vectors1->GetTuple(id, v1);
+    vectors0->GetTuple( id, v0 );
+    vectors1->GetTuple( id, v1 );
 
     // Scale vectors and compute the tips of the vectors
     double t0[3], t1[3];
@@ -163,14 +181,53 @@ int vtkVectorComparisonGlyphFilter::RequestData(
         diskPoint[i] = pt[i] + r * rot[i];
         }
 
-      newPoints->InsertNextPoint( diskPoint );
+      diskPoints->InsertNextPoint( diskPoint );
       poly->GetPointIds()->SetId( j, this->DiskResolution * id + j );
       }
 
-    newPoints->InsertNextPoint( pt );
+    diskPoints->InsertNextPoint( pt );
     poly->GetPointIds()->SetId( pointsPerArc, this->DiskResolution * id + pointsPerArc );
 
-    output->InsertNextCell( poly->GetCellType(), poly->GetPointIds() );
+    diskOutput->InsertNextCell( poly->GetCellType(), poly->GetPointIds() );
+
+    /////////////////////////////////
+    // Magnitude difference glyphs //
+    /////////////////////////////////
+
+    // Compute half angle vector between vectors
+    double sumSquared = 0.0;
+    for ( int i = 0; i < 3; ++i )
+      {
+	sumSquared += (v0[i] + v1[i]) * (v0[i] + v1[i]);
+      }
+    double magnitudeSumV0V1 = sqrt( sumSquared );
+
+    double h[3] = { 0.0, 0.0, 0.0 };
+    double p0[3], p1[3];
+    for ( int i = 0; i < 3; ++i )
+      {
+	double h = (v0[i] + v1[i]) / magnitudeSumV0V1;
+
+	// First point is displaced by vector 0 magnitude along the
+	// half vector, which is already scaled by ScaleFactor
+	p0[i] = pt[i] + r0*h;
+
+	// Second point is displaced by vector 1 magntidue along the
+	// half vector, which is already scaled by ScaleFactor
+	p1[i] = pt[i] + r1*h;
+      }
+
+    vtkIdType pid0 = magnitudePoints->InsertNextPoint( p0 );
+    vtkIdType pid1 = magnitudePoints->InsertNextPoint( p1 );
+
+    // Create a vtkLine to add to the output
+    line->GetPointIds()->Reset();
+    line->GetPointIds()->SetNumberOfIds( 2 );
+    line->GetPointIds()->SetId( 0, pid0 );
+    line->GetPointIds()->SetId( 1, pid1 );
+
+    magnitudeOutput->InsertNextCell( line->GetCellType(),
+				     line->GetPointIds() );
     }
 
   return 1;
@@ -187,7 +244,6 @@ int vtkVectorComparisonGlyphFilter::RequestUpdateExtent(
   // get the info objects
   vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
   vtkInformation *sourceInfo = inputVector[1]->GetInformationObject(0);
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
   if (sourceInfo)
     {
@@ -198,13 +254,18 @@ int vtkVectorComparisonGlyphFilter::RequestUpdateExtent(
     sourceInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
                     0);
     }
-  inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER(),
-              outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()));
-  inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(),
-              outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()));
-  inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
-              outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS()));
-  inInfo->Set(vtkStreamingDemandDrivenPipeline::EXACT_EXTENT(), 1);
+
+  for ( int i = 0; i < this->GetNumberOfOutputPorts(); ++i )
+    {
+      vtkInformation *outInfo = outputVector->GetInformationObject( i );
+      inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER(),
+		  outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()));
+      inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(),
+		  outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()));
+      inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
+		  outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS()));
+      inInfo->Set(vtkStreamingDemandDrivenPipeline::EXACT_EXTENT(), 1);
+    }
 
   return 1;
 }
