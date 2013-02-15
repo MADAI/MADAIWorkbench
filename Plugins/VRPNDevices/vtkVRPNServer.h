@@ -27,6 +27,9 @@ private:
 
   // Timer for repeated attempts to start the server
   QTimer Timer;
+
+  // Limit the number of tries to start the VRPN server
+  int StartTries;
 };
 
 #endif // __vtkVRPNServer_h

@@ -29,7 +29,8 @@ vtkVRPNClient::vtkVRPNClient()
 //----------------------------------------------------------------------------
 vtkVRPNClient::~vtkVRPNClient()
 {
-  //delete this->Navigator;
+   this->Navigator->unregister_change_handler( this, AnalogChangeHandler );
+   //delete this->Navigator;
 }
 
 //----------------------------------------------------------------------------

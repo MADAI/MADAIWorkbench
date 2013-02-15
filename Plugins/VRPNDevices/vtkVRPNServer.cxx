@@ -11,6 +11,7 @@
 //----------------------------------------------------------------------------
 vtkVRPNServer::vtkVRPNServer()
 {
+  this->StartTries = 5;
 }
 
 //----------------------------------------------------------------------------
@@ -30,6 +31,15 @@ void vtkVRPNServer::Start()
 //----------------------------------------------------------------------------
 void vtkVRPNServer::TryToStartServer()
 {
+
+  if ( this->StartTries == 1 )
+    {
+    this->Timer.stop();
+    }
+  else
+    {
+    this->StartTries--;
+    }
 
   QString appName = QCoreApplication::applicationDirPath();
 
