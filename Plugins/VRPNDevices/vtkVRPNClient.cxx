@@ -24,6 +24,7 @@ vtkVRPNClient::vtkVRPNClient()
   connect( &this->Timer, SIGNAL( timeout() ), this, SLOT( Process() ) );
 
   this->Navigator = NULL;
+  this->HasACallbackBeenCalled = false;
 }
 
 //----------------------------------------------------------------------------
@@ -43,6 +44,8 @@ void vtkVRPNClient::Start()
     }
 
   this->Timer.start();
+
+  this->StartTime = QTime::currentTime();
 }
 
 //----------------------------------------------------------------------------
@@ -54,6 +57,15 @@ void vtkVRPNClient::Stop()
 //----------------------------------------------------------------------------
 void vtkVRPNClient::Process()
 {
+  QTime currentTime = QTime::currentTime();
+  if ( this->StartTime.secsTo( currentTime ) > 10 && !this->HasACallbackBeenCalled )
+    {
+    // Give up trying to get events from server. The timer is
+    // one-shot, so we don't need to do anything to stop it because it
+    // is already stopped.
+    return;
+    }
+
   this->Navigator->mainloop();
 
   pqView * view = pqActiveObjects::instance().activeView();
@@ -78,6 +90,9 @@ void vtkVRPNClient::Process()
 void VRPN_CALLBACK vtkVRPNClient
 ::AnalogChangeHandler( void * userData, const vrpn_ANALOGCB a )
 {
+  vtkVRPNClient * client = reinterpret_cast< vtkVRPNClient * >( userData );
+  client->HasACallbackBeenCalled = true;
+
   // Values for Space Navigator
   if ( a.num_channel != 6 )
     {

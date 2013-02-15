@@ -2,6 +2,7 @@
 #define __vtkVRPNClient_h
 
 #include <QThread>
+#include <QTime>
 #include <QTimer>
 
 #include "vtkObject.h"
@@ -35,6 +36,9 @@ private:
 
   static void VRPN_CALLBACK AnalogChangeHandler( void * userData, const vrpn_ANALOGCB a );
 
+  bool HasACallbackBeenCalled;
+
+  QTime StartTime;
 };
 
 #endif // __vtkVRPNClient_h
