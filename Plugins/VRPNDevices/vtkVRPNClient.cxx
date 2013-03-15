@@ -30,8 +30,6 @@ vtkVRPNClient::vtkVRPNClient()
 //----------------------------------------------------------------------------
 vtkVRPNClient::~vtkVRPNClient()
 {
-   this->Navigator->unregister_change_handler( this, AnalogChangeHandler );
-   //delete this->Navigator;
 }
 
 //----------------------------------------------------------------------------
@@ -52,6 +50,9 @@ void vtkVRPNClient::Start()
 void vtkVRPNClient::Stop()
 {
   this->Timer.stop();
+
+  delete this->Navigator;
+  this->Navigator = NULL;
 }
 
 //----------------------------------------------------------------------------
