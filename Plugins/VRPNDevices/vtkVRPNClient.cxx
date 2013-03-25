@@ -112,7 +112,6 @@ void VRPN_CALLBACK vtkVRPNClient
   if ( viewProxy )
     {
     double pos[3], fp[3], up[3], dir[3];
-    double orient[3];
     const double *channel = a.channel;
 
     vtkCamera * camera = viewProxy->GetActiveCamera();

@@ -6,6 +6,7 @@
 #include "vtkInformationVector.h"
 #include "vtkLine.h"
 #include "vtkMath.h"
+#include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPolygon.h"
 #include "vtkSmartPointer.h"
@@ -202,7 +203,6 @@ int vtkVectorComparisonGlyphFilter::RequestData(
       }
     double magnitudeSumV0V1 = sqrt( sumSquared );
 
-    double h[3] = { 0.0, 0.0, 0.0 };
     double p0[3], p1[3];
     for ( int i = 0; i < 3; ++i )
       {
