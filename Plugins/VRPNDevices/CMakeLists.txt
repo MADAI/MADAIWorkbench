@@ -15,7 +15,11 @@ GetCMakeCacheValue( "${ParaView_BINARY_DIR}"
 
 # Get the path to the VRPN server library
 get_filename_component( VRPN_PATH "${VRPN_LIBRARY}" PATH )
-set( VRPN_SERVER_LIBRARY "${VRPN_PATH}/libvrpnserver.a" )
+if (WIN32)
+  set( VRPN_SERVER_LIBRARY "${VRPN_PATH}/vrpnserver.lib" )
+else()
+  set( VRPN_SERVER_LIBRARY "${VRPN_PATH}/libvrpnserver.a" )
+endif()
 
 cmake_policy(SET CMP0005 NEW)
 
