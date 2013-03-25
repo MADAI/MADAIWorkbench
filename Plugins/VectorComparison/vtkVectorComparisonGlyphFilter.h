@@ -11,7 +11,7 @@
 #include "vtkFiltersCoreModule.h" // For export macro
 #include "vtkPolyDataAlgorithm.h"
 
-class VTKFILTERSCORE_EXPORT vtkVectorComparisonGlyphFilter :
+class VTK_EXPORT vtkVectorComparisonGlyphFilter :
   public vtkPolyDataAlgorithm
 {
 public:
