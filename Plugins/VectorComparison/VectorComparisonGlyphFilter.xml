@@ -20,6 +20,10 @@
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet"/>
         </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array1"
+                          number_of_components="3"
+                          optional="1" />
         <Documentation>
           Set the first data set containing a vector field to be compared.
         </Documentation>
@@ -36,10 +40,57 @@
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet"/>
         </DataTypeDomain>
+        <InputArrayDomain attribute_type="point"
+                          name="input_array2"
+                          number_of_components="3"
+                          optional="1" />
         <Documentation>
           Set the second data set containing a vector field to be compared.
         </Documentation>
       </InputProperty>
+
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            default_values="0,0"
+                            default_values_delimiter=","
+                            element_types="0 0 0 0 2"
+                            label="VectorsFromInput1"
+                            name="SelectInputVectors1"
+                            number_of_elements="5">
+        <!-- default value=1 so normals go to the right place -->
+        <ArrayListDomain attribute_type="Vectors"
+                         input_domain_name="input_array1"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="FirstDataSet" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property indicates the name of the vector array on
+        which to operate. The indicated array may be used for scaling and/or
+        orienting the glyphs. (See the SetScaleMode and SetOrient
+        properties.)</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty command="SetInputArrayToProcess"
+                            default_values="1,1"
+                            default_values_delimiter=","
+                            element_types="0 0 0 0 2"
+                            label="VectorsFromInput2"
+                            name="SelectInputVectors2"
+                            number_of_elements="5">
+        <ArrayListDomain attribute_type="Vectors"
+                         input_domain_name="input_array2"
+                         name="array_list">
+          <RequiredProperties>
+            <Property function="Input"
+                      name="SecondDataSet" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>This property indicates the name of the vector array on
+        which to operate. The indicated array may be used for scaling and/or
+        orienting the glyphs. (See the SetScaleMode and SetOrient
+        properties.)</Documentation>
+      </StringVectorProperty>
 
 	    <DoubleVectorProperty
 		     name="Scale Factor"

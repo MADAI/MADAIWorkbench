@@ -25,6 +25,11 @@ vtkVectorComparisonGlyphFilter::vtkVectorComparisonGlyphFilter()
 
   this->SetNumberOfInputPorts( 2 );
   this->SetNumberOfOutputPorts( 2 );
+
+  this->SetInputArrayToProcess(0,0,0,vtkDataObject::FIELD_ASSOCIATION_POINTS,
+                               vtkDataSetAttributes::VECTORS);
+  this->SetInputArrayToProcess(1,1,0,vtkDataObject::FIELD_ASSOCIATION_POINTS,
+                               vtkDataSetAttributes::VECTORS);
 }
 
 //----------------------------------------------------------------------------
@@ -63,11 +68,8 @@ int vtkVectorComparisonGlyphFilter::RequestData(
 
   int numInput0Points = input0->GetNumberOfPoints();
 
-  vtkPointData * pd0 = input0->GetPointData();
-  vtkDataArray * vectors0 = pd0->GetVectors();
-
-  vtkPointData * pd1 = input1->GetPointData();
-  vtkDataArray * vectors1 = pd1->GetVectors();
+  vtkDataArray * vectors0 = this->GetInputArrayToProcess( 0, inputVector );
+  vtkDataArray * vectors1 = this->GetInputArrayToProcess( 1, inputVector);
 
   if (!vectors0)
     {
