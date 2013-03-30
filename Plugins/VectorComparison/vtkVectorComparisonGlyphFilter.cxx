@@ -24,7 +24,7 @@ vtkVectorComparisonGlyphFilter::vtkVectorComparisonGlyphFilter()
 {
   this->ScaleFactor = 1.0;
   this->DiskResolution = 8;
-  this->AlignMagnitudeDifferenceWithSmallerVector = 0;
+  this->MagnitudeDifferenceAlignmentMode = VTK_HALF_VECTOR;
 
   this->SetNumberOfInputPorts( 2 );
   this->SetNumberOfOutputPorts( 2 );
@@ -210,31 +210,65 @@ int vtkVectorComparisonGlyphFilter::RequestData(
 
     largestVectorArray->SetValue( id, r0 > r1 ? 0 : 1 );
 
+    double minR = std::min( r0, r1 );
+    double maxR = std::max( r0, r1 );
+
     double p0[3], p1[3];
-    if ( this->AlignMagnitudeDifferenceWithSmallerVector )
+    switch ( this->MagnitudeDifferenceAlignmentMode )
       {
-      if ( r0 < r1 )
+      case VTK_FIRST_VECTOR:
+      {
+      for ( int i = 0; i < 3; ++i )
         {
-        for ( int i = 0; i < 3; ++i )
-          {
-          p0[i] = pt[i] + r0*v0[i];
-          p1[i] = pt[i] + r1*v0[i];
-          }
-        }
-      else
-        {
-        for ( int i = 0; i < 3; ++i )
-          {
-          p0[i] = pt[i] + r1*v1[i];
-          p1[i] = pt[i] + r0*v1[i];
-          }
+        p0[i] = pt[i] + minR*v0[i];
+        p1[i] = pt[i] + maxR*v0[i];
         }
       }
-    else
+      break;
+
+      case VTK_SECOND_VECTOR:
       {
+      for ( int i = 0; i < 3; ++i )
+        {
+        p0[i] = pt[i] + minR*v1[i];
+        p1[i] = pt[i] + maxR*v1[i];
+        }
+      }
+      break;
 
-      // Draw along half vector
+      case VTK_SMALLEST_VECTOR:
+      {
+      for ( int i = 0; i < 3; ++i )
+        {
+        double smallestV = v0[i];
+        if ( r0 > r1 )
+          {
+          smallestV = v1[i];
+          }
+        p0[i] = pt[i] + minR*smallestV;
+        p1[i] = pt[i] + maxR*smallestV;
+        }
+      }
+      break;
 
+      case VTK_LARGEST_VECTOR:
+      {
+      for ( int i = 0; i < 3; ++i )
+        {
+        double largestV = v0[i];
+        if ( r1 > r0 )
+          {
+          largestV = v1[i];
+          }
+        p0[i] = pt[i] + minR*largestV;
+        p1[i] = pt[i] + maxR*largestV;
+        }
+      }
+      break;
+
+      case VTK_HALF_VECTOR:
+      default:
+      {
       // Compute half angle vector between vectors
       double sumSquared = 0.0;
       for ( int i = 0; i < 3; ++i )
@@ -256,7 +290,9 @@ int vtkVectorComparisonGlyphFilter::RequestData(
         p1[i] = pt[i] + r1*h;
         }
       }
+      break;
 
+      }
     vtkIdType pid0 = magnitudePoints->InsertNextPoint( p0 );
     vtkIdType pid1 = magnitudePoints->InsertNextPoint( p1 );
 

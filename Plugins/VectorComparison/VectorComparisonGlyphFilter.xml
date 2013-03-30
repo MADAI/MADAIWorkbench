@@ -1,6 +1,6 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
-    <SourceProxy 
+    <SourceProxy
         name="VectorComparisonGlyphFilter"
         class="vtkVectorComparisonGlyphFilter"
         label="Vector Comparison Glyph Filter">
@@ -108,15 +108,18 @@
 
 	    <IntVectorProperty
 		     name="Orient Difference with Smaller Vector"
-		     command="SetAlignMagnitudeDifferenceWithSmallerVector"
+		     command="SetMagnitudeDifferenceAlignmentMode"
 		     number_of_elements="1"
 		     default_values="0">
-        <BooleanDomain name="bool"/>
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Half Vector"/>
+          <Entry value="1" text="First Vector"/>
+          <Entry value="2" text="Second Vector"/>
+          <Entry value="3" text="Smallest Vector"/>
+          <Entry value="4" text="Largest Vector"/>
+        </EnumerationDomain>
       </IntVectorProperty>
 
     </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
-
-
-		

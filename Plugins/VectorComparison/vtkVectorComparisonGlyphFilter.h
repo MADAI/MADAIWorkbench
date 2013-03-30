@@ -32,11 +32,20 @@ public:
   vtkSetMacro(DiskResolution, int);
   vtkGetMacro(DiskResolution, int);
 
+  enum OrientationType
+  {
+    VTK_HALF_VECTOR=0,
+    VTK_FIRST_VECTOR,
+    VTK_SECOND_VECTOR,
+    VTK_SMALLEST_VECTOR,
+    VTK_LARGEST_VECTOR
+  };
+
+
   // Description:
-  // Enable/disable aligning the difference line segment with the
-  // smaller-magnitude vector
-  vtkSetMacro(AlignMagnitudeDifferenceWithSmallerVector, int);
-  vtkGetMacro(AlignMagnitudeDifferenceWithSmallerVector, int);
+  // Choose how to align magnitude difference with vector fields
+  vtkSetMacro(MagnitudeDifferenceAlignmentMode, int);
+  vtkGetMacro(MagnitudeDifferenceAlignmentMode, int);
 
 protected:
   vtkVectorComparisonGlyphFilter();
@@ -55,7 +64,7 @@ private:
 
   int DiskResolution;
 
-  int AlignMagnitudeDifferenceWithSmallerVector;
+  int MagnitudeDifferenceAlignmentMode;
 };
 
 
