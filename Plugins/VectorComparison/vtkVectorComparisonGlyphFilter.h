@@ -32,6 +32,12 @@ public:
   vtkSetMacro(DiskResolution, int);
   vtkGetMacro(DiskResolution, int);
 
+  // Description:
+  // Enable/disable aligning the difference line segment with the
+  // smaller-magnitude vector
+  vtkSetMacro(AlignMagnitudeDifferenceWithSmallerVector, int);
+  vtkGetMacro(AlignMagnitudeDifferenceWithSmallerVector, int);
+
 protected:
   vtkVectorComparisonGlyphFilter();
   ~vtkVectorComparisonGlyphFilter();
@@ -48,6 +54,8 @@ private:
   double ScaleFactor;
 
   int DiskResolution;
+
+  int AlignMagnitudeDifferenceWithSmallerVector;
 };
 
 

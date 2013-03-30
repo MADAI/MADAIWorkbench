@@ -106,6 +106,14 @@
 		     default_values="8">
       </IntVectorProperty>
 
+	    <IntVectorProperty
+		     name="Orient Difference with Smaller Vector"
+		     command="SetAlignMagnitudeDifferenceWithSmallerVector"
+		     number_of_elements="1"
+		     default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
     </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

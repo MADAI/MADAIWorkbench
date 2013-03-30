@@ -2,6 +2,7 @@
 
 #include "vtkAlgorithm.h"
 #include "vtkCellArray.h"
+#include "vtkCellData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkLine.h"
@@ -9,6 +10,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPolygon.h"
+#include "vtkShortArray.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTransform.h"
@@ -22,6 +24,7 @@ vtkVectorComparisonGlyphFilter::vtkVectorComparisonGlyphFilter()
 {
   this->ScaleFactor = 1.0;
   this->DiskResolution = 8;
+  this->AlignMagnitudeDifferenceWithSmallerVector = 0;
 
   this->SetNumberOfInputPorts( 2 );
   this->SetNumberOfOutputPorts( 2 );
@@ -105,6 +108,14 @@ int vtkVectorComparisonGlyphFilter::RequestData(
     vtkSmartPointer< vtkTransform >::New();
   vtkSmartPointer< vtkLine > line =
     vtkSmartPointer< vtkLine >::New();
+
+  // Add array encoding which vector field is largest
+  vtkSmartPointer< vtkShortArray > largestVectorArray =
+    vtkSmartPointer< vtkShortArray >::New();
+  largestVectorArray->SetName( "Larger Vector" );
+  largestVectorArray->SetNumberOfValues( numInput0Points );
+
+  magnitudeOutput->GetCellData()->AddArray( largestVectorArray );
 
   for ( vtkIdType id = 0; id < numInput0Points; ++id )
     {
@@ -197,26 +208,53 @@ int vtkVectorComparisonGlyphFilter::RequestData(
     // Magnitude difference glyphs //
     /////////////////////////////////
 
-    // Compute half angle vector between vectors
-    double sumSquared = 0.0;
-    for ( int i = 0; i < 3; ++i )
-      {
-	sumSquared += (v0[i] + v1[i]) * (v0[i] + v1[i]);
-      }
-    double magnitudeSumV0V1 = sqrt( sumSquared );
+    largestVectorArray->SetValue( id, r0 > r1 ? 0 : 1 );
 
     double p0[3], p1[3];
-    for ( int i = 0; i < 3; ++i )
+    if ( this->AlignMagnitudeDifferenceWithSmallerVector )
       {
-	double h = (v0[i] + v1[i]) / magnitudeSumV0V1;
+      if ( r0 < r1 )
+        {
+        for ( int i = 0; i < 3; ++i )
+          {
+          p0[i] = pt[i] + r0*v0[i];
+          p1[i] = pt[i] + r1*v0[i];
+          }
+        }
+      else
+        {
+        for ( int i = 0; i < 3; ++i )
+          {
+          p0[i] = pt[i] + r1*v1[i];
+          p1[i] = pt[i] + r0*v1[i];
+          }
+        }
+      }
+    else
+      {
 
-	// First point is displaced by vector 0 magnitude along the
-	// half vector, which is already scaled by ScaleFactor
-	p0[i] = pt[i] + r0*h;
+      // Draw along half vector
 
-	// Second point is displaced by vector 1 magntidue along the
-	// half vector, which is already scaled by ScaleFactor
-	p1[i] = pt[i] + r1*h;
+      // Compute half angle vector between vectors
+      double sumSquared = 0.0;
+      for ( int i = 0; i < 3; ++i )
+        {
+        sumSquared += (v0[i] + v1[i]) * (v0[i] + v1[i]);
+        }
+      double magnitudeSumV0V1 = sqrt( sumSquared );
+
+      for ( int i = 0; i < 3; ++i )
+        {
+        double h = (v0[i] + v1[i]) / magnitudeSumV0V1;
+
+        // First point is displaced by vector 0 magnitude along the
+        // half vector, which is already scaled by ScaleFactor
+        p0[i] = pt[i] + r0*h;
+
+        // Second point is displaced by vector 1 magnitude along the
+        // half vector, which is already scaled by ScaleFactor
+        p1[i] = pt[i] + r1*h;
+        }
       }
 
     vtkIdType pid0 = magnitudePoints->InsertNextPoint( p0 );
