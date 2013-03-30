@@ -98,6 +98,7 @@ set(MW_PLUGINS
   EnsembleSurfaceSlicing
   GaussianScalarSplatter
   MaskTableRows
+  PolyDataDistanceFilter
   ThresholdPointsFilter
   VectorComparisonGlyphFilter
   VRPNDevices

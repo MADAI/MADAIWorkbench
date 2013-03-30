@@ -1,7 +1,7 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
     <!-- ================================================================== -->
-    <SourceProxy name="PolyDataDistance" class="vtkDistancePolyDataFilter" label="PolyData Distance Filter">
+    <SourceProxy name="PolyDataDistanceFilter" class="vtkDistancePolyDataFilter" label="PolyData Distance Filter">
       <Documentation
          long_help="Computes the signed distance from one vtkPolyData to another. The signed distance to the second input is computed at every point in the first input using vtkImplicitPolyDataDistance. Optionally, the signed distance to the first input at every point in the second input can be computed. This may be enabled by calling ComputeSecondDistanceOn()."
          short_help="Computes the signed distance from one vtkPolyData to another.">

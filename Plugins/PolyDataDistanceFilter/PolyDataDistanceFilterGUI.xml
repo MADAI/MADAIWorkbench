@@ -2,6 +2,6 @@
 <ParaViewFilters>
   <Category name="MADAI" menu_label="&amp;MADAI">
     <!-- adds a new category and then adds our filter to it -->
-    <Filter name="PolyDataDistance" />
+    <Filter name="PolyDataDistanceFilter" />
   </Category>
 </ParaViewFilters>
