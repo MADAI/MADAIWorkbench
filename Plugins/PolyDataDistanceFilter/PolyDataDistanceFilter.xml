@@ -1,0 +1,57 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ================================================================== -->
+    <SourceProxy name="PolyDataDistance" class="vtkDistancePolyDataFilter" label="PolyData Distance Filter">
+      <Documentation
+         long_help="Computes the signed distance from one vtkPolyData to another. The signed distance to the second input is computed at every point in the first input using vtkImplicitPolyDataDistance. Optionally, the signed distance to the first input at every point in the second input can be computed. This may be enabled by calling ComputeSecondDistanceOn()."
+         short_help="Computes the signed distance from one vtkPolyData to another.">
+      </Documentation>
+ 
+      <InputProperty
+         name="FirstSurface"
+          port_index="0"
+         command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData"/>
+        </DataTypeDomain>
+        <Documentation>
+          Set the first surface.
+        </Documentation>
+      </InputProperty>
+ 
+      <InputProperty
+         name="SecondSurface"
+          port_index="1"
+         command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData"/>
+        </DataTypeDomain>
+        <Documentation>
+          Set the second surface.
+        </Documentation>
+      </InputProperty>
+ 
+      <IntVectorProperty
+         name="SignedDistance"
+         command="SetSignedDistance"
+         number_of_elements="1"
+         default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Compute the signed distance.
+        </Documentation>
+      </IntVectorProperty>
+
+    </SourceProxy>
+    <!-- End LandmarkTransformFilter -->
+  </ProxyGroup>
+  <!-- End Filters Group -->
+</ServerManagerConfiguration>
