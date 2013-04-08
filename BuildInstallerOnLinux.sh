@@ -152,6 +152,10 @@ git submodule update --init
 python_version=`python -c 'import sys; print sys.version[:3]'`
 python_exe=`which python`
 python_lib=`ldd ${python_exe} | grep python | cut -d ' ' -f 3`
+if  [ ! ${python_lib} ] 
+then 
+    python_lib="/usr/lib/libpython${python_version}.so"
+fi
 
 ###################################
 # Copy Macro directory
@@ -184,12 +188,13 @@ cmake \
     -D PARAVIEW_BUILD_PLUGIN_PointSprite:BOOL=OFF \
     -D PYTHON_EXECUTABLE:PATH=/usr/bin/python \
     -D PYTHON_INCLUDE_DIR:PATH=/usr/include/python${python_version} \
-    -D PYTHON_LIBRARY:PATH=${python_lib} \
+    -D PYTHON_LIBRARY:FILEPATH=${python_lib} \
     -D PARAVIEW_USE_VISITBRIDGE:BOOL=ON \
     -D PARAVIEW_BUILD_PLUGIN_VRPlugin:BOOL=ON \
     -D PARAVIEW_USE_VRPN:BOOL=ON \
     -D PARAVIEW_USE_VRUI:BOOL=OFF \
     -D VRPN_INCLUDE_DIR:PATH=${install_dir}/include \
+    -D VRPN_LIBUSB_INCLUDE_DIR:PATH=/usr/include \
     -D VRPN_LIBRARY:FILEPATH=${install_dir}/lib/libvrpn.a \
     -D CMAKE_CXX_FLAGS:STRING=-I/usr/include/libusb-1.0 \
     -D QT_QMAKE_EXECUTABLE:PATH=${qmake} \
