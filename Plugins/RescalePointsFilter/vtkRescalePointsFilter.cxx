@@ -112,4 +112,12 @@ int vtkRescalePointsFilter::RequestData(
 void vtkRescalePointsFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "OutputBounds: ["
+     << this->OutputBounds[0] << ", "
+     << this->OutputBounds[1] << ", "
+     << this->OutputBounds[2] << ", "
+     << this->OutputBounds[3] << ", "
+     << this->OutputBounds[4] << ", "
+     << this->OutputBounds[5] << "]\n";
 }
