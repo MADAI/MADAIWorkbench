@@ -32,7 +32,6 @@
 #include "vtkCellArray.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkDelaunay3D.h"
-#include "vtkMaskPoints.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkThresholdPoints.h"
 #include "vtkThreshold.h"
@@ -93,18 +92,8 @@ int vtkPercentileSurfaceFilter::RequestData(
     return 1;
     }
 
-  vtkSmartPointer < vtkMaskPoints > maskPoints =
-    vtkSmartPointer < vtkMaskPoints >::New();
-  maskPoints->SetMaximumNumberOfPoints(input->GetNumberOfPoints());
-  maskPoints->GenerateVerticesOn();
-  maskPoints->SingleVertexPerCellOn();
-  maskPoints->RandomModeOff();
-  maskPoints->SetOnRatio(1);
-  maskPoints->SetInputData(input);
-  maskPoints->Update();
   // I update here so that I know that if something goes wrong, the
   // debugger will mention this line in the stack trace.
-
   vtkDataArray * inScalars= this->GetInputArrayToProcess(0,inputVector);
   if ( inScalars == NULL )
     {
@@ -146,7 +135,7 @@ int vtkPercentileSurfaceFilter::RequestData(
       << "Threshold is " << values[values.size() - number_kept] << '\n');
 
     thresholdPoints->ThresholdByUpper(values[values.size() - number_kept]);
-    thresholdPoints->SetInputConnection(maskPoints->GetOutputPort());
+    thresholdPoints->SetInputData(input);
     thresholdPoints->Update();
     vtkDebugMacro( << "Number finally kept = "
                    << thresholdPoints->GetOutput()->GetNumberOfPoints());
@@ -155,7 +144,7 @@ int vtkPercentileSurfaceFilter::RequestData(
     }
   else
     {
-    delaunay3D->SetInputConnection(maskPoints->GetOutputPort());
+    delaunay3D->SetInputData(input);
     }
 
   delaunay3D->DebugOff(); // It is very possible that this fails.
