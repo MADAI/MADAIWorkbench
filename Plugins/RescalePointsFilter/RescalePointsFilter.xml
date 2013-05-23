@@ -1,0 +1,24 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <SourceProxy
+        name="RescalePointsFilter"
+        class="vtkRescalePointsFilter"
+        label="Rescale Points Filter">
+      <Documentation
+          long_help="This filter changes the positions of points in a data set to fit within a box of a specified physical size in each dimension."
+          short_help="This filter changes the positions of points in a data set to fit within a box of a specified physical size in each dimension.">
+      </Documentation>
+      <InputProperty
+          name="Input"
+          command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData"/>
+        </DataTypeDomain>
+      </InputProperty>
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
