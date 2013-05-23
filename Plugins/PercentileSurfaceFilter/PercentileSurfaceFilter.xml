@@ -1,0 +1,45 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <SourceProxy
+        name="PercentileSurfaceFilter"
+        class="vtkPercentileSurfaceFilter"
+        label="Percentile Surface Filter">
+      <Documentation
+          long_help="This filter computes a surface from a subset of points in the input that comprise a percentile according to one of the point-associated scalar arrays."
+          short_help="This filter computes a surface from a subset of points in the input that comprise a percentile according to one of the point-associated scalar arrays.">
+      </Documentation>
+      <InputProperty
+          name="Input"
+          command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPointSet"/>
+        </DataTypeDomain>
+      </InputProperty>
+
+      <DoubleVectorProperty
+          name="Percentile"
+          command="SetPercentile"
+          number_of_elements="1"
+          default_values="0.95">
+        <Documentation>
+          Set the desired percentile of points.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+          name="MaximumEdgeLength"
+          command="SetMaximumEdgeLength"
+          number_of_elements="1"
+          default_values="0.25">
+        <Documentation>
+          The maximum size of a tetrahedra edge in the output dataset.
+        </Documentation>
+      </DoubleVectorProperty>
+
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
