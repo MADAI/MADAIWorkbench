@@ -71,15 +71,16 @@ int vtkPercentileSurfaceFilter::RequestData(
       inInfo->Get(vtkDataObject::DATA_OBJECT()));
   if (input == NULL)
     {
-    vtkErrorMacro(<<"No input found");
-    return 1;
+    vtkErrorMacro(<<"Input was not a vtkDataSet");
+    return 0;
     }
 
   vtkPolyData *output = vtkPolyData::SafeDownCast(
       outInfo->Get(vtkDataObject::DATA_OBJECT()));
   if (output == NULL)
     {
-    return 1;
+    vtkErrorMacro(<<"No output available");
+    return 0;
     }
 
   // I update here so that I know that if something goes wrong, the
@@ -88,7 +89,7 @@ int vtkPercentileSurfaceFilter::RequestData(
   if ( inScalars == NULL )
     {
     vtkErrorMacro(<<"No scalar data to threshold");
-    return 1;
+    return 0;
     }
   vtkSmartPointer < vtkDelaunay3D > delaunay3D =
     vtkSmartPointer < vtkDelaunay3D >::New();
@@ -113,7 +114,7 @@ int vtkPercentileSurfaceFilter::RequestData(
       << "Keeping " << number_kept << " of " << values.size() << '\n');
     if (number_kept == 0)
       {
-      vtkErrorMacro(<<"Error: No points kept.  Try increasing Percentile.");
+      vtkErrorMacro(<<"Error: No points kept. Try increasing Percentile.");
       return 0;
       }
     vtkSmartPointer < vtkThresholdPoints > thresholdPoints =
@@ -138,8 +139,8 @@ int vtkPercentileSurfaceFilter::RequestData(
   delaunay3D->Update();
   if (delaunay3D->GetOutput() == NULL)
     {
-    vtkErrorMacro(<<"delaunay3D failed.");
-    return 1;
+    vtkErrorMacro(<<"Delaunay3D failed.");
+    return 0;
     }
   if ((delaunay3D->GetOutput()->GetNumberOfPoints() == 0) ||
       (delaunay3D->GetOutput()->GetNumberOfCells() == 0))
