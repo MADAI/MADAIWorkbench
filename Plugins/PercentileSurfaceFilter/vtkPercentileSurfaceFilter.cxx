@@ -19,28 +19,20 @@
 
 #include "vtkPercentileSurfaceFilter.h"
 
-#include "vtkXMLPolyDataWriter.h"
-#include "vtkPointData.h"
 #include "vtkDataSetAttributes.h"
-#include "vtkObjectFactory.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkInformationVector.h"
-#include "vtkInformation.h"
-#include "vtkDataObject.h"
-#include "vtkSmartPointer.h"
-#include "vtkUnstructuredGrid.h"
-#include "vtkCellArray.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkDelaunay3D.h"
+#include "vtkErrorCode.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkObjectFactory.h"
+#include "vtkSmartPointer.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkThresholdPoints.h"
-#include "vtkThreshold.h"
-#include "vtkErrorCode.h"
-#include "vtkVersion.h"
 
 #include "vtkRemoveLargeTetrahedraFilter.h"
 
-#include <cmath>
 #include <algorithm>
 #include <vector>
 
