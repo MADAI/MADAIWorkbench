@@ -72,7 +72,6 @@ int vtkPercentileSurfaceFilter::RequestData(
   if (input == NULL)
     {
     vtkErrorMacro(<<"No input found");
-    this->SetErrorCode(vtkErrorCode::GetErrorCodeFromString("UnknownError"));
     return 1;
     }
 
@@ -80,7 +79,6 @@ int vtkPercentileSurfaceFilter::RequestData(
       outInfo->Get(vtkDataObject::DATA_OBJECT()));
   if (output == NULL)
     {
-    this->SetErrorCode(vtkErrorCode::GetErrorCodeFromString("UnknownError"));
     return 1;
     }
 
@@ -89,7 +87,6 @@ int vtkPercentileSurfaceFilter::RequestData(
   vtkDataArray * inScalars= this->GetInputArrayToProcess(0,inputVector);
   if ( inScalars == NULL )
     {
-    this->SetErrorCode(vtkErrorCode::GetErrorCodeFromString("UnknownError"));
     vtkErrorMacro(<<"No scalar data to threshold");
     return 1;
     }
@@ -102,7 +99,6 @@ int vtkPercentileSurfaceFilter::RequestData(
     std::vector< double > values(numberOfTuples);
     if (numberOfTuples == 0)
       {
-      this->SetErrorCode(vtkErrorCode::GetErrorCodeFromString("UnknownError"));
       vtkErrorMacro(<<"Empty scalar array.");
       return 0;
       }
@@ -118,7 +114,6 @@ int vtkPercentileSurfaceFilter::RequestData(
     if (number_kept == 0)
       {
       vtkErrorMacro(<<"Error: No points kept.  Try increasing Percentile.");
-      this->SetErrorCode(vtkErrorCode::GetErrorCodeFromString("UnknownError"));
       return 0;
       }
     vtkSmartPointer < vtkThresholdPoints > thresholdPoints =
@@ -144,13 +139,11 @@ int vtkPercentileSurfaceFilter::RequestData(
   if (delaunay3D->GetOutput() == NULL)
     {
     vtkErrorMacro(<<"delaunay3D failed.");
-    this->SetErrorCode(vtkErrorCode::GetErrorCodeFromString("UnknownError"));
     return 1;
     }
   if ((delaunay3D->GetOutput()->GetNumberOfPoints() == 0) ||
       (delaunay3D->GetOutput()->GetNumberOfCells() == 0))
     {
-    this->SetErrorCode(vtkErrorCode::GetErrorCodeFromString("UnknownError"));
     return 1;
     }
 
