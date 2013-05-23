@@ -34,6 +34,14 @@ vtkRescalePointsFilter::vtkRescalePointsFilter()
 {
   this->SetNumberOfInputPorts(1);
   this->SetNumberOfOutputPorts(1);
+
+  // Default to 1x1x1 box
+  this->OutputBounds[0] = 0.0;
+  this->OutputBounds[1] = 1.0;
+  this->OutputBounds[2] = 0.0;
+  this->OutputBounds[3] = 1.0;
+  this->OutputBounds[4] = 0.0;
+  this->OutputBounds[5] = 1.0;
 }
 
 vtkRescalePointsFilter::~vtkRescalePointsFilter()
@@ -67,28 +75,32 @@ int vtkRescalePointsFilter::RequestData(
   output->SetPoints( points );
   points->Delete();
 
-  double bounds[6];
-  points->GetBounds(bounds);
+  double inputBounds[6];
+  points->GetBounds(inputBounds);
 
-  double minima[3] = { bounds[0], bounds[2], bounds[4] };
-  double inverseRange[3];
+  double inputInverseRange[3];
+  double outputRange[3];
 
   for (int i = 0; i < 3; ++i)
     {
-    inverseRange[i] = bounds[2*i + 1] - bounds[2*i + 0];
-    if (inverseRange[i] != 0.0)
+    inputInverseRange[i] = inputBounds[2*i + 1] - inputBounds[2*i];
+    if (inputInverseRange[i] != 0.0)
       {
-      inverseRange[i] = 1.0 / inverseRange[i];
+      inputInverseRange[i] = 1.0 / inputInverseRange[i];
       }
+
+    outputRange[i] = this->OutputBounds[2*i + 1] - this->OutputBounds[2*i];
     }
 
   vtkIdType numberOfPoints = points->GetNumberOfPoints();
   for (vtkIdType id = 0; id < numberOfPoints; ++id) {
     double xyz[3];
     points->GetPoint(id, xyz);
-    for (int j = 0; j < 3; ++j) {
-      xyz[j] = (xyz[j] - minima[j]) * inverseRange[j];
-    }
+    for (int j = 0; j < 3; ++j)
+      {
+      xyz[j] = ((xyz[j] - inputBounds[2*j]) * inputInverseRange[j]) *
+        outputRange[j] + this->OutputBounds[2*j];
+      }
     points->SetPoint(id, xyz);
   }
   return 1;

@@ -19,6 +19,17 @@
           <DataType value="vtkPolyData"/>
         </DataTypeDomain>
       </InputProperty>
+
+      <DoubleVectorProperty
+          name="OutputBounds"
+          command="SetOutputBounds"
+          number_of_elements="6"
+          default_values="0 1 0 1 0 1">
+        <Documentation>
+          Set the desired bounds of the filter output.
+        </Documentation>
+      </DoubleVectorProperty>
+
     </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>

@@ -28,7 +28,15 @@ public:
   vtkTypeMacro(vtkRescalePointsFilter,vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  static vtkRescalePointsFilter *New();
+  static vtkRescalePointsFilter * New();
+
+  // DESCRIPTION:
+  // Set/Get the desired bounds of the output. The bounds are defined
+  // in the usual VTK interleaved format [xmin, xmax, ymin, ymax,
+  // zmin, zmax]. The input points will be rescaled in each dimension
+  // to fit within these bounds.
+  vtkSetVector6Macro(OutputBounds, double);
+  vtkGetVector6Macro(OutputBounds, double);
 
 protected:
   vtkRescalePointsFilter();
@@ -40,6 +48,7 @@ private:
   vtkRescalePointsFilter(const vtkRescalePointsFilter&);  // Not implemented.
   void operator=(const vtkRescalePointsFilter&);  // Not implemented.
 
+  double OutputBounds[6];
 };
 
 #endif
