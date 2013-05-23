@@ -25,6 +25,7 @@
 #include "vtkDataObject.h"
 #include "vtkSmartPointer.h"
 #include "vtkPoints.h"
+#include "vtkPointSet.h"
 
 #include "vtkRescalePointsFilter.h"
 
@@ -58,10 +59,10 @@ int vtkRescalePointsFilter::RequestData(
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
   // get the input and ouptut
-  vtkPolyData *input = vtkPolyData::SafeDownCast(
+  vtkPointSet *input = vtkPointSet::SafeDownCast(
       inInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  vtkPolyData *output = vtkPolyData::SafeDownCast(
+  vtkPointSet *output = vtkPointSet::SafeDownCast(
       outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   // We can shallow copy most of the input object because this filter

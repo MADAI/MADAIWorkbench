@@ -20,12 +20,12 @@
 #ifndef __vtkRescalePointsFilter_h
 #define __vtkRescalePointsFilter_h
 
-#include "vtkPolyDataAlgorithm.h"
+#include "vtkPointSetAlgorithm.h"
 
-class vtkRescalePointsFilter : public vtkPolyDataAlgorithm
+class vtkRescalePointsFilter : public vtkPointSetAlgorithm
 {
 public:
-  vtkTypeMacro(vtkRescalePointsFilter,vtkPolyDataAlgorithm);
+  vtkTypeMacro(vtkRescalePointsFilter,vtkPointSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   static vtkRescalePointsFilter * New();
