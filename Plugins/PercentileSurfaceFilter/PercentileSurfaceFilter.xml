@@ -43,7 +43,7 @@
             <Property name="Input" function="Input"/>
           </RequiredProperties>
         </ArrayListDomain>
-        <Documentation>Set point scalar field to use to calculate the percentile. The points will be sorted according to this scalar field in ascending order and the first percentile of points will be retained.</Documentation>
+        <Documentation>Set point scalar field to use to calculate the percentile. The points will be sorted according to this scalar field in ascending order and either the first or last percentile of points will be retained depending on whether the value of the Retain Lowest Values option.</Documentation>
       </StringVectorProperty>
 
       <DoubleVectorProperty
