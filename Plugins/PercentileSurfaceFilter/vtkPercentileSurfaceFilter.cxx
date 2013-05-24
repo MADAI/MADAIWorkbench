@@ -119,11 +119,25 @@ int vtkPercentileSurfaceFilter::RequestData(
       }
     vtkSmartPointer < vtkThresholdPoints > thresholdPoints =
       vtkSmartPointer < vtkThresholdPoints >::New();
-    vtkDebugMacro(
-      << "Threshold is " << values[values.size() - number_kept] << '\n');
 
-    thresholdPoints->ThresholdByUpper(values[values.size() - number_kept]);
+    if ( this->RetainLowestValues )
+      {
+      double thresholdValue = values[number_kept];
+      vtkDebugMacro(<< "Threshold is " << thresholdValue << '\n');
+      thresholdPoints->ThresholdByLower(thresholdValue);
+      }
+    else
+      {
+      double thresholdValue = values[values.size() - number_kept];
+      vtkDebugMacro(<< "Threshold is " << thresholdValue << '\n');
+      thresholdPoints->ThresholdByUpper(thresholdValue);
+      }
+
     thresholdPoints->SetInputData(input);
+    thresholdPoints->
+      SetInputArrayToProcess( 0, 0, 0,
+                              vtkDataObject::FIELD_ASSOCIATION_POINTS,
+                              inScalars->GetName() );
     thresholdPoints->Update();
     vtkDebugMacro( << "Number finally kept = "
                    << thresholdPoints->GetOutput()->GetNumberOfPoints());

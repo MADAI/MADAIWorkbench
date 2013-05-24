@@ -37,12 +37,22 @@ public:
   vtkGetMacro(Percentile, double);
 
   // Description:
+  // Set/Get whether the points with lowest or highest value will be
+  // retained. By default, this filter will retain the lowest-valued
+  // points.
+  vtkSetMacro(RetainLowestValues, int);
+  vtkGetMacro(RetainLowestValues, int);
+  vtkBooleanMacro(RetainLowestValues, int);
+
+  // Description:
   // Set/Get the maximum length of an edge in a tetrahedron in the output.
   vtkSetMacro(MaximumEdgeLength, double);
   vtkGetMacro(MaximumEdgeLength, double);
 
 protected:
   double Percentile;
+
+  int RetainLowestValues;
 
   double MaximumEdgeLength;
 

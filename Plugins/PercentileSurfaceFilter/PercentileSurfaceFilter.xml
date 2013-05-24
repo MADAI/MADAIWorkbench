@@ -56,6 +56,18 @@
         </Documentation>
       </DoubleVectorProperty>
 
+      <IntVectorProperty
+          name="RetainLowestValues"
+          command="SetRetainLowestValues"
+          number_of_elements="1"
+          default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Determines whether the points with lowest or highest value will be
+          retained.
+        </Documentation>
+      </IntVectorProperty>
+
       <DoubleVectorProperty
           name="MaximumEdgeLength"
           command="SetMaximumEdgeLength"
