@@ -27,6 +27,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPercentileSurfaceFilter.h"
 #include "vtkPointData.h"
+#include "vtkRescalePointsFilter.h"
 #include "vtkSmartPointer.h"
 #include "vtkSmoothPolyDataFilter.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
@@ -67,10 +68,14 @@ double getScore(
   tableToPoints->PreserveCoordinateColumnsAsDataArraysOn();
   tableToPoints->SetInputData( table );
 
+  vtkSmartPointer< vtkRescalePointsFilter > rescaleFilter =
+    vtkSmartPointer< vtkRescalePointsFilter >::New();
+  rescaleFilter->SetInputConnection( tableToPoints->GetOutputPort() );
+
   vtkSmartPointer < vtkPercentileSurfaceFilter > percentileSurfaceFilter =
     vtkSmartPointer < vtkPercentileSurfaceFilter >::New();
   percentileSurfaceFilter->SetInputConnection(
-      tableToPoints->GetOutputPort());
+      rescaleFilter->GetOutputPort());
   percentileSurfaceFilter->SetPercentile(percentile);
   percentileSurfaceFilter->RetainLowestValuesOff();
   percentileSurfaceFilter->SetMaximumEdgeLength(maximumEdgeLength);
@@ -204,13 +209,17 @@ int vtkMaximizeSquaredGaussianCurvatureProjectionFilter::RequestData(
   tableToPoints->PreserveCoordinateColumnsAsDataArraysOn();
   tableToPoints->SetInputData(table);
 
-  tableToPoints->Update();
-  output0->ShallowCopy(tableToPoints->GetOutput());
+  vtkSmartPointer< vtkRescalePointsFilter > rescaleFilter =
+    vtkSmartPointer< vtkRescalePointsFilter >::New();
+  rescaleFilter->SetInputConnection( tableToPoints->GetOutputPort() );
+
+  rescaleFilter->Update();
+  output0->ShallowCopy(rescaleFilter->GetOutput());
 
   vtkSmartPointer < vtkPercentileSurfaceFilter > percentileSurfaceFilter =
     vtkSmartPointer < vtkPercentileSurfaceFilter >::New();
   percentileSurfaceFilter->SetInputConnection(
-    tableToPoints->GetOutputPort());
+    rescaleFilter->GetOutputPort());
   percentileSurfaceFilter->SetPercentile(this->Percentile);
   percentileSurfaceFilter->SetMaximumEdgeLength(this->MaximumEdgeLength);
   percentileSurfaceFilter->
