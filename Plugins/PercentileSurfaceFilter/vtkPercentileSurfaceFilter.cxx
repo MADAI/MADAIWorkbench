@@ -44,6 +44,7 @@ vtkPercentileSurfaceFilter::vtkPercentileSurfaceFilter()
   this->SetNumberOfInputPorts(1);
   this->SetNumberOfOutputPorts(1);
   this->Percentile = 0.95; // default values
+  this->RetainLowestValues = 1;
   this->MaximumEdgeLength = 0.25;
 
   // by default process active point scalars
