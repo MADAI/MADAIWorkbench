@@ -22,6 +22,7 @@
 
 #include "vtkCurvatures.h"
 #include "vtkDataObject.h"
+#include "vtkFieldData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
@@ -30,7 +31,9 @@
 #include "vtkRescalePointsFilter.h"
 #include "vtkSmartPointer.h"
 #include "vtkSmoothPolyDataFilter.h"
+#include "vtkStdString.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringArray.h"
 #include "vtkTable.h"
 #include "vtkTableToPolyData.h"
 
@@ -191,15 +194,15 @@ int vtkMaximizeSquaredGaussianCurvatureProjectionFilter::RequestData(
     return 0;
     }
 
+  vtkStdString xColumnString( table->GetColumn(bestXYZ[0])->GetName() );
+  vtkStdString yColumnString( table->GetColumn(bestXYZ[1])->GetName() );
+  vtkStdString zColumnString( table->GetColumn(bestXYZ[2])->GetName() );
+
   vtkDebugMacro(
     << "The best projection is "
-    << bestXYZ[0] << " ("
-    << table->GetColumn(bestXYZ[0])->GetName()
-    << ") " << bestXYZ[1] << " ("
-    << table->GetColumn(bestXYZ[1])->GetName()
-    << ") " << bestXYZ[2] << " ("
-    << table->GetColumn(bestXYZ[2])->GetName()
-    << ")\n");
+    << bestXYZ[0] << " (" << xColumnString << ") "
+    << bestXYZ[1] << " (" << yColumnString << ") "
+    << bestXYZ[2] << " (" << zColumnString << ")\n");
 
   vtkSmartPointer < vtkTableToPolyData > tableToPoints =
     vtkSmartPointer < vtkTableToPolyData >::New();
@@ -227,6 +230,21 @@ int vtkMaximizeSquaredGaussianCurvatureProjectionFilter::RequestData(
                             inputScalarName );
   percentileSurfaceFilter->Update();
   output1->ShallowCopy(percentileSurfaceFilter->GetOutput());
+
+  // Record the projection in the field data of the output
+  vtkSmartPointer< vtkStringArray > bestDimensionNamesArray =
+    vtkSmartPointer< vtkStringArray >::New();
+  bestDimensionNamesArray->SetName( "Best dimensions" );
+  bestDimensionNamesArray->SetNumberOfValues( 3 );
+  bestDimensionNamesArray->SetValue( 0, xColumnString );
+  bestDimensionNamesArray->SetValue( 1, yColumnString );
+  bestDimensionNamesArray->SetValue( 2, zColumnString );
+
+  vtkSmartPointer< vtkFieldData > fieldData =
+    vtkSmartPointer< vtkFieldData >::New();
+  fieldData->AddArray( bestDimensionNamesArray );
+
+  output1->SetFieldData( fieldData );
 
   return 1;
 }
