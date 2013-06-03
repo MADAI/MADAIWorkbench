@@ -224,6 +224,7 @@ int vtkMaximizeSquaredGaussianCurvatureProjectionFilter::RequestData(
   percentileSurfaceFilter->SetInputConnection(
     rescaleFilter->GetOutputPort());
   percentileSurfaceFilter->SetPercentile(this->Percentile);
+  percentileSurfaceFilter->RetainLowestValuesOff();
   percentileSurfaceFilter->SetMaximumEdgeLength(this->MaximumEdgeLength);
   percentileSurfaceFilter->
     SetInputArrayToProcess( 0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS,
