@@ -27,6 +27,8 @@
 #include "vtkPolyDataAlgorithm.h"
 
 
+class vtkMaximizeSquaredGaussianCurvatureProjectionFilterInternal;
+
 class vtkMaximizeSquaredGaussianCurvatureProjectionFilter : public vtkPolyDataAlgorithm
 {
 public:
@@ -45,23 +47,27 @@ public:
   vtkGetMacro(MaximumEdgeLength, double);
 
   // Description:
-  // Set/Get the number of arrays to be considered.
-  // 0 means "all arrays"
-  // I used VTK_INT_MAX below instead of VTK_LARGE_INTEGER
-  // because VTK_LARGE_INTEGER is not defined for some reason, even
-  // when I include vtkTypes.h
-  vtkSetClampMacro(Dimensions, int, 0, VTK_INT_MAX);
-  vtkGetMacro(Dimensions, int);
+  // Get number of point data arrays
+  int GetNumberOfPointArrays();
+
+  // Description:
+  // Get name of a point data array
+  const char* GetPointArrayName(int index);
+
+  // Description:
+  // Get/set the status of a point data array
+  void SetPointArrayStatus(const char *name, int status);
+  int GetPointArrayStatus(const char *name);
 
 protected:
   double Percentile;
 
   double MaximumEdgeLength;
 
-  int Dimensions;
+  vtkMaximizeSquaredGaussianCurvatureProjectionFilterInternal * Internal;
 
   vtkMaximizeSquaredGaussianCurvatureProjectionFilter();
-  ~vtkMaximizeSquaredGaussianCurvatureProjectionFilter(){}
+  ~vtkMaximizeSquaredGaussianCurvatureProjectionFilter();
 
   int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 

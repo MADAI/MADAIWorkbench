@@ -15,10 +15,12 @@
  *  limitations under the License.
  *
  *=========================================================================*/
-// Written 2013 Hal Canary
+// Written 2013 Hal Canary and Cory Quammen
 
 #include <cmath>
 #include <limits>
+#include <map>
+#include <string>
 
 #include "vtkCurvatures.h"
 #include "vtkDataObject.h"
@@ -39,6 +41,13 @@
 
 #include "vtkMaximizeSquaredGaussianCurvatureProjectionFilter.h"
 
+class vtkMaximizeSquaredGaussianCurvatureProjectionFilterInternal
+{
+public:
+  std::map< std::string, bool > ActivePointArrays;
+};
+
+
 vtkStandardNewMacro(vtkMaximizeSquaredGaussianCurvatureProjectionFilter)
 
 vtkMaximizeSquaredGaussianCurvatureProjectionFilter::vtkMaximizeSquaredGaussianCurvatureProjectionFilter()
@@ -46,7 +55,12 @@ vtkMaximizeSquaredGaussianCurvatureProjectionFilter::vtkMaximizeSquaredGaussianC
   this->SetNumberOfOutputPorts(2);
   this->Percentile = 0.95;
   this->MaximumEdgeLength = 0.25;
-  this->Dimensions = 0;
+  this->Internal = new vtkMaximizeSquaredGaussianCurvatureProjectionFilterInternal();
+}
+
+vtkMaximizeSquaredGaussianCurvatureProjectionFilter::~vtkMaximizeSquaredGaussianCurvatureProjectionFilter()
+{
+  delete this->Internal;
 }
 
 int vtkMaximizeSquaredGaussianCurvatureProjectionFilter::FillInputPortInformation(
@@ -164,18 +178,25 @@ int vtkMaximizeSquaredGaussianCurvatureProjectionFilter::RequestData(
   table->ShallowCopy(input);
 
   int numberColumns = table->GetNumberOfColumns();
-  if (this->Dimensions != 0 && (this->Dimensions < numberColumns))
-    numberColumns = this->Dimensions;
 
   int bestXYZ[3] = {-1, -1, -1};
   double bestScore = -std::numeric_limits< double >::infinity();
 
   for (int X = 0; X < numberColumns; ++X)
     {
+    // Skip if column isn't active
+    if (this->GetPointArrayStatus(this->GetPointArrayName(X)) == 0) continue;
+
     for (int Y = (X + 1); Y < numberColumns; ++Y)
       {
+      // Skip if column isn't active
+      if (this->GetPointArrayStatus(this->GetPointArrayName(Y)) == 0) continue;
+
       for (int Z = (Y + 1); Z < numberColumns; ++Z)
         {
+        // Skip if column isn't active
+        if (this->GetPointArrayStatus(this->GetPointArrayName(Z)) == 0) continue;
+
         double score = getScore(
           inputScalarName, table, X, Y, Z, this->MaximumEdgeLength, this->Percentile);
         if (score > bestScore)
@@ -248,4 +269,60 @@ int vtkMaximizeSquaredGaussianCurvatureProjectionFilter::RequestData(
   output1->SetFieldData( fieldData );
 
   return 1;
+}
+
+int
+vtkMaximizeSquaredGaussianCurvatureProjectionFilter
+::GetNumberOfPointArrays()
+{
+  int numberOfPointArrays = 0;
+
+  vtkTable * input = vtkTable::SafeDownCast(this->GetInput());
+  if (input)
+    {
+    numberOfPointArrays = input->GetNumberOfColumns();
+    }
+
+  return numberOfPointArrays;
+}
+
+const char*
+vtkMaximizeSquaredGaussianCurvatureProjectionFilter
+::GetPointArrayName(int index)
+{
+  const char *name = "<unnamed>";
+
+  vtkTable * input = vtkTable::SafeDownCast(this->GetInput());
+  if (input)
+    {
+    name = input->GetColumn(index)->GetName();
+    }
+
+  return name;
+}
+
+void
+vtkMaximizeSquaredGaussianCurvatureProjectionFilter
+::SetPointArrayStatus(const char *name, int status)
+{
+  std::string nameString(name);
+  this->Internal->ActivePointArrays[nameString] = status;
+
+  this->Modified();
+}
+
+int
+vtkMaximizeSquaredGaussianCurvatureProjectionFilter
+::GetPointArrayStatus(const char *name)
+{
+  // Check if the map has an entry. If not, create one and set it to be
+  // enabled. Otherwise, return the status.
+  std::string nameString(name);
+
+  if (this->Internal->ActivePointArrays.count(nameString) == 0)
+    {
+    this->Internal->ActivePointArrays[nameString] = 1;
+    }
+
+  return this->Internal->ActivePointArrays[nameString];
 }
