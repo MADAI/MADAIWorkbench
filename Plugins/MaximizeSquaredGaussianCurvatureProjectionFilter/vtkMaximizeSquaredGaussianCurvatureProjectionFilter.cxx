@@ -268,6 +268,7 @@ int vtkMaximizeSquaredGaussianCurvatureProjectionFilter::RequestData(
     vtkSmartPointer< vtkFieldData >::New();
   fieldData->AddArray( bestDimensionNamesArray );
 
+  output0->SetFieldData( fieldData );
   output1->SetFieldData( fieldData );
 
   return 1;

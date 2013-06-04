@@ -27,6 +27,9 @@
         </Documentation>
       </InputProperty>
 
+      <OutputPort name="Points" index="0" id="port0" />
+      <OutputPort name="Percentile Surface" index="1" id="port1"/>
+
       <StringVectorProperty
           name="SelectInputScalars"
           command="SetInputArrayToProcess"
