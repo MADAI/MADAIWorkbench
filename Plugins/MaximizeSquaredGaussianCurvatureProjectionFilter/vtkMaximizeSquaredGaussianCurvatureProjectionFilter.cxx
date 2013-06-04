@@ -54,6 +54,7 @@ vtkMaximizeSquaredGaussianCurvatureProjectionFilter::vtkMaximizeSquaredGaussianC
 {
   this->SetNumberOfOutputPorts(2);
   this->Percentile = 0.95;
+  this->RetainLowestValues = 0;
   this->MaximumEdgeLength = 0.25;
   this->Internal = new vtkMaximizeSquaredGaussianCurvatureProjectionFilterInternal();
 }
@@ -75,7 +76,7 @@ int vtkMaximizeSquaredGaussianCurvatureProjectionFilter::FillInputPortInformatio
 double getScore(
   const char * scalarName, vtkTable * table,
   int XColumnIndex, int YColumnIndex, int ZColumnIndex,
-  double maximumEdgeLength, double percentile) {
+  double maximumEdgeLength, int retainLowestValues, double percentile) {
 
   vtkSmartPointer< vtkTableToPolyData > tableToPoints =
     vtkSmartPointer< vtkTableToPolyData >::New();
@@ -94,7 +95,7 @@ double getScore(
   percentileSurfaceFilter->SetInputConnection(
       rescaleFilter->GetOutputPort());
   percentileSurfaceFilter->SetPercentile(percentile);
-  percentileSurfaceFilter->RetainLowestValuesOff();
+  percentileSurfaceFilter->SetRetainLowestValues(retainLowestValues);
   percentileSurfaceFilter->SetMaximumEdgeLength(maximumEdgeLength);
   percentileSurfaceFilter->
     SetInputArrayToProcess( 0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS,
@@ -198,7 +199,8 @@ int vtkMaximizeSquaredGaussianCurvatureProjectionFilter::RequestData(
         if (this->GetPointArrayStatus(this->GetPointArrayName(Z)) == 0) continue;
 
         double score = getScore(
-          inputScalarName, table, X, Y, Z, this->MaximumEdgeLength, this->Percentile);
+          inputScalarName, table, X, Y, Z, this->MaximumEdgeLength,
+          this->RetainLowestValues, this->Percentile);
         if (score > bestScore)
           {
           bestScore = score;
@@ -245,7 +247,7 @@ int vtkMaximizeSquaredGaussianCurvatureProjectionFilter::RequestData(
   percentileSurfaceFilter->SetInputConnection(
     rescaleFilter->GetOutputPort());
   percentileSurfaceFilter->SetPercentile(this->Percentile);
-  percentileSurfaceFilter->RetainLowestValuesOff();
+  percentileSurfaceFilter->SetRetainLowestValues(this->RetainLowestValues);
   percentileSurfaceFilter->SetMaximumEdgeLength(this->MaximumEdgeLength);
   percentileSurfaceFilter->
     SetInputArrayToProcess( 0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_POINTS,
