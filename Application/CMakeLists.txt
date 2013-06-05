@@ -1,7 +1,7 @@
 # Set the version number
 set(MW_VERSION_MAJOR 1)
-set(MW_VERSION_MINOR 6)
-set(MW_VERSION_PATCH 2)
+set(MW_VERSION_MINOR 7)
+set(MW_VERSION_PATCH 0)
 set(MW_VERSION_STRING "${MW_VERSION_MAJOR}.${MW_VERSION_MINOR}.${MW_VERSION_PATCH}")
 
 # Now build the MADAI workbench as a branded ParaView
@@ -98,7 +98,11 @@ set(MW_PLUGINS
   EnsembleSurfaceSlicing
   GaussianScalarSplatter
   MaskTableRows
+  MaximizeSquaredGaussianCurvatureProjectionFilter
+  PercentileSurfaceFilter
   PolyDataDistanceFilter
+  RescalePointsFilter
+  RemoveLargeTetrahedraFilter
   ThresholdPointsFilter
   VectorComparisonGlyphFilter
   VRPNDevices
