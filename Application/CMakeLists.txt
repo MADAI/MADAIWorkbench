@@ -106,6 +106,7 @@ set(MW_PLUGINS
   ThresholdPointsFilter
   VectorComparisonGlyphFilter
   VRPNDevices
+  CACHE INTERNAL "List of MADAI Workbench plugins"
 )
 
 if("${CMAKE_SIZEOF_VOID_P}" EQUAL 8)
