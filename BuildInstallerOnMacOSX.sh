@@ -132,7 +132,7 @@ cmake \
     -D PYTHON_EXECUTABLE:PATH=/usr/bin/python${python_version} \
     -D PYTHON_INCLUDE_DIR:PATH=/System/Library/Frameworks/Python.framework/Versions/${python_version}/Headers \
     -D PYTHON_LIBRARY:PATH=/usr/lib/libpython${python_version}.dylib \
-    -D PARAVIEW_USE_VISITBRIDGE:BOOL=ON \
+    -D PARAVIEW_USE_VISITBRIDGE:BOOL=OFF \
     -D PARAVIEW_BUILD_PLUGIN_VRPlugin:BOOL=ON \
     -D PARAVIEW_USE_VRPN:BOOL=ON \
     -D PARAVIEW_USE_VRUI:BOOL=OFF \
