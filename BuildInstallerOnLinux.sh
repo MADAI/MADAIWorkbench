@@ -193,9 +193,9 @@ cmake \
     -D PARAVIEW_BUILD_PLUGIN_VRPlugin:BOOL=ON \
     -D PARAVIEW_USE_VRPN:BOOL=ON \
     -D PARAVIEW_USE_VRUI:BOOL=OFF \
-    -D VRPN_INCLUDE_DIR:PATH=${install_dir}/include \
+    -D VRPN_INCLUDE_DIR:PATH=${vrpn_src_dir} \
     -D VRPN_LIBUSB_INCLUDE_DIR:PATH=/usr/include \
-    -D VRPN_LIBRARY:FILEPATH=${install_dir}/lib/libvrpn.a \
+    -D VRPN_LIBRARY:FILEPATH=${vrpn_build_dir}/libvrpn.a \
     -D CMAKE_CXX_FLAGS:STRING=-I/usr/include/libusb-1.0 \
     -D QT_QMAKE_EXECUTABLE:PATH=${qmake} \
     ${paraview_src_dir}
@@ -286,11 +286,7 @@ cp -r ${madaiworkbench_build_dir}/bin/MADAIWorkbench ${bin_dir}
 cp -r ${madaiworkbench_build_dir}/bin/vrpn_server ${bin_dir}
 
 # Get list of plugins
-#plugin_list=`grep PARAVIEW_PLUGINLIST ${madaiworkbench_build_dir}/CMakeCache.txt | cut -d'=' -f 2 | sed 's/;/\n/g' | sort | uniq`
-plugin_list=(BinningFilter BooleanOperationFilter \
-             EnsembleSurfaceSlicing GaussianScalarSplatter \
-             MADAILogoTextSourcePlugin MaskTableRows \
-             ThresholdPointsFilter VRPNDevices)
+plugin_list=`grep MW_PLUGINS ${madaiworkbench_build_dir}/CMakeCache.txt | cut -d'=' -f 2 | sed 's/;/\n/g' | sort | uniq`
 
 pushd ${plugin_dir}
 for plugin in ${plugin_list[*]}
