@@ -3,7 +3,7 @@
     <SourceProxy
         name="PercentileSurfaceFilter"
         class="vtkPercentileSurfaceFilter"
-        label="Percentile Surface Filter">
+        label="Percentile Surface">
       <Documentation
           long_help="This filter computes a surface from a subset of points in the input that comprise a percentile according to one of the point-associated scalar arrays."
           short_help="This filter computes a surface from a subset of points in the input that comprise a percentile according to one of the point-associated scalar arrays.">

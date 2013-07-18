@@ -3,7 +3,7 @@
     <SourceProxy
         name="VectorComparisonGlyphFilter"
         class="vtkVectorComparisonGlyphFilter"
-        label="Vector Comparison Glyph Filter">
+        label="Vector Comparison Glyph">
       <Documentation
           long_help=""
           short_help="">

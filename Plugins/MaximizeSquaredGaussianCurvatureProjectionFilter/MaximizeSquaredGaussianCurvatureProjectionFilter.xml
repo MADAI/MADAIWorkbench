@@ -3,7 +3,7 @@
     <SourceProxy
         name="MaximizeSquaredGaussianCurvatureProjectionFilter"
         class="vtkMaximizeSquaredGaussianCurvatureProjectionFilter"
-        label="Maximize Squared Gaussian Curvature Projection Filter">
+        label="Maximize Squared Gaussian Curvature Projection">
       <Documentation
           long_help=""
           short_help="Filter that computes a projected surface from a high-dimensional dataset such that the squared Gaussian curvature is maximized.">

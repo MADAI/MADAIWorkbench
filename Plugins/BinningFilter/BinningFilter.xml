@@ -21,7 +21,7 @@
     <SourceProxy
         name="BinningFilter"
         class="vtkBinningFilter"
-        label="Binning Filter">
+        label="Binning">
       <Documentation
           long_help="Binning Filter injects values from input points into a structured points (volume) dataset. As each point is injected, it contributes to a single voxel/bin.
 

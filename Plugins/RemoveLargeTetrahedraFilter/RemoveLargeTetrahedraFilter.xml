@@ -3,7 +3,7 @@
     <SourceProxy
         name="RemoveLargeTetrahedraFilter"
         class="vtkRemoveLargeTetrahedraFilter"
-        label="Remove Large Tetrahedra Filter">
+        label="Remove Large Tetrahedra">
       <Documentation
           long_help="This filter removes tetrahedra from a data set that have an edge larger than a maximum length.
 
