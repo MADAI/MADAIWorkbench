@@ -98,7 +98,8 @@ set(MW_PLUGINS
   EnsembleSurfaceSlicing
   GaussianScalarSplatter
   MaskTableRows
-  MaximizeSquaredGaussianCurvatureProjectionFilter
+  MaximizeNormalizedShapeIndexProjectionFilter
+  #MaximizeSquaredGaussianCurvatureProjectionFilter
   PercentileSurfaceFilter
   PolyDataDistanceFilter
   RescalePointsFilter

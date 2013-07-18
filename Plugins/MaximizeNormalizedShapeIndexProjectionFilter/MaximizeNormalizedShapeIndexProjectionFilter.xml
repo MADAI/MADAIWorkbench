@@ -1,0 +1,111 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <SourceProxy
+        name="MaximizeNormalizedShapeIndexProjectionFilter"
+        class="vtkMaximizeNormalizedShapeIndexProjectionFilter"
+        label="Maximize Normalized Shape Index Projection">
+      <Documentation
+          long_help=""
+          short_help="Filter that computes a projected surface from a high-dimensional dataset such that the normalized shape index is maximized.">
+      </Documentation>
+
+      <InputProperty
+          name="Input"
+          command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array"
+                          attribute_type="row"
+                          number_of_components="1"/>
+        <Documentation>
+          Set the input dataset.
+        </Documentation>
+      </InputProperty>
+
+      <OutputPort name="Points" index="0" id="port0" />
+      <OutputPort name="Percentile Surface" index="1" id="port1"/>
+
+      <StringVectorProperty
+          name="SelectInputScalars"
+          command="SetInputArrayToProcess"
+          number_of_elements="5"
+          element_types="0 0 0 0 2"
+          default_value="0,0"
+          default_values_delimiter=","
+          animateable="0"
+          label="Point Scalars to Use for Percentile">
+        <ArrayListDomain
+           name="array_list"
+           attribute_type="Scalars"
+           input_domain_name="input_array">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>Set point scalar field to use to calculate the percentile. The points will be sorted according to this scalar field in ascending order and the last percentile of points will be retained.</Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+          name="Percentile"
+          command="SetPercentile"
+          number_of_elements="1"
+          default_values="0.95">
+        <Documentation>
+          Set the desired percentile of points.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+          name="RetainLowestValues"
+          command="SetRetainLowestValues"
+          number_of_elements="1"
+          default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Determines whether the points with lowest or highest value will be
+          retained.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+          name="MaximumEdgeLength"
+          command="SetMaximumEdgeLength"
+          number_of_elements="1"
+          default_values="0.25">
+        <Documentation>
+          The maximum size of a tetrahedra edge in the output dataset.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <StringVectorProperty information_only="1"
+                            name="PointArrayInfo">
+        <ArraySelectionInformationHelper attribute_name="Point" />
+      </StringVectorProperty>
+      <StringVectorProperty command="SetPointArrayStatus"
+                            element_types="2 0"
+                            information_property="PointArrayInfo"
+                            label="Point Arrays to Evaluate"
+                            name="ArrayStatus"
+                            number_of_elements="0"
+                            number_of_elements_per_command="2"
+                            panel_visibility="default"
+                            repeat_command="1">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property function="ArrayList"
+                      name="PointArrayInfo" />
+          </RequiredProperties>
+          </ArraySelectionDomain>
+        <Documentation>
+This property lists which point arrays to use when finding the projection that maximizes the normalized shape index. You must have at least three point arrays selected to create a 3D projection.
+        </Documentation>
+      </StringVectorProperty>
+
+    </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>
