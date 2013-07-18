@@ -55,7 +55,7 @@ To see that this is the case, create a point source by selecting Sources $\right
    \centering
    \includegraphics[scale=.5]{images/ThresholdPointsFilterCalculator.png} % requires the graphicx package
    \caption{Creating a point scalar field for the point data.}
-   \label{fig:PointsFilterCalculator}
+   \label{fig:ThresholdPointsFilterCalculator}
 \end{figure}
 
 No apply the Threshold filter (Filters $\rightarrow$ Alphabetical $\rightarrow$ Threshold). Select ``X'' from the \textbf{Scalars} menu and uncheck the \textbf{All Scalars} checkbox and then click \textbf{Apply}. You should see all the original points. Next, change the \textbf{Maximum} value to 0.2. Again, all the original points are displayed, indicating that thresholding did not work. Select the \textbf{Calculator1} filter in the Pipeline Browser again and this time create a Threshold Points filter (Filters $\rightarrow$ Alphabetical $\rightarrow$ Threshold Points Filter). Select ``X'' as the scalars and change the right value of the \textbf{Threshold Range} to 0.2. This time, the points will be filtered such that points with the X value (and x-coordinate) above 0.2 are removed from the point set.
@@ -64,11 +64,30 @@ No apply the Threshold filter (Filters $\rightarrow$ Alphabetical $\rightarrow$ 
    \centering
    \includegraphics[scale=.25]{images/ThresholdPointsFilter.png} % requires the graphicx package
    \caption{Results of the \textbf{Threshold Points} filter.}
-   \label{fig:PointsFilterCalculator}
+   \label{fig:ThresholdPointsFilter}
 \end{figure}
 
 \section{Binning Filter}
 
+The Binning Filter provides a fast way to create a regular 2D or 3D grid representing density from a point set. If you have completed the exercise from the previous section, delete the Threshold1 and ThresholdPoints1 filters from the pipeline by right-clicking them and choosing the menu item \textbf{Delete}. Now click on the PointSource1 source and change the \textbf{Number of Points} to 100,000. Now apply a Binning filter to it (Filters $\rightarrow$ Alphabetical $\rightarrow$ Binning Filter). The default settings are fine. Click \textbf{Apply}. Now set the representation to \textbf{Slice} and set the \textbf{Slice Direction} to XY Plane. Move the \textbf{Slice} to the middle of the range. In the \textbf{Coloring} section, choose the \texttt{NumberDensity} point field in the popup menu and click the \textbf{Rescale} button.
+
+\begin{figure}[htbp]
+   \centering
+   \includegraphics[scale=.25]{images/BinningFilter.png} % requires the graphicx package
+   \caption{Results of the \textbf{Binning} filter.}
+   \label{fig:BinningFilter}
+\end{figure}
+
+The \texttt{NumberDensity} feld gives the number of points that fall within each grid cell. In addition to the \texttt{NumberDensity} field, the binning filter also sums up each point data field. Change the point data field in the \textbf{Coloring} section to \texttt{X\_Density}. The value of each grid point in this filter's output is the sum of all the \texttt{X} values of the points that fall within the cell.
+
+\begin{figure}[htbp]
+   \centering
+   \includegraphics[scale=.25]{images/BinningFilter_XDensity.png} % requires the graphicx package
+   \caption{The \texttt{X\_Density} field computed by the \textbf{Binning} filter from the \texttt{X} field.}
+   \label{fig:BinningFilterXDensity}
+\end{figure}
+
+To get the average density of the points in the grid cel, you can divide the \texttt{X\_Density} field by the \texttt{NumberDensity} field. To do thisl, apply a \textbf{Calculator} filter to \texttt{BinningFilter1}, set the \textbf{Result Array Name} to \texttt{AverageX}, and set the text field to \texttt{X\_Density / NumberDensity}. 
 
 \section{Gaussian Scalar Splatter Filter}
 
