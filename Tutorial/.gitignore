@@ -1,6 +1,7 @@
-MADAIWorkbenchTutorial.aux
-MADAIWorkbenchTutorial.log
-MADAIWorkbenchTutorial.pdf
-MADAIWorkbenchTutorial.toc
-MADAIWorkbenchTutorial.bbl
-MADAIWorkbenchTutorial.blg
+*.aux
+*.log
+*.pdf
+*.toc
+*.bbl
+*.blg
+*.synctex*
