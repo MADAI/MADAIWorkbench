@@ -91,7 +91,35 @@ To get the average density of the points in the grid cel, you can divide the \te
 
 \section{Gaussian Scalar Splatter Filter}
 
-\section{}
+Whereas the Binning filter computes discrete summation of points within a grid cell, the Gaussian Scalar Splatter filter computes smoother density fields by spreading the values associated with each point according to an isotropic 3D Gaussian ``splat'' function whose integrated energy is 1. The 3D Gaussian splat has a size specified in units of standard deviation that determines how far the influence of each point reaches and how smooth the resulting scalar field. The splat is translated to each point in the input. The integrated portion of the splat that intersects a grid cell is computed and added to the value at the cell to arrive at a number density similar in concept to the number density field produced by the binning filter. In fact, this filter produces the same results as the binning filter as the size of the splat approaches 0. Each point data field \texttt{F} is multiplied by this integrated value and added to a new data field called \texttt{F\_Density}. An important feature of this filter is that if you integrate a dataset field produced by the filter and integrate the dataset field input to this filter, the answer is the same.
+
+Add a Gaussian Scalar Splatter filter (Filters $\rightarrow$ MADAI $\rightarrow$ Gaussian Scalar Splatter) to Calculator. Leave the \textbf{Standard Deviation} setting at 0.1, but change the \textbf{Sample Dimensions} to 50 50 11. Click the \textbf{Apply} button. Next, change the representation to Slice, color the data by \texttt{NumberDensity}, and click the \textbf{Rescale} button.
+
+\begin{figure}[htbp]
+   \centering
+   \includegraphics[scale=.25]{images/GaussianScalarSplatterPoint1.png} % requires the graphicx package
+   \caption{Point density produced by the \textbf{GaussianScalarSplatter} filter (\texttt{NumberDensity} field) with standard deviation 0.1.}
+   \label{fig:GaussianScalarSplatter1}
+\end{figure}
+
+Now change the \textbf{Standard Deviation} value to 0.2 and click \textbf{Rescale}. Notice how the splatted result is smoother.
+
+\begin{figure}[htbp]
+   \centering
+   \includegraphics[scale=.25]{images/GaussianScalarSplatterPoint2.png} % requires the graphicx package
+   \caption{Smoother point density produced by the \textbf{GaussianScalarSplatter} filter with standard deviation 0.2.}
+   \label{fig:GaussianScalarSplatter2}
+\end{figure}
+
+Now color the slice by the \texttt{X\_Density} dataset and click the \textbf{Rescale} button.
+
+\begin{figure}[htbp]
+   \centering
+   \includegraphics[scale=.25]{images/GaussianScalarSplatterXDensity.png} % requires the graphicx package
+   \caption{\texttt{X\_Density} produced by the \textbf{GaussianScalarSplatter} filter with standard deviation 0.2.}
+   \label{fig:GaussianScalarSplatter2}
+\end{figure}
+
 
 \bibliographystyle{plain}
 \bibliography{MADAIWorkbenchTutorial}
