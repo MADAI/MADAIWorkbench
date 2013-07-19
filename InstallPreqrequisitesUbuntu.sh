@@ -9,6 +9,7 @@
 
 apt-get install -y   \
     build-essential  \
+    ia32-libs        \
     git              \
     libusb-1.0.0-dev \
     python2.7-dev    \
