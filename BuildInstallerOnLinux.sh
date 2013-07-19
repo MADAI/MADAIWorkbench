@@ -299,7 +299,7 @@ done
 popd
 
 # Copy Qt libraries
-cp -r -L ${qt_lib_dir}/libQt*.so ${lib_dir}
+cp -r ${qt_lib_dir}/libQt*.so* ${lib_dir}
 
 # Copy MPI items
 mpi_items=(bt2line check_callstack clog2_join clog2_print clog2_repair \
