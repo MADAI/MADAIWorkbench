@@ -11,11 +11,20 @@
 \author{Cory Quammen}
 \date{} % delete this line to display the current date
 
+\newcommand{\filter}[1]{\textbf{#1}}
+\newcommand{\filterinstance}[1]{\texttt{#1}}
+\newcommand{\menu}[1]{\textbf{#1}}
+\newcommand{\representation}[1]{\texttt{#1}}
+\newcommand{\file}[1]{\texttt{#1}}
+\newcommand{\setting}[1]{\textbf{#1}}
+\newcommand{\field}[1]{\texttt{#1}}
+
 %%% BEGIN DOCUMENT
 \begin{document}
 
+
 \maketitle
-%\tableofcontents
+\tableofcontents
 
 \section{Introduction}
 
@@ -23,37 +32,9 @@ This tutorial will walk you through using several of the features of the MADAI W
 
 The content of this tutorial assumes that you have gone through the ParaView Tutorial for version 3.98 or higher of ParaView.
 
-\section{Ensemble Surface Slicing Representation}
-
-In the ParaView tutorial, we have seen that several representations are available for displaying data in ParaView (\texttt{3D Glyphs}, \texttt{Outline}, \texttt{Points}, \texttt{Surface}, \texttt{Surface with Edges}, \texttt{Wireframe}). Another representation is suitable for displaying a group of surfaces using a technique called Ensemble Surface Slicing \cite{Oluwafemi2012}.
-
-Open the files \texttt{apple.ply}, \texttt{banana.ply}, \texttt{cherry.ply}, and \texttt{grape.ply}. The \texttt{Ensemble Surface Slicing} representation operates on a set of surfaces grouped together into a multiblock dataset. To group the files, select them all in the pipeline browser by selecting the first file in the browser, then press the shift key and select the last file. Next, group them together with \texttt{Filters} $\rightarrow$ \texttt{Alphabetical} $\rightarrow$ \texttt{Group Datasets}. The resulting display will show the union of the surfaces, the same as what you would get just by having all the surfaces' visibility turned on.
-
-\begin{figure}[htbp]
-   \centering
-   \includegraphics[scale=.5]{images/ESSGroupDatasets.png} % requires the graphicx package
-   \caption{The fruit datasets \texttt{apple.ply}, \texttt{banana.ply}, \texttt{cherry.ply}, and \texttt{grape.ply} grouped together.}
-   \label{fig:ESSGroupDatasets}
-\end{figure}
-
-You will now see all the surfaces, but only slices from each surface wil be displayed. These slices are interleaved in such a way that the slices from all the surfaces are mostly visible (some slices from one surface may be 
-
-Next, change the representation of the grouped surfaces to \textbf{Ensemble Surface Slicing}. Change the \textbf{Slice Width} setting to 2 and the \textbf{Plane Normal} to 0, 0, 1. 
-
-\begin{figure}[htbp]
-   \centering
-   \includegraphics[scale=.25]{images/ESSSurfaces.png} % requires the graphicx package
-   \caption{The fruit datasets displayed with the ensemble surface slicing technique.}
-   \label{fig:ESSSurfaces}
-\end{figure}
-
 \section{Threshold Points Filter}
 
-One type of data you want to view is point data. Problem with Threshold filter in ParaView when you have this scenario. We'll see what the problem is in the following.
-
-ParaView provides a Threshold filter that operates on cells in a dataset. Cells, such as triangle or tetrahedra, are elements that either have a surface area or volume. This is a problem when your dataset consists of points with no associated cells. This can show up in strange ways when you have applied a Threshold filter to your dataset, but no filtering appears to have been done.
-
-To see that this is the case, create a point source by selecting Sources $\rightarrow$ Point Source. Change the \textbf{Number of Points} to 1000 and \textbf{Radius} to 1. Next, create a \textbf{Calculator} filter by selecting \textbf{Filters} $\rightarrow$ \textbf{Alphabetical} $\rightarrow$ \textbf{Calculator}. Set the \textbf{Result Array Name} to ``X'' and enter ``coordsX'' in the text field above the calculator buttons. This creates a point scalar field that has the same value as the x-coordinates of the points.
+One type of data you may want to view is point data, especially if your work involves simulating particle systems. You may want to threshold a point set to show only points that have a variable value within some range. There is a problem with the \filter{Threshold} filter provided by ParaView when you try to do this. This filter operates on cells in a dataset. Cells, such as triangle or tetrahedra, are elements that either have a surface area or volume. This is a problem when your dataset consists of points with no associated cells. This can show up in strange ways when you have applied a \filter{Threshold} filter to your dataset, but no filtering appears to have been done.
 
 \begin{figure}[htbp]
    \centering
@@ -62,29 +43,35 @@ To see that this is the case, create a point source by selecting Sources $\right
    \label{fig:ThresholdPointsFilterCalculator}
 \end{figure}
 
-Now apply the Threshold filter (Filters $\rightarrow$ Alphabetical $\rightarrow$ Threshold). Select ``X'' from the \textbf{Scalars} menu and uncheck the \textbf{All Scalars} checkbox and then click \textbf{Apply}. You should see all the original points. Next, change the \textbf{Maximum} value to 0.2. Again, all the original points are displayed, indicating that thresholding did not work. Now delete the \textbf{Threshold1} filter.
+To see that this is the case, create a point source by selecting \menu{Sources} $\rightarrow$ \menu {Point Source}. Change the \setting{Number of Points} to 1000 and \setting{Radius} to 1. Next, create a \filter{Calculator} filter by selecting \menu{Filters} $\rightarrow$ \menu{Alphabetical} $\rightarrow$ \menu{Calculator}. Set the \setting{Result Array Name} to ``X'' and enter ``coordsX'' in the text field above the calculator buttons (you can also click on the \menu{Scalars} menu and select \menu{coordsX}). Figure \ref{fig:ThresholdPointsFilterCalculator} shows the settings for the calculator. This creates a point scalar field that has the same value as the $x$-coordinates of the points.
 
-Now we will perform thresholding that works for point data sets. Select the \textbf{Calculator1} filter in the Pipeline Browser again and this time create a Threshold Points filter (Filters $\rightarrow$ Alphabetical $\rightarrow$ Threshold Points Filter). Select ``X'' as the scalars and change the right value of the \textbf{Threshold Range} to 0.2. This time, the points will be filtered such that points with the X value (and x-coordinate) above 0.2 are removed from the point set.
+Now apply the \filter{Threshold} filter (\menu{Filters} $\rightarrow$ \menu{Alphabetical} $\rightarrow$ \menu{Threshold}). Select ``X'' from the \setting{Scalars} menu and uncheck the \setting{All Scalars} checkbox and then click \setting{Apply}. You should still see all the original points in the 3D View. Next, change the \setting{Maximum} value to 0.2. Again, all the original points are displayed, indicating that thresholding did not work. Now delete the \filterinstance{Threshold1} filter.
+
+Now we will perform thresholding that works for point data sets. Select the \filterinstance{Calculator1} filter in the Pipeline Browser again and this time create a \filter{Threshold Points} filter (\menu{Filters} $\rightarrow$ \menu{Alphabetical} $\rightarrow$ \menu{Threshold Points}). Select ``X'' as the scalars and change the right value of the \setting{Threshold Range} to 0.2. This time, the points will be filtered such that points with the X value (and $x$-coordinate) above 0.2 are removed from the point set, as shown in Figure \ref{fig:ThresholdPointsFilter}.
 
 \begin{figure}[htbp]
    \centering
    \includegraphics[scale=.25]{images/ThresholdPointsFilter.png} % requires the graphicx package
-   \caption{Results of the \textbf{Threshold Points} filter.}
+   \caption{Results of the \filter{Threshold Points} filter.}
    \label{fig:ThresholdPointsFilter}
 \end{figure}
 
 \section{Binning Filter}
 
-The Binning Filter provides a fast way to create a regular 2D or 3D grid representing density from a point set. If you have completed the exercise from the previous section, delete the and ThresholdPoints1 filters from the pipeline by right-clicking them and choosing the menu item \textbf{Delete}. Now click on the PointSource1 source and change the \textbf{Number of Points} to 100,000. Now apply a Binning filter to it (Filters $\rightarrow$ Alphabetical $\rightarrow$ Binning Filter). The default settings are fine. Click \textbf{Apply}. Now set the representation to \textbf{Slice} and set the \textbf{Slice Direction} to XY Plane. Move the \textbf{Slice} to the middle of the range. In the \textbf{Coloring} section, choose the \texttt{NumberDensity} point field in the popup menu and click the \textbf{Rescale} button.
+When you have a large number of points, it may be difficult to estimate certain quantities such as local density of points because of \emph{overplotting}. Overplotting occurs when there are fewer pixels than points to display; more than one point will map to one pixel in the display, and you will see only the nearest point.
+
+In cases of overplotting, you can instead compute an intermediate dataset that stores density information by using the \filter{Binning} filter. The \filter{Binning} filter provides a fast way to create a regular 2D or 3D grid representing density from a point set.
+
+If you have completed the exercise from the previous section, delete the and \filterinstance{ThresholdPoints1} filters from the pipeline by right-clicking them and choosing the menu item \menu{Delete}. Now click on the \filterinstance{PointSource1} source and change the \setting{Number of Points} to 100,000. Now apply a \filter{Binning} filter to it (\menu{Filters} $\rightarrow$ \menu{Alphabetical} $\rightarrow$ \menu{Binning} filter). The default settings are fine. Click \setting{Apply}. Now set the representation to \representation{Slice} and set the \setting{Slice Direction} to XY Plane. Move the \setting{Slice} to the middle of the range. In the \setting{Coloring} section, choose the \field{NumberDensity} point field in the popup menu and click the \setting{Rescale} button. You should see an image similar to Figure \ref{fig:BinningFilter}.
 
 \begin{figure}[htbp]
    \centering
    \includegraphics[scale=.25]{images/BinningFilter.png} % requires the graphicx package
-   \caption{Results of the \textbf{Binning} filter.}
+   \caption{Results of the \filter{Binning} filter.}
    \label{fig:BinningFilter}
 \end{figure}
 
-The \texttt{NumberDensity} feld gives the number of points that fall within each grid cell. In addition to the \texttt{NumberDensity} field, the binning filter also sums up each point data field. Change the point data field in the \textbf{Coloring} section to \texttt{X\_Density}. The value of each grid point in this filter's output is the sum of all the \texttt{X} values of the points that fall within the cell.
+The \field{NumberDensity} field gives the number of points that fall within each grid cell. In addition to the \field{NumberDensity} field, the binning filter also sums up each point data field. Change the point data field in the \setting{Coloring} section to \field{X\_Density}. The value of each grid point in this filter's output is the sum of all the \field{X} values of the points that fall within the cell (see Figure \ref{fig:BinningFilterXDensity}).
 
 \begin{figure}[htbp]
    \centering
@@ -93,39 +80,57 @@ The \texttt{NumberDensity} feld gives the number of points that fall within each
    \label{fig:BinningFilterXDensity}
 \end{figure}
 
-To get the average density of the points in the grid cell, you can divide the \texttt{X\_Density} field by the \texttt{NumberDensity} field. To do this, apply a \textbf{Calculator} filter to \texttt{BinningFilter1}, set the \textbf{Result Array Name} to \texttt{AverageX}, and set the text field to \texttt{X\_Density / NumberDensity}. 
+To get the average density of the points in the grid cell, you can divide the \field{X\_Density} field by the \field{NumberDensity} field. To do this, apply a \filter{Calculator} filter to \filterinstance{BinningFilter1}, set the \setting{Result Array Name} to \field{AverageX}, and set the text field to ``X\_Density / NumberDensity'' (without the quotation marks).  Choose the \field{AverageX} field in the \setting{Coloring} section and click the \setting{Rescale} button. The image will look largely the same as Figure \ref{fig:BinningFilterXDensity}. The main difference is that the range of the \field{AverageX} is now close to [-1,1]. You can confirm this by clicking on \textbf{Information} tab. Under \setting{Data Arrays}, you will see a table showing field names, field data types, and the numeric ranges of the fields. Look at the table row for field \field{AverageX}. It is slightly smaller than the range [-1,1]. Because this is in a sense the average $x$-coordinate value from the points in each bin and the points were sampled from a sphere with radius 1, this range makes sense. 
 
 \section{Gaussian Scalar Splatter Filter}
 
-Whereas the Binning filter computes discrete summation of points within a grid cell, the Gaussian Scalar Splatter filter computes smoother density fields by spreading the values associated with each point according to an isotropic 3D Gaussian ``splat'' function whose integrated energy is 1. The 3D Gaussian splat has a size specified by the standard deviation given in the units of the space in which the data is embedded (e.g., meters) that determines how far the influence of each point reaches and how smooth the resulting scalar field. The splat is translated to each point in the input. The integrated portion of the splat that intersects a grid cell is computed and added to the value at the cell to arrive at a number density similar in concept to the number density field produced by the binning filter. In fact, this filter produces the same results as the binning filter as the size of the splat approaches 0. Each point data field \texttt{F} is multiplied by this integrated value and added to a new data field called \texttt{F\_Density}. An important feature of this filter is that if you integrate a dataset field produced by the filter and integrate the dataset field input to this filter, the answer is the same.
+Whereas the \filter{Binning} filter computes discrete summation of points within a grid cell, the \filter{Gaussian Scalar Splatter} filter computes smoother density fields by spreading the values associated with each point according to an isotropic 3D Gaussian ``splat'' function whose integrated energy is 1. The 3D Gaussian splat's size is controlled by the standard deviation parameter of the Gaussian and is specified in the units of the space in which the data is embedded (e.g., meters). The splat size determines how far the influence of each point reaches and how smooth the resulting scalar field.
 
-1000 points - otherwise too long
+The \filter{Gaussian Scalar Splatter} operates on each point in the input dataset. For each input point, the splat is centered at the point. The integrated portion of the splat that intersects a grid cell in the output is computed and added to the value at the cell. After each point is processed, each cell in the output has a number density similar in concept to the number density field produced by the \filter{Binning} filter. In fact, this filter produces the same results as the binning filter as the size of the splat approaches 0. Each point data field \field{F} is multiplied by this integrated value and added to a new data field called \field{F\_Density}. An important feature of this filter is that if you integrate a dataset field produced by the filter and integrate the dataset field input to this filter, the answer is the same (within some tolerance). This is true no matter the resolution of the output dataset.
 
-Add a Gaussian Scalar Splatter filter (Filters $\rightarrow$ MADAI $\rightarrow$ Gaussian Scalar Splatter) to Calculator. Leave the \textbf{Standard Deviation} setting at 0.1, but change the \textbf{Sample Dimensions} to 25 25 25. WARNING: if you don't change the \textbf{Sample Dimensions} to 25 25 25, you will be waiting a long time for the filter to finish. Click the \textbf{Apply} button. Next, change the representation to \textbf{Volume}, color the data by \texttt{NumberDensity}, and click the \textbf{Rescale} button.
+Click on the \filterinstance{PointSource1} filter and change the \setting{Number of Points} to 1000. If you do not change this number to 1000, it will take too long to compute.
+
+Next, add a \filter{Gaussian Scalar Splatter} filter (\menu{Filters} $\rightarrow$ \menu{MADAI} $\rightarrow$ \menu{Gaussian Scalar Splatter}) to \filterinstance{Calculator1}. Leave the \textbf{Standard Deviation} setting at 0.1, but change the \textbf{Sample Dimensions} to 25 25 25. (\emph{\textbf{WARNING}}: if you don't change the \textbf{Sample Dimensions} to 25 25 25, you will be wait a \emph{very} long time for the filter to finish.) Click the \setting{Apply} button. Next, change the representation to \representation{Volume}, color the data by \field{NumberDensity}, and click the \setting{Rescale} button. You should see an image similar to the left side of Figure \ref{fig:GaussianScalarSplatter1}.
 
 \begin{figure}[htbp]
    \centering
-   \includegraphics[scale=.25]{images/GaussianScalarSplatterPoint1.png} % requires the graphicx package
-   \caption{Point density produced by the \textbf{GaussianScalarSplatter} filter (\texttt{NumberDensity} field) with standard deviation 0.1.}
+   \includegraphics[scale=.22]{images/GaussianScalarSplatterPoint1.png}
+   \includegraphics[scale=.22]{images/GaussianScalarSplatterPoint2.png}
+   \caption{Point density produced by the \filter{GaussianScalarSplatter} filter (\field{NumberDensity} field) with standard deviation 0.1 (left) and standard deviation 0.2 (right).}
    \label{fig:GaussianScalarSplatter1}
 \end{figure}
 
-Now change the \textbf{Standard Deviation} value to 0.2 and click \textbf{Rescale}. Notice how the splatted result is smoother in Figure \ref{fig:GaussianScalarSplatter2}.
+Now change the \setting{Standard Deviation} value to 0.2 and click \setting{Rescale}. Notice how the splatted result is smoother on the right side of Figure \ref{fig:GaussianScalarSplatter1}.
+
+Finally, color the slice by the \field{X\_Density} field and click the \setting{Rescale} button. Figure \ref{fig:GaussianScalarSplatter2} shows the result.
 
 \begin{figure}[htbp]
    \centering
-   \includegraphics[scale=.25]{images/GaussianScalarSplatterPoint2.png} % requires the graphicx package
-   \caption{Smoother point density produced by the \textbf{GaussianScalarSplatter} filter with standard deviation 0.2.}
+   \includegraphics[scale=.25]{images/GaussianScalarSplatterXDensity.png}
+   \caption{\texttt{X\_Density} produced by the \filter{Gaussian Scalar Splatter} filter with standard deviation 0.2.}
    \label{fig:GaussianScalarSplatter2}
 \end{figure}
 
-Now color the slice by the \texttt{X\_Density} dataset and click the \textbf{Rescale} button. Figure \ref{fig:GaussianScalarSplatter2} shows the result.
+\section{Ensemble Surface Slicing Representation}
+
+In the ParaView tutorial, we have seen that several representations are available for displaying data in ParaView (\representation{3D Glyphs}, \representation{Outline}, \representation{Points}, \representation{Surface}, \representation{Surface with Edges}, \representation{Wireframe}). Another representation is suitable for displaying a group of surfaces using a technique called Ensemble Surface Slicing \cite{Oluwafemi2012}. In this technique, more than one surface embedded in the same space are all displayed at the same time. However, only slices from each surface are displayed. These slices are interleaved in such a way that the slices from all the surfaces are mostly visible (some slices from one surface may be occluded by slices from other surfaces depending on the shape and viewing angle.
+
+To try this technique, open the files \file{apple.ply}, \file{banana.ply}, \file{cherry.ply}, and \file{grape.ply}. The \representation{Ensemble Surface Slicing} representation operates on a set of surfaces grouped together into what is called a multiblock dataset. A multiblock data set is a hierarchy of other datasets. To group the files, select them all in the pipeline browser by selecting the first file in the browser, then press the shift key and select the last file. Next, group them together with \menu{Filters} $\rightarrow$ \menu{Alphabetical} $\rightarrow$ \menu{Group Datasets}. The resulting display will show the union of the surfaces, the same as what you would get just by having all the surfaces' visibility turned on.
 
 \begin{figure}[htbp]
    \centering
-   \includegraphics[scale=.25]{images/GaussianScalarSplatterXDensity.png} % requires the graphicx package
-   \caption{\texttt{X\_Density} produced by the \textbf{GaussianScalarSplatter} filter with standard deviation 0.2.}
-   \label{fig:GaussianScalarSplatter2}
+   \includegraphics[scale=.5]{images/ESSGroupDatasets.png} % requires the graphicx package
+   \caption{The fruit datasets \texttt{apple.ply}, \texttt{banana.ply}, \texttt{cherry.ply}, and \texttt{grape.ply} grouped together.}
+   \label{fig:ESSGroupDatasets}
+\end{figure}
+
+Next, change the representation of the grouped surfaces to \representation{Ensemble Surface Slicing}. Change the \setting{Slice Width} setting to 2 and the \setting{Plane Normal} to 0, 0, 1. You should see an image similar to Figure \ref{fig:ESSSurfaces}. Each surface is colored by a different color. These colors are automatically chosen to be perceptually well-separated in color space but isoluminant to avoid obscuring the perceived shapes. You can try changing the \setting{Plane Normal} to different values to change the orientation of the slices and the \setting{Slice Width} to change the width of the slices.
+
+\begin{figure}[htbp]
+   \centering
+   \includegraphics[scale=.25]{images/ESSSurfaces.png} % requires the graphicx package
+   \caption{The fruit datasets displayed with the ensemble surface slicing technique.}
+   \label{fig:ESSSurfaces}
 \end{figure}
 
 
