@@ -1,9 +1,10 @@
 
 \documentclass[12pt]{article}
-\usepackage{geometry} % see geometry.pdf on how to lay out the page. There's lots.
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry} % see geometry.pdf on how to lay out the page. There's lots.
 \usepackage{graphicx}
-\geometry{a4paper} % or letter or a5paper or ... etc
+\geometry{letterpaper} % or letter or a5paper or ... etc
 % \geometry{landscape} % rotated page geometry
+\usepackage{hyperref}
 
 % See the ``Article customise'' template for come common customisations
 
@@ -28,11 +29,60 @@
 
 \section{Introduction}
 
-This tutorial will walk you through using several of the features of the MADAI Workbench. These features not available in a plain installation of ParaView.
+The MADAI Workbench is a visualization program based on ParaView. It uses ParaView's plugin-mechanism to provide features over and above what ParaView provides in addition to all the great features already in ParaView.
 
-The content of this tutorial assumes that you have gone through the ParaView Tutorial for version 3.98 or higher of ParaView.
+The first question you must answer when attempting to use a visualization tool is how to get the your data into the visualization program. The first half of this tutorial starts with some examples of converting example data files into a format that can be imported by the MADAI Workbench. 
 
-\section{Threshold Points Filter}
+The second half of this tutorial will walk you through using several of the extensions that the MADAI Workbench provides. These features are not available in a plain installation of ParaView.
+
+The content of this tutorial assumes that you have gone through the ParaView Tutorial for version 3.98 or higher of ParaView. You also need the tutorial data in the ZIP file \file{MADAIWorkbenchTutorial.zip}.
+
+\section{Importing Data}
+
+The MADAI Workbench can import many different file types. We first start with a relatively simple conversion of an example text file containing data from a simulation into a VTK (Visualization Toolkit) file that the MADAI Workbench can load. Next we convert two different kinds of OSCAR (Open Standard Codes and Routines) files into XDMF files that the MADAI Workbench can read.
+
+\subsection{Importing a Text File}
+
+It is often the case that simulation codes produce output files in a custom format that no other programs can read. In some cases, however, the output format file may be modified slightly to become a file that the MADAI Workbench can read. We will be loading ASCII files written by a particular program that has five data points per line separated by spaces with no header. We’re going to edit this file (make a copy first) to turn it into a VTK file. This file format is described in the \href{http://www.vtk.org/VTK/img/file-formats.pdf}{VTK File Formats PDF}.
+
+Copy the file \file{AR.spec} to \file{AR.vtk}. Open \file{AR.spec} in your favorite text editor and paste the following text into the beginning of the file. Do not include the portions of the line following \verb+//+. Make sure to get the correct number of spaces in each line. Note the space between the \verb+#+ and \verb+vtk+ in the first line.
+
+\begin{verbatim}
+# vtk DataFile Version 2.0   // File-format indicator string (“magic cookie”)
+Converted Jonathan Lees file // This comment line  must be present
+ASCII
+DATASET STRUCTURED_POINTS 
+DIMENSIONS 7461 4096 1       // Tells the number of points in X, Y, and Z 
+SPACING 1 1 0                // Computed based on number of points and X,Y extent
+ORIGIN 0 0 0                 // Centered around (0,0) in X and Y
+POINT_DATA 30560256          // 7461x4096x1 total data values
+SCALARS AR float 1           // One scalar per value. Name based on file name (AR)
+LOOKUP_TABLE default         // Use the default color map
+\end{verbatim}
+
+After you save the file with your modifications, load it in the MADAI Workbench. It will probably take a long time to parse and load the ASCII file. To make future operations faster, you can save the data as a binary file that will be loaded later. To do this, select \menu{File} $\rightarrow$ \menu{Save Data} and then change the \setting{Files of type} menu to ``VTK ImageData Files (*.vti)''. Give the file the name \file{AR.vti} and click \setting{OK}. Make sure \setting{Compressor Type} is set to None. Now, when you load \file{AR.vti}, it will read in much faster.
+
+Now do the same modifications to the files \file{MTM.FVMAT} and \file{MTM.spec} files to produce \file{FV.vti} and \file{M\_small.vti}.
+
+\subsubsection{Combining Different Data Fields}
+
+The files you produced in the previous section each contain a single scalar data field. For certain visualization techniques, the separate scalar data fields must be combined into a single dataset. The \filter{Append Attributes} filter makes it possible to combine the different data sets.
+
+Load the files \file{AR.vti}, \file{FV.vti}, and \file{M\_small.vtk}. Select all three by clicking the first file in the pipeline browser, then press the shift key and click the last file in the pipeline browser. Next, select \menu{Filters} $\rightarrow$ \menu{Alphabetical} $\rightarrow$ \menu{Append Attributes}. This file creates a new object that has all three data sets included in it.
+
+Click on \filterinstance{AppendAttributes1} and choose \menu{File} $\rightarrow$ \menu{Save Data}. Save this file as a VTI binary file. In the future, you can load just this file and have all three data fields loaded. This is more convenient than having to load each data field file separately.
+
+\subsubsection{Visualizing Two Data Fields in 2D}
+
+With the \filterinstance{AppendAttributes1} still selected, select \filter{Filters} $\rightarrow$ \filter{Alphabetical} $\rightarrow$ \filter{Extract Surface}. Next, select \filter{Filters} $\rightarrow$ \filter{Alphabetical} $\rightarrow$ \filter{Warp Scalar}. SETTINGS. Choose the \field{AR} for \setting{Coloring}. Now, add a \menu{Filters} $\rightarrow$ \menu{Alphabetical} $\rightarrow$ \menu{Contour} filter to \filterinstance{WarpScalar1}. Set the contour value(s) to XXX and the data field to \field{FV}.
+
+Figure XXX shows the three data fields with different display channels (height surface, color scale, and isocontour lines).
+
+\subsection{Converting OSCAR Files}
+
+\section{MADAI Workbench Features}
+
+\subsection{Threshold Points Filter}
 
 One type of data you may want to view is point data, especially if your work involves simulating particle systems. You may want to threshold a point set to show only points that have a variable value within some range. There is a problem with the \filter{Threshold} filter provided by ParaView when you try to do this. This filter operates on cells in a dataset. Cells, such as triangle or tetrahedra, are elements that either have a surface area or volume. This is a problem when your dataset consists of points with no associated cells. This can show up in strange ways when you have applied a \filter{Threshold} filter to your dataset, but no filtering appears to have been done.
 
@@ -56,7 +106,7 @@ Now we will perform thresholding that works for point data sets. Select the \fil
    \label{fig:ThresholdPointsFilter}
 \end{figure}
 
-\section{Binning Filter}
+\subsection{Binning Filter}
 
 When you have a large number of points, it may be difficult to estimate certain quantities such as local density of points because of \emph{overplotting}. Overplotting occurs when there are fewer pixels than points to display; more than one point will map to one pixel in the display, and you will see only the nearest point.
 
@@ -82,7 +132,7 @@ The \field{NumberDensity} field gives the number of points that fall within each
 
 To get the average density of the points in the grid cell, you can divide the \field{X\_Density} field by the \field{NumberDensity} field. To do this, apply a \filter{Calculator} filter to \filterinstance{BinningFilter1}, set the \setting{Result Array Name} to \field{AverageX}, and set the text field to ``X\_Density / NumberDensity'' (without the quotation marks).  Choose the \field{AverageX} field in the \setting{Coloring} section and click the \setting{Rescale} button. The image will look largely the same as Figure \ref{fig:BinningFilterXDensity}. The main difference is that the range of the \field{AverageX} is now close to [-1,1]. You can confirm this by clicking on \textbf{Information} tab. Under \setting{Data Arrays}, you will see a table showing field names, field data types, and the numeric ranges of the fields. Look at the table row for field \field{AverageX}. It is slightly smaller than the range [-1,1]. Because this is in a sense the average $x$-coordinate value from the points in each bin and the points were sampled from a sphere with radius 1, this range makes sense. 
 
-\section{Gaussian Scalar Splatter Filter}
+\subsection{Gaussian Scalar Splatter Filter}
 
 Whereas the \filter{Binning} filter computes discrete summation of points within a grid cell, the \filter{Gaussian Scalar Splatter} filter computes smoother density fields by spreading the values associated with each point according to an isotropic 3D Gaussian ``splat'' function whose integrated energy is 1. The 3D Gaussian splat's size is controlled by the standard deviation parameter of the Gaussian and is specified in the units of the space in which the data is embedded (e.g., meters). The splat size determines how far the influence of each point reaches and how smooth the resulting scalar field.
 
@@ -111,7 +161,7 @@ Finally, color the slice by the \field{X\_Density} field and click the \setting{
    \label{fig:GaussianScalarSplatter2}
 \end{figure}
 
-\section{Ensemble Surface Slicing Representation}
+\subsection{Ensemble Surface Slicing Representation}
 
 In the ParaView tutorial, we have seen that several representations are available for displaying data in ParaView (\representation{3D Glyphs}, \representation{Outline}, \representation{Points}, \representation{Surface}, \representation{Surface with Edges}, \representation{Wireframe}). Another representation is suitable for displaying a group of surfaces using a technique called Ensemble Surface Slicing \cite{Oluwafemi2012}. In this technique, more than one surface embedded in the same space are all displayed at the same time. However, only slices from each surface are displayed. These slices are interleaved in such a way that the slices from all the surfaces are mostly visible (some slices from one surface may be occluded by slices from other surfaces depending on the shape and viewing angle.
 
