@@ -1,3 +1,5 @@
+#!/bin/sh
+[ $(id -u) = 0 ] || exec sudo "$0" "$@"
 #Author: Cory Quammen <cquammen@cs.unc.edu>
 #Last updated: June 10, 2013
 
