@@ -80,6 +80,50 @@ Figure XXX shows the three data fields with different display channels (height s
 
 \subsection{Converting OSCAR Files}
 
+People in the high-energy physics community often produce OSCAR (Open Standard Codes and Routines) files from their simulation codes. To get these data into the MADAI Workbench, a couple external conversion utilities are available to turn OSCAR files into XDMF files that can be read by the MADAI Workbench. Two different converters are available, one that converts OSCAR1997a files and one that converts OSCAR2008H files. In this section, we will see how to use the converters to create files that can be visualized in the MADAI Workbench.
+
+\subsection{Converting OSCAR1997A Files}
+
+Run the following commands
+
+\begin{verbatim}
+> cd OSCARData/1997A
+> oscar1997a_to_xdmf-1.1.2 -i AuAu_s200_b2_t100_1ev-1.f19 \
+   -o AuAu_s200_b2_t100_1ev-1
+\end{verbatim}
+
+The \texttt{-i} option gives the input name of the OSCAR file to convert while the \texttt{-o} option gives the prefix of the output file names. The converter produces two files, one with the extension \texttt{.h5} and one with the extension \texttt{.xmf}. When you run this command, you should see two new files created in your working directory, \texttt{AuAu\_s200\_b2\_t100\_1ev-1.xmf} and \texttt{AuAu\_s200\_b2\_t100\_1ev-1.h5}.
+
+Now open the \texttt{AuAu\_s200\_b2\_t100\_1ev-1.xmf} file in the MADAI Workbench. You should see XXX.
+
+There are additional options available in this OSCAR converter program. Run
+
+\begin{verbatim}
+> oscar1997a_to_xdmf-1.1.2 --help
+\end{verbatim}
+to see additional options.
+
+\subsection{Converting OSCAR2008H Files}
+
+Run the following commands
+
+\begin{verbatim}
+> cd OSCARData/2008H
+> oscar2008h_to_xdmf-1.1.2 -i e160_b7_3e0_coarse_truncated.dat \
+   -o e160_b7_3e0_coarse_truncated
+\end{verbatim}
+
+As with the conversion of the OSCAR1997A files, you will see two new files, \\ \texttt{e160\_b7\_3e0\_coarse\_truncated.xmf} and \texttt{e160\_b7\_3e0\_coarse\_truncated.h5}.
+
+Now open the \texttt{e160\_b7\_3e0\_coarse\_truncated.xmf} file 
+
+There are additional options available in this OSCAR converter program. Run
+
+\begin{verbatim}
+> oscar2008h_to_xdmf-1.1.2 --help
+\end{verbatim}
+to see additional options.
+
 \section{MADAI Workbench Features}
 
 \subsection{Threshold Points Filter}
