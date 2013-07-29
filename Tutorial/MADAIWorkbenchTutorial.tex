@@ -92,7 +92,7 @@ Run the following commands
    -o AuAu_s200_b2_t100_1ev-1
 \end{verbatim}
 
-The \texttt{-i} option gives the input name of the OSCAR file to convert while the \texttt{-o} option gives the prefix of the output file names. The converter produces two files, one with the extension \texttt{.h5} and one with the extension \texttt{.xmf}. When you run this command, you should see two new files created in your working directory, \texttt{AuAu\_s200\_b2\_t100\_1ev-1.xmf} and \texttt{AuAu\_s200\_b2\_t100\_1ev-1.h5}.
+The \texttt{-i} option gives the input name of the OSCAR file to convert while the \texttt{-o} option gives the prefix of the output file names. The converter produces two files, one with the extension \file{.h5} and one with the extension \file{.xmf}. When you run this command, you should see two new files created in your working directory, \file{AuAu\_s200\_b2\_t100\_1ev-1.xmf} and \file{AuAu\_s200\_b2\_t100\_1ev-1.h5}.
 
 \begin{figure}[htbp]
    \centering
@@ -110,28 +110,39 @@ The \texttt{-i} option gives the input name of the OSCAR file to convert while t
 
 Now open the \texttt{AuAu\_s200\_b2\_t100\_1ev-1.xmf} file in the MADAI Workbench. In the Properties panel, you should see the available point data, as shown in Figure \ref{fig:OSCAR1997A_PointArrays}.
 
-\begin{figure}[htbp]
-   \centering
-   \includegraphics[scale=.5]{images/OSCAR1997A_Hierarchy.png} % requires the graphicx package
-   \caption{Hierarchy of the converted OSCAR1997A file. Each frame is a different time step.}
-   \label{fig:OSCAR1997A_Hierarchy}
-\end{figure}
+%\begin{figure}[htbp]
+%   \centering
+%   \includegraphics[scale=.5]{images/OSCAR1997A_Hierarchy.png} % requires the graphicx package
+%   \caption{Hierarchy of the converted OSCAR1997A file. Each frame is a different time step.}
+%   \label{fig:OSCAR1997A_Hierarchy}
+%\end{figure}
 
 \begin{figure}[htbp]
    \centering
    \includegraphics[scale=.5]{images/OSCAR1997A_HierarchyCollapsed.png} % requires the graphicx package
-   \caption{Collapsed hierarchy of the converted OSCAR1997A file. Each frame is a different time step.}
+   \caption{Collapsed hierarchy of the converted OSCAR1997A file showing the different spaces in which the particles are embedded.}
    \label{fig:OSCAR1997A_HierarchyCollapsed}
 \end{figure}
+
+The converted file is a type of dataset called a \emph{multiblock} dataset. A multiblock dataset is a hierarchical collection of other dataset types. This structure can be used to organize different subsets of the overall dataset. You can see a list of blocks in this dataset in Figure \ref{fig:OSCAR1997A_Blocks}.
+
+The OSCAR converter program for 1997a files embeds the particle positions in different spaces. These spaces are listed under the Hierarchy tab (see Figure \ref{fig:OSCAR1997A_HierarchyCollapsed}). You see all these spaces mapped to 3D space in the visualization window, so the data may appear odd. You can do two things to restrict which space you are viewing. First, you can check only the spaces that you want to load from the file. Second, you can extract a block from the dataset using the \filter{Extract Block} filter. Add an \filter{Extract Block} filter to the file \file{AuAu\_s200\_b2\_t100\_1ev-1.xmf} and check the ``euclidean position'' box (see Figure \ref{fig:OSCAR1997A_ExtractBlock}).
+
+\begin{figure}[htbp]
+   \centering
+   \includegraphics[scale=.35]{images/OSCAR1997A_ExtractBlock.png} % requires the graphicx package
+   \caption{Extracting a block from the converted OSCAR1997A file.}
+   \label{fig:OSCAR1997A_ExtractBlock}
+\end{figure}
+
+In addition, the converted file has a number of timesteps. Click on the play button to watch the collision unfold over time.
 
 There are additional options available in this OSCAR converter program. Run
 
 \begin{verbatim}
 > oscar1997a_to_xdmf-1.1.2 --help
 \end{verbatim}
-to see additional options.
-
-
+to learn more about them.
 
 \subsection{Converting OSCAR2008H Files}
 
@@ -145,14 +156,14 @@ Run the following commands
 
 As with the conversion of the OSCAR1997A files, you will see two new files, \\ \texttt{e160\_b7\_3e0\_coarse\_truncated.xmf} and \texttt{e160\_b7\_3e0\_coarse\_truncated.h5}.
 
-Now open the \texttt{e160\_b7\_3e0\_coarse\_truncated.xmf} file in the MADAI Workbench. 
+Now open the \texttt{e160\_b7\_3e0\_coarse\_truncated.xmf} file in the MADAI Workbench. You should see an image as it appears in Figure \ref{fig:OSCAR2008H_ScreenShot}.
 
-\begin{figure}[htbp]
-   \centering
-   \includegraphics[scale=.5]{images/OSCAR2008H_PointArrays.png} % requires the graphicx package
-   \caption{Point arrays available in the converted OSCAR2008H file.}
-   \label{fig:OSCAR2008H_PointArrays}
-\end{figure}
+%\begin{figure}[htbp]
+%   \centering
+%   \includegraphics[scale=.5]{images/OSCAR2008H_PointArrays.png} % requires the graphicx package
+%   \caption{Point arrays available in the converted OSCAR2008H file.}
+%   \label{fig:OSCAR2008H_PointArrays}
+%\end{figure}
 
 \begin{figure}[htbp]
    \centering
@@ -166,7 +177,7 @@ There are additional options available in this OSCAR converter program. Run
 \begin{verbatim}
 > oscar2008h_to_xdmf-1.1.2 --help
 \end{verbatim}
-to see additional options.
+to learn more about them.
 
 \section{MADAI Workbench Features}
 
