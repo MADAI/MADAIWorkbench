@@ -39,7 +39,7 @@ The content of this tutorial assumes that you have gone through the ParaView Tut
 
 \section{Importing Data}
 
-The MADAI Workbench can import many different file types. We first start with a relatively simple conversion of an example text file containing data from a simulation into a VTK (Visualization Toolkit) file that the MADAI Workbench can load. Next we convert two different kinds of OSCAR (Open Standard Codes and Routines) files into XDMF files that the MADAI Workbench can read.
+The MADAI Workbench can import many different file types. In this section, we will perform a relatively simple manual conversion of an example text file containing data from a simulation into a VTK (Visualization Toolkit) file that the MADAI Workbench can load.
 
 \subsection{Importing a Text File}
 
@@ -86,135 +86,6 @@ Click on \filterinstance{AppendAttributes1} and choose \menu{File} $\rightarrow$
 With the \filterinstance{AppendAttributes1} still selected, select \filter{Filters} $\rightarrow$ \filter{Alphabetical} $\rightarrow$ \filter{Extract Surface}. Next, select \filter{Filters} $\rightarrow$ \filter{Alphabetical} $\rightarrow$ \filter{Warp Scalar}. Set the \setting{Scalars} field to \field{FV} and the \setting{Coloring} field to \field{AR}. Choose the \field{AR} for \setting{Coloring}. Change the colormap to an isoluminant one by clicking on the \setting{Edit} and clicking the \setting{Choose Preset} button. Choose the color map ``CIELab Blue to Red''.  Now, add a \menu{Filters} $\rightarrow$ \menu{Alphabetical} $\rightarrow$ \menu{Contour} filter to \filterinstance{WarpScalar1} filter. Set the \setting{Contour By} filter to \field{M}. Delete the default contour value and click the \setting{Add Range} button. Set the number of steps to 5 and click \setting{OK}.
 
 Figure \ref{fig:ThreeScalarsCombined} shows the resulting visualization of the three data fields with different display channels (\field{FV} mapped to height surface, \field{AR} mapped to color scale, and \field{M} mapped to isocontour lines).
-
-\subsection{Converting OSCAR Files}
-
-One type of file format researchers in the high-energy physics community might produce from their simulations is the OSCAR (Open Standard Codes and Routines) file format. To get these data into the MADAI Workbench, two external conversion utilities are available to turn OSCAR files into XDMF files that can be read by the MADAI Workbench. Two different converters are available, one that converts OSCAR1997A files and one that converts OSCAR2008H files. In this section, we will see how to use the converters to create files that can be visualized in the MADAI Workbench.
-
-\subsection{Installing the OSCAR Converters}
-
-\subsubsection{Mac OS X}
-
-Double click the file oscar2xdmf-X.Y.Z-Darwin.dmg.  This will mount a new volume called oscar2xdmf-X.Y.Z-Darwin and will open a Finder window. Double click the installer oscar2xdmf-X.Y.Z-Darwin.pkg to run it. When you are finished, the OSCAR converters will be placed in /usr/local/bin and will be available on the command line.
-
-\subsubsection{Linux}
-
-I assume you want to put these executables somewhere you can access without having root privileges, such as your home directory.
-
-\begin{enumerate}
-
-\item If you don’t have a special install directory in your file space, create one. For example,
-
-\texttt{mkdir "\${HOME}/install"}
-
-\item Run the installer
-
-\texttt{./oscar2xdmf-1.0.0-Linux.sh --prefix="\${HOME}/install"}
-
-\item Answer the two questions about accepting the license and creating a subdirectory posed by the installer. You will probably want to answer ``n'' for the second question.
-
-\item If you created an install directory, add the bin directory created by the installer to your PATH environment variable.
-
-\item  If you want to put the binaries in \texttt{/usr/local}, set the prefix to \texttt{/usr/local} and run the installer as in Step 2 above. You will likely need to run the command using sudo.
-
-\end{enumerate}
-
-\subsection{Converting OSCAR1997A Files}
-
-Run the following commands
-
-\begin{verbatim}
-> cd OSCARData/1997A
-> oscar1997a_to_xdmf-1.1.2 -i AuAu_s200_b2_t100_1ev-1.f19 \
-   -o AuAu_s200_b2_t100_1ev-1
-\end{verbatim}
-
-The \texttt{-i} option gives the input name of the OSCAR file to convert while the \texttt{-o} option gives the prefix of the output file names. The converter produces two files, one with the extension \file{.h5} and one with the extension \file{.xmf}. When you run this command, you should see two new files created in your working directory, \file{AuAu\_s200\_b2\_t100\_1ev-1.xmf} and \file{AuAu\_s200\_b2\_t100\_1ev-1.h5}.
-
-\begin{figure}[htbp]
-   \centering
-   \includegraphics[scale=.5]{images/OSCAR1997A_PointArrays.png} % requires the graphicx package
-   \caption{Available data fields  in the converted OSCAR1997A file.}
-   \label{fig:OSCAR1997A_PointArrays}
-\end{figure}
-
-\begin{figure}[htbp]
-   \centering
-   \includegraphics[scale=.5]{images/OSCAR1997A_Blocks.png} % requires the graphicx package
-   \caption{Available frames  in the converted OSCAR1997A file. Each frame is a different time step.}
-   \label{fig:OSCAR1997A_Blocks}
-\end{figure}
-
-Now open the \texttt{AuAu\_s200\_b2\_t100\_1ev-1.xmf} file in the MADAI Workbench. In the Properties panel, you should see the available point data, as shown in Figure \ref{fig:OSCAR1997A_PointArrays}.
-
-%\begin{figure}[htbp]
-%   \centering
-%   \includegraphics[scale=.5]{images/OSCAR1997A_Hierarchy.png} % requires the graphicx package
-%   \caption{Hierarchy of the converted OSCAR1997A file. Each frame is a different time step.}
-%   \label{fig:OSCAR1997A_Hierarchy}
-%\end{figure}
-
-\begin{figure}[htbp]
-   \centering
-   \includegraphics[scale=.5]{images/OSCAR1997A_HierarchyCollapsed.png} % requires the graphicx package
-   \caption{Collapsed hierarchy of the converted OSCAR1997A file showing the different spaces in which the particles are embedded.}
-   \label{fig:OSCAR1997A_HierarchyCollapsed}
-\end{figure}
-
-The converted file is a type of dataset called a \emph{multiblock} dataset. A multiblock dataset is a hierarchical collection of other dataset types. This structure can be used to organize different subsets of the overall dataset. You can see a list of blocks in this dataset in Figure \ref{fig:OSCAR1997A_Blocks}.
-
-The OSCAR converter program for 1997a files embeds the particle positions and momenta in different spaces. These spaces are listed under the \setting{Hierarchy} tab (see Figure \ref{fig:OSCAR1997A_HierarchyCollapsed}). You see all these spaces mapped to 3D space in the visualization window, so the data may appear odd. You can do two things to restrict which space you are viewing. First, you can check only the spaces that you want to load from the file. Second, you can extract a block from the dataset using the \filter{Extract Block} filter. Add an \filter{Extract Block} filter to the file \file{AuAu\_s200\_b2\_t100\_1ev-1.xmf} and check the ``euclidean position'' box (see Figure \ref{fig:OSCAR1997A_ExtractBlock}).
-
-\begin{figure}[htbp]
-   \centering
-   \includegraphics[scale=.35]{images/OSCAR1997A_ExtractBlock.png} % requires the graphicx package
-   \caption{Extracting a block from the converted OSCAR1997A file.}
-   \label{fig:OSCAR1997A_ExtractBlock}
-\end{figure}
-
-In addition, the converted file has a number of timesteps. Click on the play button to watch the collision unfold over time.
-
-There are additional options available in this OSCAR converter program. Run
-
-\begin{verbatim}
-> oscar1997a_to_xdmf-1.1.2 --help
-\end{verbatim}
-to learn more about them.
-
-\subsection{Converting OSCAR2008H Files}
-
-Run the following commands
-
-\begin{verbatim}
-> cd OSCARData/2008H
-> oscar2008h_to_xdmf-1.1.2 -i e160_b7_3e0_coarse_truncated.dat \
-   -o e160_b7_3e0_coarse_truncated
-\end{verbatim}
-
-As with the conversion of the OSCAR1997A files, you will see two new files, \\ \texttt{e160\_b7\_3e0\_coarse\_truncated.xmf} and \texttt{e160\_b7\_3e0\_coarse\_truncated.h5}.
-
-Now open the \texttt{e160\_b7\_3e0\_coarse\_truncated.xmf} file in the MADAI Workbench. You should see an image as it appears in Figure \ref{fig:OSCAR2008H_ScreenShot}.
-
-%\begin{figure}[htbp]
-%   \centering
-%   \includegraphics[scale=.5]{images/OSCAR2008H_PointArrays.png} % requires the graphicx package
-%   \caption{Point arrays available in the converted OSCAR2008H file.}
-%   \label{fig:OSCAR2008H_PointArrays}
-%\end{figure}
-
-\begin{figure}[htbp]
-   \centering
-   \includegraphics[scale=.35]{images/OSCAR2008H_ScreenShot.png} % requires the graphicx package
-   \caption{MADAI Workbench appearance after loading the OSCAR2008h file.}
-   \label{fig:OSCAR2008H_ScreenShot}
-\end{figure}
-
-There are additional options available in this OSCAR converter program. Run
-
-\begin{verbatim}
-> oscar2008h_to_xdmf-1.1.2 --help
-\end{verbatim}
-to learn more about them.
 
 \section{MADAI Workbench Features}
 
