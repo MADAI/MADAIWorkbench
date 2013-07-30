@@ -8,7 +8,7 @@
 
 % See the ``Article customise'' template for come common customisations
 
-\title{MADAI Workbench 1.8.0 Tutorial: \\A Supplement to the ParaView Tutorial}
+\title{MADAI Workbench 1.8.0 Tutorial: \\A Supplement to the ParaView 3.98 Tutorial}
 \author{Cory Quammen}
 \date{} % delete this line to display the current date
 
@@ -31,11 +31,11 @@
 
 The MADAI Workbench is a visualization program based on ParaView. It uses ParaView's plugin-mechanism to provide features over and above what ParaView provides in addition to all the great features already in ParaView.
 
-The first question you must answer when attempting to use a visualization tool is how to get the your data into the visualization program. The first half of this tutorial starts with some examples of converting example data files into a format that can be imported by the MADAI Workbench. 
+As with all visualization tools, the first question you must answer is how to get the your data into the visualization program. The first half of this tutorial starts with some examples of converting example data files into a format that can be imported by the MADAI Workbench. 
 
 The second half of this tutorial will walk you through using several of the extensions that the MADAI Workbench provides. These features are not available in a plain installation of ParaView.
 
-The content of this tutorial assumes that you have gone through the ParaView Tutorial for version 3.98 or higher of ParaView. You also need the tutorial data in the ZIP file \file{MADAIWorkbenchTutorial.zip}.
+The content of this tutorial assumes that you have gone through the ParaView Tutorial for version 3.98 or higher of ParaView. You also need the tutorial data in the ZIP file \file{VisTutoriaData.zip}.
 
 \section{Importing Data}
 
@@ -43,9 +43,9 @@ The MADAI Workbench can import many different file types. We first start with a 
 
 \subsection{Importing a Text File}
 
-It is often the case that simulation codes produce output files in a custom format that no other programs can read. In some cases, however, the output format file may be modified slightly to become a file that the MADAI Workbench can read. We will be loading ASCII files written by a particular program that has five data points per line separated by spaces with no header. We’re going to edit this file (make a copy first) to turn it into a VTK file. This file format is described in the \href{http://www.vtk.org/VTK/img/file-formats.pdf}{VTK File Formats PDF}.
+It is often the case that simulation codes produce output files in a custom format that no other programs can read. In some cases, however, the output format file may be modified slightly to become a file that the MADAI Workbench can read. We will be loading ASCII files written by a particular program that has five data points per line separated by spaces with no header. In this exercise, we are going to edit this file (make a copy first) to turn it into a VTK file. This file format is described in the \href{http://www.vtk.org/VTK/img/file-formats.pdf}{VTK File Formats PDF}.
 
-Copy the file \file{AR.spec} to \file{AR.vtk}. Open \file{AR.spec} in your favorite text editor and paste the following text into the beginning of the file. Do not include the portions of the line following \verb+//+. Make sure to get the correct number of spaces in each line. Note the space between the \verb+#+ and \verb+vtk+ in the first line.
+Copy the file \file{AR.spec} to \file{AR.vtk}. Open \file{AR.vtk} in your favorite text editor and paste the following text into the beginning of the file. Do not include the portions of the line following \verb+//+. Make sure to get the correct number of spaces in each line. Note the space between the \verb+#+ and \verb+vtk+ in the first line.
 
 \begin{verbatim}
 # vtk DataFile Version 2.0   // File-format indicator string (“magic cookie”)
@@ -60,27 +60,64 @@ SCALARS AR float 1           // One scalar per value. Name based on file name (A
 LOOKUP_TABLE default         // Use the default color map
 \end{verbatim}
 
-After you save the file with your modifications, load it in the MADAI Workbench. It will probably take a long time to parse and load the ASCII file. To make future operations faster, you can save the data as a binary file that will be loaded later. To do this, select \menu{File} $\rightarrow$ \menu{Save Data} and then change the \setting{Files of type} menu to ``VTK ImageData Files (*.vti)''. Give the file the name \file{AR.vti} and click \setting{OK}. Make sure \setting{Compressor Type} is set to None. Now, when you load \file{AR.vti}, it will read in much faster.
+After you save the file with your modifications, load it in the MADAI Workbench. It will probably take a long time to parse and load the ASCII file. To make future operations faster, you can save the data as a binary file that will be loaded later. To do this, select \menu{File} $\rightarrow$ \menu{Save Data} and then change the \setting{Files of type} menu to ``VTK ImageData Files (*.vti)''. Give the file the name \file{AR.vti} and click \setting{OK}. Make sure \setting{Data Mode} to Binary and \setting{Compressor Type} is set to None. Now, when you load \file{AR.vti}, it will read in much faster.
 
-Now do the same modifications to the files \file{MTM.FVMAT} and \file{MTM.spec} files to produce \file{FV.vti} and \file{M\_small.vti}.
+The file \file{AR.vti} is too large to process on most computers. We will extract a subset of the file to work with. Click on \file{AR.vtk} in the pipeline browser and add the filter \filter{Extract Subset}. Set the first row of text fields of the \setting{VOI} (volume of interest) to 2000 and 3000, the second row of text fields to 0 and 1000, and the third row of text fields to 0 and 0. Click \setting{Apply}. Now save this file to \file{AR\_small.vti}.
+
+Now do the same modifications to the files \file{MTM.FVMAT} and \file{MTM.spec} files to produce \file{FV\_small.vti} and \file{M\_small.vti}. Make sure the fields are called FV and M in the headers.
 
 \subsubsection{Combining Different Data Fields}
 
 The files you produced in the previous section each contain a single scalar data field. For certain visualization techniques, the separate scalar data fields must be combined into a single dataset. The \filter{Append Attributes} filter makes it possible to combine the different data sets.
 
-Load the files \file{AR.vti}, \file{FV.vti}, and \file{M\_small.vtk}. Select all three by clicking the first file in the pipeline browser, then press the shift key and click the last file in the pipeline browser. Next, select \menu{Filters} $\rightarrow$ \menu{Alphabetical} $\rightarrow$ \menu{Append Attributes}. This file creates a new object that has all three data sets included in it.
+Reset the MADAI Workbench and load the files \file{AR\_small.vti}, \file{FV\_small.vti}, and \file{M\_small.vti}. Select all three by clicking the first file in the pipeline browser, then press the shift key and click the last file in the pipeline browser. Next, select \menu{Filters} $\rightarrow$ \menu{Alphabetical} $\rightarrow$ \menu{Append Attributes}. This file creates a new object that has all three data sets included in it.
 
 Click on \filterinstance{AppendAttributes1} and choose \menu{File} $\rightarrow$ \menu{Save Data}. Save this file as a VTI binary file. In the future, you can load just this file and have all three data fields loaded. This is more convenient than having to load each data field file separately.
 
-\subsubsection{Visualizing Two Data Fields in 2D}
+\subsubsection{Visualizing Three Data Fields in 2D}
 
-With the \filterinstance{AppendAttributes1} still selected, select \filter{Filters} $\rightarrow$ \filter{Alphabetical} $\rightarrow$ \filter{Extract Surface}. Next, select \filter{Filters} $\rightarrow$ \filter{Alphabetical} $\rightarrow$ \filter{Warp Scalar}. SETTINGS. Choose the \field{AR} for \setting{Coloring}. Now, add a \menu{Filters} $\rightarrow$ \menu{Alphabetical} $\rightarrow$ \menu{Contour} filter to \filterinstance{WarpScalar1}. Set the contour value(s) to XXX and the data field to \field{FV}.
+\begin{figure}[htbp]
+   \centering
+   \includegraphics[scale=.35]{images/ThreeScalarsCombined.png} % requires the graphicx package
+   \caption{Three data fields with different display channels.}
+   \label{fig:ThreeScalarsCombined}
+\end{figure}
 
-Figure XXX shows the three data fields with different display channels (height surface, color scale, and isocontour lines).
+With the \filterinstance{AppendAttributes1} still selected, select \filter{Filters} $\rightarrow$ \filter{Alphabetical} $\rightarrow$ \filter{Extract Surface}. Next, select \filter{Filters} $\rightarrow$ \filter{Alphabetical} $\rightarrow$ \filter{Warp Scalar}. Set the \setting{Scalars} field to \field{FV} and the \setting{Coloring} field to \field{AR}. Choose the \field{AR} for \setting{Coloring}. Change the colormap to an isoluminant one by clicking on the \setting{Edit} and clicking the \setting{Choose Preset} button. Choose the color map ``CIELab Blue to Red''.  Now, add a \menu{Filters} $\rightarrow$ \menu{Alphabetical} $\rightarrow$ \menu{Contour} filter to \filterinstance{WarpScalar1} filter. Set the \setting{Contour By} filter to \field{M}. Delete the default contour value and click the \setting{Add Range} button. Set the number of steps to 5 and click \setting{OK}.
+
+Figure \ref{fig:ThreeScalarsCombined} shows the resulting visualization of the three data fields with different display channels (\field{FV} mapped to height surface, \field{AR} mapped to color scale, and \field{M} mapped to isocontour lines).
 
 \subsection{Converting OSCAR Files}
 
-People in the high-energy physics community often produce OSCAR (Open Standard Codes and Routines) files from their simulation codes. To get these data into the MADAI Workbench, a couple external conversion utilities are available to turn OSCAR files into XDMF files that can be read by the MADAI Workbench. Two different converters are available, one that converts OSCAR1997a files and one that converts OSCAR2008H files. In this section, we will see how to use the converters to create files that can be visualized in the MADAI Workbench.
+One type of file format researchers in the high-energy physics community might produce from their simulations is the OSCAR (Open Standard Codes and Routines) file format. To get these data into the MADAI Workbench, two external conversion utilities are available to turn OSCAR files into XDMF files that can be read by the MADAI Workbench. Two different converters are available, one that converts OSCAR1997A files and one that converts OSCAR2008H files. In this section, we will see how to use the converters to create files that can be visualized in the MADAI Workbench.
+
+\subsection{Installing the OSCAR Converters}
+
+\subsubsection{Mac OS X}
+
+Double click the file oscar2xdmf-X.Y.Z-Darwin.dmg.  This will mount a new volume called oscar2xdmf-X.Y.Z-Darwin and will open a Finder window. Double click the installer oscar2xdmf-X.Y.Z-Darwin.pkg to run it. When you are finished, the OSCAR converters will be placed in /usr/local/bin and will be available on the command line.
+
+\subsubsection{Linux}
+
+I assume you want to put these executables somewhere you can access without having root privileges, such as your home directory.
+
+\begin{enumerate}
+
+\item If you don’t have a special install directory in your file space, create one. For example,
+
+\texttt{mkdir "\${HOME}/install"}
+
+\item Run the installer
+
+\texttt{./oscar2xdmf-1.0.0-Linux.sh --prefix="\${HOME}/install"}
+
+\item Answer the two questions about accepting the license and creating a subdirectory posed by the installer. You will probably want to answer ``n'' for the second question.
+
+\item If you created an install directory, add the bin directory created by the installer to your PATH environment variable.
+
+\item  If you want to put the binaries in \texttt{/usr/local}, set the prefix to \texttt{/usr/local} and run the installer as in Step 2 above. You will likely need to run the command using sudo.
+
+\end{enumerate}
 
 \subsection{Converting OSCAR1997A Files}
 
@@ -126,7 +163,7 @@ Now open the \texttt{AuAu\_s200\_b2\_t100\_1ev-1.xmf} file in the MADAI Workbenc
 
 The converted file is a type of dataset called a \emph{multiblock} dataset. A multiblock dataset is a hierarchical collection of other dataset types. This structure can be used to organize different subsets of the overall dataset. You can see a list of blocks in this dataset in Figure \ref{fig:OSCAR1997A_Blocks}.
 
-The OSCAR converter program for 1997a files embeds the particle positions in different spaces. These spaces are listed under the Hierarchy tab (see Figure \ref{fig:OSCAR1997A_HierarchyCollapsed}). You see all these spaces mapped to 3D space in the visualization window, so the data may appear odd. You can do two things to restrict which space you are viewing. First, you can check only the spaces that you want to load from the file. Second, you can extract a block from the dataset using the \filter{Extract Block} filter. Add an \filter{Extract Block} filter to the file \file{AuAu\_s200\_b2\_t100\_1ev-1.xmf} and check the ``euclidean position'' box (see Figure \ref{fig:OSCAR1997A_ExtractBlock}).
+The OSCAR converter program for 1997a files embeds the particle positions and momenta in different spaces. These spaces are listed under the \setting{Hierarchy} tab (see Figure \ref{fig:OSCAR1997A_HierarchyCollapsed}). You see all these spaces mapped to 3D space in the visualization window, so the data may appear odd. You can do two things to restrict which space you are viewing. First, you can check only the spaces that you want to load from the file. Second, you can extract a block from the dataset using the \filter{Extract Block} filter. Add an \filter{Extract Block} filter to the file \file{AuAu\_s200\_b2\_t100\_1ev-1.xmf} and check the ``euclidean position'' box (see Figure \ref{fig:OSCAR1997A_ExtractBlock}).
 
 \begin{figure}[htbp]
    \centering
@@ -168,7 +205,7 @@ Now open the \texttt{e160\_b7\_3e0\_coarse\_truncated.xmf} file in the MADAI Wor
 \begin{figure}[htbp]
    \centering
    \includegraphics[scale=.35]{images/OSCAR2008H_ScreenShot.png} % requires the graphicx package
-   \caption{MADAI Workbench appearance after loading the OSCAR2008H file.}
+   \caption{MADAI Workbench appearance after loading the OSCAR2008h file.}
    \label{fig:OSCAR2008H_ScreenShot}
 \end{figure}
 
