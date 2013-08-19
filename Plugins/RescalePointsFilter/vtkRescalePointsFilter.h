@@ -38,17 +38,31 @@ public:
   vtkSetVector6Macro(OutputBounds, double);
   vtkGetVector6Macro(OutputBounds, double);
 
+
+  // DESCRIPTION:
+  // Set/Get the RescaleByStandardScore variable.
+  // If false, linearly rescale X, Y, and Z so that the bounding box
+  // is given by the OutputBounds.
+  // If true, linearly recake X, Y, and Z so that the mean is 0.0 and
+  // variance is 1.0.
+  // Defaults to false.
+  vtkSetMacro(RescaleByStandardScore, int);
+  vtkGetMacro(RescaleByStandardScore, int);
+  vtkBooleanMacro(RescaleByStandardScore, int);
+
 protected:
   vtkRescalePointsFilter();
   ~vtkRescalePointsFilter();
 
   int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
+
 private:
   vtkRescalePointsFilter(const vtkRescalePointsFilter&);  // Not implemented.
   void operator=(const vtkRescalePointsFilter&);  // Not implemented.
 
   double OutputBounds[6];
+  int RescaleByStandardScore;
 };
 
 #endif

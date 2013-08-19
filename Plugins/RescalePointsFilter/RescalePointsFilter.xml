@@ -30,6 +30,21 @@
         </Documentation>
       </DoubleVectorProperty>
 
+      <IntVectorProperty
+          name="RescaleByStandardScore"
+          command="SetRescaleByStandardScore"
+          number_of_elements="1"
+          default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Determines whether the points should be scaled by the standard score.
+          If false, linearly rescale X, Y, and Z so that the bounding box
+          is given by the OutputBounds.
+          If true, linearly recake X, Y, and Z so that the mean is 0.0 and
+          variance is 1.0.
+        </Documentation>
+      </IntVectorProperty>
+
     </SourceProxy>
   </ProxyGroup>
 </ServerManagerConfiguration>
